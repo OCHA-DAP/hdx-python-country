@@ -21,16 +21,16 @@ The usage of the country mappings functionality is best illustrated by some exam
 
 ::
 
-    from hdx.utilities.location import Location
+    from hdx.location.country import Country
 
-    Location.get_country_name_from_iso3('jpn')  # returns 'Japan'
-    Location.get_country_name_from_iso2('Pl')  # returns 'Poland'
-    Location.get_iso3_country_code('UZBEKISTAN')  # returns 'UZB'
+    Country.get_country_name_from_iso3('jpn')  # returns 'Japan'
+    Country.get_country_name_from_iso2('Pl')  # returns 'Poland'
+    Country.get_iso3_country_code('UZBEKISTAN')  # returns 'UZB'
 
-    Location.get_iso3_country_code_partial('Sierra')
+    Country.get_iso3_country_code_partial('Sierra')
     # performs partial match and returns ('SLE', False)
 
-    Location.get_country_info_from_iso2('jp')
+    Country.get_country_info_from_iso2('jp')
     # {'id': 'JPN', 'iso2Code': 'JP', 'name': 'Japan',
     # 'latitude': '35.67', 'longitude': '139.77',
     # 'region': {'value': 'East Asia & Pacific', 'id': 'EAS'},
@@ -38,7 +38,7 @@ The usage of the country mappings functionality is best illustrated by some exam
     # 'incomeLevel': {'value': 'High income', 'id': 'HIC'},
     # 'lendingType': {'value': 'Not classified', 'id': 'LNX'}}
 
-    Location.get_countries_in_region('South Asia')
+    Country.get_countries_in_region('South Asia')
     # ['AFG', 'BGD', 'BTN', 'IND', 'LKA', 'MDV', 'NPL', 'PAK']
 
 Valid regions are:
