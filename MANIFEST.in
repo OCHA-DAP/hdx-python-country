@@ -9,12 +9,8 @@ recursive-include documentation *.sh
 recursive-include documentation Makefile
 recursive-include src *.txt
 recursive-include src *.yml
-recursive-include tests *.csv
-recursive-include tests *.hdxkey
-recursive-include tests *.json
+recursive-include src *.json
+recursive-include src *.html
 recursive-include tests *.py
-recursive-include tests *.txt
-recursive-include tests *.yml
-recursive-include workingexample *.csv
-recursive-include workingexample *.py
-recursive-include workingexample *.xlsx
+recursive-include tests *.json
+recursive-include tests *.html
