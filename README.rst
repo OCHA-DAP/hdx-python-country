@@ -7,7 +7,7 @@ with retrieving data from the urls. (Also it is possible to force the use of the
 internal static files.)
 
 This library is part of the `Humanitarian Data Exchange`_ (HDX) project. If you have
-humanitarian-related data, please upload your datasets to HDX.
+humanitarian related data, please upload your datasets to HDX.
 
 -  `Usage <#usage>`__
 -  `Countries <#countries>`__
@@ -29,7 +29,7 @@ The usage of the country mappings functionality is best illustrated by some exam
 
     from hdx.location.country import Country
 
-    Country.get_country_name_from_iso3('jpn', uselive=False)  # returns 'Japan'
+    Country.get_country_name_from_iso3('jpn', use_live=False)  # returns 'Japan'
     # uselive=False forces the use of internal files instead of accessing the live feeds.
     # It only needs to be supplied to the first call as the data once loaded is held
     # in internal dictionaries for future use.
