@@ -2,16 +2,16 @@
 """location Tests"""
 import pytest
 
-from hdx.utilities.loader import load_json
-from hdx.location.country import Country
+from hdx.utilities.loader import load_json, load_file_to_str
+from hdx.location.country import Country, CountryError
 from hdx.utilities.path import script_dir_plus_file
 
 
 class LocationError(Exception):
     pass
 
+
 class TestCountry:
-    @pytest.fixture(scope='class')
     def test_get_country_name_from_iso3(self):
         assert Country.get_country_name_from_iso3('jpn', use_live=False) == 'Japan'
         assert Country.get_country_name_from_iso3('awe', use_live=False) is None
@@ -21,10 +21,10 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_country_name_from_iso3('uy', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso3('uy', use_live=False) is None
-        assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela, RB'
+        assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela (Bolivarian Republic of)'
 
     def test_get_country_info_from_iso2(self):
-        assert Country.get_country_info_from_iso2('jp', use_live=False) == {'name': 'Japan', 'lendingType': {'value': 'Not classified', 'id': 'LNX'}, 'latitude': '35.67', 'incomeLevel': {'value': 'High income', 'id': 'HIC'}, 'id': 'JPN', 'iso2Code': 'JP', 'longitude': '139.77', 'region': {'value': 'East Asia & Pacific', 'id': 'EAS'}, 'adminregion': {'value': '', 'id': ''}, 'capitalCity': 'Tokyo'}
+        assert Country.get_country_info_from_iso2('jp', use_live=False) == {'Sub-region Name': 'Eastern Asia', 'M49 Code': '392', 'ISO-alpha3 Code': 'JPN', 'Developed / Developing Countries': 'Developed', 'Land Locked Developing Countries (LLDC)': '', 'Global Name': 'World', 'Region Name': 'Asia', 'Least Developed Countries (LDC)': '', 'Intermediate Region Code': '', 'Region Code': '142', 'Country or Area': 'Japan', 'Sub-region Code': '030', 'Intermediate Region Name': '', 'Small Island Developing States (SIDS)': '', 'Global Code': '001'}
         assert Country.get_country_info_from_iso2('ab', use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_country_info_from_iso2('ab', use_live=False, exception=LocationError)
@@ -37,7 +37,7 @@ class TestCountry:
         assert Country.get_country_name_from_iso2('SGP', use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_country_name_from_iso2('SGP', use_live=False, exception=LocationError)
-        assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela, RB'
+        assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
 
     def test_get_iso3_country_code(self):
         assert Country.get_iso3_country_code('jpn', use_live=False) == 'JPN'
@@ -51,8 +51,10 @@ class TestCountry:
         assert Country.get_iso3_country_code_partial('abc', use_live=False) == (None, False)
         with pytest.raises(LocationError):
             Country.get_iso3_country_code_partial('abc', use_live=False, exception=LocationError)
-        assert Country.get_iso3_country_code_partial('United Kingdom', use_live=False) == ('GBR', True)
-        assert Country.get_iso3_country_code_partial('united states', use_live=False) == ('USA', True)
+        assert Country.get_iso3_country_code_partial('United Kingdom', use_live=False) == ('GBR', False)
+        assert Country.get_iso3_country_code_partial('United Kingdom of Great Britain and Northern Ireland', use_live=False) == ('GBR', True)
+        assert Country.get_iso3_country_code_partial('united states', use_live=False) == ('UMI', False)
+        assert Country.get_iso3_country_code_partial('united states of america', use_live=False) == ('USA', True)
         assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) == 'UZB'
         assert Country.get_iso3_country_code_partial('UZBEKISTAN', use_live=False) == ('UZB', True)
         assert Country.get_iso3_country_code('Sierra', use_live=False) is None
@@ -65,21 +67,35 @@ class TestCountry:
             Country.get_iso3_country_code_partial('abc', use_live=False, exception=ValueError)
 
     def test_get_countries_in_region(self):
-        assert len(Country.get_countries_in_region('SSF', use_live=False)) == 48
-        assert Country.get_countries_in_region('South Asia', use_live=False) == ['AFG', 'BGD', 'BTN', 'IND', 'LKA',
-                                                                  'MDV', 'NPL', 'PAK']
+        assert len(Country.get_countries_in_region('Africa', use_live=False)) == 60
+        assert Country.get_countries_in_region('013', use_live=False) == ['BLZ', 'CRI', 'GTM', 'HND', 'MEX', 'NIC', 'PAN', 'SLV']
+        assert Country.get_countries_in_region('Channel Islands', use_live=False) == ['GGY', 'JEY']
         assert len(Country.get_countries_in_region('NOTEXIST', use_live=False)) == 0
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', use_live=False, exception=LocationError)
 
     def test_wb_feed_file_working(self):
-        Country.set_data_url(Country._wburl)
-        Country._countriesdata = None
-        assert len(Country.get_countries_in_region('SSF')) == 48
-        json = load_json(script_dir_plus_file('countries.json', TestCountry))
-        data = json[1]
-        Country.set_countriesdata(data)
+        json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
+        html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
+        Country.set_countriesdata(json, html)
         assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) is None
-        Country.set_data_url('NOTEXIST')
+        assert Country.get_iso3_country_code('south sudan', use_live=False) == 'SSD'
+        html = load_file_to_str(script_dir_plus_file('unstats_emptytable.html', TestCountry))
+        with pytest.raises(CountryError):
+            Country.set_countriesdata(json, html)
+        Country.set_worldbank_url()
+        Country.set_unstats_url_tablename('NOTEXIST')
         Country._countriesdata = None
         assert Country.get_iso3_country_code('UZBEKISTAN', use_live=True) == 'UZB'
+        Country.set_unstats_url_tablename()
+        Country.set_worldbank_url('NOTEXIST')
+        Country._countriesdata = None
+        assert Country.get_iso3_from_iso2('AF') == 'AFG'
+        Country.set_unstats_url_tablename(tablename='NOTEXIST')
+        Country.set_worldbank_url()
+        Country._countriesdata = None
+        with pytest.raises(CountryError):
+            Country.get_countries_in_region('Caribbean')
+        Country.set_unstats_url_tablename()
+        Country._countriesdata = None
+        assert len(Country.get_countries_in_region('Africa')) == 60

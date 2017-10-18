@@ -1,1 +1,1 @@
-hdx-python-utilities==1.1.2
+hdx-python-utilities==1.1.4
