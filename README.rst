@@ -6,6 +6,9 @@ and `World Bank`_ api with fallbacks to internal static files if there is any pr
 with retrieving data from the urls. (Also it is possible to force the use of the
 internal static files.)
 
+This library is part of the `Humanitarian Data Exchange`_ (HDX) project. If you have
+humanitarian-related data, please upload your datasets to HDX.
+
 -  `Usage <#usage>`__
 -  `Countries <#countries>`__
 -  `Configuring Logging <#configuring-logging>`__
@@ -63,5 +66,6 @@ subregions as specified on the `UNStats M49`_ website.
     :alt: Coveralls Build Status
     :target: https://coveralls.io/github/OCHA-DAP/hdx-python-country?branch=master
 
+.. _Humanitarian Data Exchange: https://data.humdata.org/
 .. _UNStats M49: https://unstats.un.org/unsd/methodology/m49/overview/
 .. _World Bank: http://api.worldbank.org/countries?format=json&per_page=10000
