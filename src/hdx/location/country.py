@@ -77,6 +77,10 @@ class Country(object):
 
     """
 
+    abbreviations = {'DEM.': 'DEMOCRATIC', 'FMR.': 'FORMER', 'PROV.': 'PROVINCE', 'REP.': 'REPUBLIC', 'ST.': 'SAINT',
+                     'TERR.': 'TERRITORY', 'UTD': 'UNITED'}
+    multiple_abbreviations = {'FED.': ['FEDERATION', 'FEDERAL', 'FEDERATED'],
+                              'ISL.': ['ISLAND', 'ISLANDS']}
     _countriesdata = None
     _wburl_int = 'http://api.worldbank.org/countries?format=json&per_page=10000'
     _wburl = _wburl_int
@@ -329,6 +333,27 @@ class Country(object):
         return None
 
     @classmethod
+    def get_expanded_countries(cls, country):
+        # type: (str) -> List[str]
+        """Gets country with abbreviations expanded to return multiple candidates. (eg. FED -> FEDERATED, FEDERAL etc.)
+
+        Args:
+            country (str): Country to expand
+
+        Returns:
+            List[str]: Candidate expansions of abbreviations
+        """
+        countryupper = country.upper()
+        for abbreviation in cls.abbreviations:
+            countryupper = countryupper.replace(abbreviation, cls.abbreviations[abbreviation])
+        candidates = [countryupper]
+        for abbreviation in cls.multiple_abbreviations:
+            if abbreviation in countryupper:
+                for expanded in cls.multiple_abbreviations[abbreviation]:
+                    candidates.append(countryupper.replace(abbreviation, expanded))
+        return candidates
+
+    @classmethod
     def get_iso3_country_code(cls, country, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
         """Get iso 3 code for cls. Only exact matches or None are returned.
@@ -356,11 +381,10 @@ class Country(object):
         if iso3 is not None:
             return iso3
 
-        countryupper = countryupper.replace('REP.', 'REPUBLIC')
-        countryupper = countryupper.replace('DEM.', 'DEMOCRATIC')
-        iso3 = countriesdata['countrynames2iso3'].get(countryupper)
-        if iso3 is not None:
-            return iso3
+        for candidate in cls.get_expanded_countries(countryupper):
+            iso3 = countriesdata['countrynames2iso3'].get(candidate)
+            if iso3 is not None:
+                return iso3
 
         if exception is not None:
             raise exception
@@ -386,10 +410,10 @@ class Country(object):
         if iso3 is not None:
             return iso3, True
 
-        countryupper = country.upper()
         for countryname in sorted(countriesdata['countrynames2iso3']):
-            if countryupper in countryname or countryname in countryupper:
-                return countriesdata['countrynames2iso3'][countryname], False
+            for candidate in cls.get_expanded_countries(country):
+                if candidate in countryname or countryname in candidate:
+                    return countriesdata['countrynames2iso3'][countryname], False
 
         if exception is not None:
             raise exception
