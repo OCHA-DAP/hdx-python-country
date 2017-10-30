@@ -41,6 +41,13 @@ class TestCountry:
 
     def test_get_iso3_country_code(self):
         assert Country.get_iso3_country_code('jpn', use_live=False) == 'JPN'
+        assert Country.get_iso3_country_code('Dem. Rep. of the Congo', use_live=False) == 'COD'
+        assert Country.get_iso3_country_code('Iran (Islamic Rep. of)', use_live=False) == 'IRN'
+        assert Country.get_iso3_country_code('United Rep. of Tanzania', use_live=False) == 'TZA'
+        assert Country.get_iso3_country_code('United Rep. of Tanzania', use_live=False) == 'TZA'
+        assert Country.get_iso3_country_code('Syrian Arab Rep.', use_live=False) == 'SYR'
+        assert Country.get_iso3_country_code('Central African Rep.', use_live=False) == 'CAF'
+        assert Country.get_iso3_country_code('Rep. of Korea', use_live=False) == 'KOR'
         assert Country.get_iso3_country_code('jp', use_live=False) == 'JPN'
         assert Country.get_iso3_country_code_partial('jpn', use_live=False) == ('JPN', True)
         assert Country.get_iso3_country_code_partial('ZWE', use_live=False) == ('ZWE', True)

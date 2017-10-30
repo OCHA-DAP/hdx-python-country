@@ -356,6 +356,12 @@ class Country(object):
         if iso3 is not None:
             return iso3
 
+        countryupper = countryupper.replace('REP.', 'REPUBLIC')
+        countryupper = countryupper.replace('DEM.', 'DEMOCRATIC')
+        iso3 = countriesdata['countrynames2iso3'].get(countryupper)
+        if iso3 is not None:
+            return iso3
+
         if exception is not None:
             raise exception
         return None

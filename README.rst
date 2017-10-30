@@ -11,7 +11,6 @@ humanitarian related data, please upload your datasets to HDX.
 
 -  `Usage <#usage>`__
 -  `Countries <#countries>`__
--  `Configuring Logging <#configuring-logging>`__
 
 Usage
 -----
