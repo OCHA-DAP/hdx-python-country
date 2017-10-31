@@ -39,12 +39,21 @@ class TestCountry:
             Country.get_country_name_from_iso2('SGP', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
 
-    def test_get_expanded_countries(self):
-        assert Country.get_expanded_countries('jpn') == ['JPN']
-        assert Country.get_expanded_countries('Haha Dem. Fed. Republic') == ['HAHA DEMOCRATIC FED. REPUBLIC',
+    def test_expand_countryname_abbrevs(self):
+        assert Country.expand_countryname_abbrevs('jpn') == ['JPN']
+        assert Country.expand_countryname_abbrevs('Haha Dem. Fed. Republic') == ['HAHA DEMOCRATIC FED. REPUBLIC',
                                                                              'HAHA DEMOCRATIC FEDERATION REPUBLIC',
                                                                              'HAHA DEMOCRATIC FEDERAL REPUBLIC',
                                                                              'HAHA DEMOCRATIC FEDERATED REPUBLIC']
+
+    def test_simplify_countryname(self):
+        assert Country.simplify_countryname('jpn') == 'JPN'
+        assert Country.simplify_countryname('United Rep. of Tanzania') == 'TANZANIA'
+        assert Country.simplify_countryname('Micronesia (Federated States of)') == 'MICRONESIA'
+        assert Country.simplify_countryname('Dem. Rep. of the Congo') == 'CONGO'
+        assert Country.simplify_countryname("Korea, Democratic People's Republic of") == 'KOREA'
+        assert Country.simplify_countryname("Democratic People's Republic of Korea") == 'KOREA'
+        assert Country.simplify_countryname('The former Yugoslav Republic of Macedonia') == 'MACEDONIA'
 
     def test_get_iso3_country_code(self):
         assert Country.get_iso3_country_code('jpn', use_live=False) == 'JPN'
@@ -61,31 +70,34 @@ class TestCountry:
         assert Country.get_iso3_country_code('Christmas Isl.', use_live=False) == 'CXR'
         assert Country.get_iso3_country_code('Cayman Isl.', use_live=False) == 'CYM'
         assert Country.get_iso3_country_code('jp', use_live=False) == 'JPN'
-        assert Country.get_iso3_country_code_partial('jpn', use_live=False) == ('JPN', True)
-        assert Country.get_iso3_country_code_partial('ZWE', use_live=False) == ('ZWE', True)
-        assert Country.get_iso3_country_code_partial('Vut', use_live=False) == ('VUT', True)
+        assert Country.get_iso3_country_code_fuzzy('jpn', use_live=False) == ('JPN', True)
+        assert Country.get_iso3_country_code_fuzzy('ZWE', use_live=False) == ('ZWE', True)
+        assert Country.get_iso3_country_code_fuzzy('Vut', use_live=False) == ('VUT', True)
         assert Country.get_iso3_country_code('abc', use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_iso3_country_code('abc', use_live=False, exception=LocationError)
-        assert Country.get_iso3_country_code_partial('abc', use_live=False) == (None, False)
+        assert Country.get_iso3_country_code_fuzzy('abc', use_live=False) == (None, False)
         with pytest.raises(LocationError):
-            Country.get_iso3_country_code_partial('abc', use_live=False, exception=LocationError)
-        assert Country.get_iso3_country_code_partial('United Kingdom', use_live=False) == ('GBR', False)
-        assert Country.get_iso3_country_code_partial('United Kingdom of Great Britain and Northern Ireland', use_live=False) == ('GBR', True)
-        assert Country.get_iso3_country_code_partial('united states', use_live=False) == ('UMI', False)
-        assert Country.get_iso3_country_code_partial('united states of america', use_live=False) == ('USA', True)
+            Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=LocationError)
+        assert Country.get_iso3_country_code_fuzzy('United Kingdom', use_live=False) == ('GBR', False)
+        assert Country.get_iso3_country_code_fuzzy('United Kingdom of Great Britain and Northern Ireland', use_live=False) == ('GBR', True)
+        assert Country.get_iso3_country_code_fuzzy('united states', use_live=False) == ('UMI', False)
+        assert Country.get_iso3_country_code_fuzzy('united states of america', use_live=False) == ('USA', True)
         assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) == 'UZB'
-        assert Country.get_iso3_country_code_partial('UZBEKISTAN', use_live=False) == ('UZB', True)
+        assert Country.get_iso3_country_code_fuzzy('UZBEKISTAN', use_live=False) == ('UZB', True)
         assert Country.get_iso3_country_code('Sierra', use_live=False) is None
-        assert Country.get_iso3_country_code_partial('Sierra', use_live=False) == ('SLE', False)
+        assert Country.get_iso3_country_code_fuzzy('Sierra', use_live=False) == ('SLE', False)
         assert Country.get_iso3_country_code('Venezuela', use_live=False) is None
-        assert Country.get_iso3_country_code_partial('Venezuela', use_live=False) == ('VEN', False)
-        assert Country.get_iso3_country_code_partial('Heard Isl.', use_live=False) == ('HMD', False)
-        assert Country.get_iso3_country_code_partial('Falkland Isl.', use_live=False) == ('FLK', False)
+        assert Country.get_iso3_country_code_fuzzy('Venezuela', use_live=False) == ('VEN', False)
+        assert Country.get_iso3_country_code_fuzzy('Heard Isl.', use_live=False) == ('HMD', False)
+        assert Country.get_iso3_country_code_fuzzy('Falkland Isl.', use_live=False) == ('FLK', False)
+        assert Country.get_iso3_country_code_fuzzy('Czech Republic', use_live=False) == ('CZE', False)
+        assert Country.get_iso3_country_code_fuzzy('Czech Rep.', use_live=False) == ('CZE', False)
+        assert Country.get_iso3_country_code_fuzzy('Islamic Rep. of Iran', use_live=False) == ('IRN', False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
         with pytest.raises(ValueError):
-            Country.get_iso3_country_code_partial('abc', use_live=False, exception=ValueError)
+            Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=ValueError)
 
     def test_get_countries_in_region(self):
         assert len(Country.get_countries_in_region('Africa', use_live=False)) == 60

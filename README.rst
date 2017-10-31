@@ -35,8 +35,10 @@ The usage of the country mappings functionality is best illustrated by some exam
     Country.get_country_name_from_iso2('Pl')  # returns 'Poland'
     Country.get_iso3_country_code('UZBEKISTAN')  # returns 'UZB'
 
-    Country.get_iso3_country_code_partial('Sierra')
-    # performs partial match and returns ('SLE', False)
+    Country.get_iso3_country_code_fuzzy('Sierra')
+    # performs fuzzy match and returns ('SLE', False). The False indicates a fuzzy rather than exact match.
+    assert Country.get_iso3_country_code_fuzzy('Czech Rep.')
+    # returns ('CZE', False)
 
     Country.get_country_info_from_iso2('jp')
     # {'Sub-region Name': 'Eastern Asia', 'M49 Code': '392', 'ISO-alpha3 Code': 'JPN',
