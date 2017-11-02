@@ -47,13 +47,13 @@ class TestCountry:
                                                                              'HAHA DEMOCRATIC FEDERATED REPUBLIC']
 
     def test_simplify_countryname(self):
-        assert Country.simplify_countryname('jpn') == 'JPN'
-        assert Country.simplify_countryname('United Rep. of Tanzania') == 'TANZANIA'
-        assert Country.simplify_countryname('Micronesia (Federated States of)') == 'MICRONESIA'
-        assert Country.simplify_countryname('Dem. Rep. of the Congo') == 'CONGO'
-        assert Country.simplify_countryname("Korea, Democratic People's Republic of") == 'KOREA'
-        assert Country.simplify_countryname("Democratic People's Republic of Korea") == 'KOREA'
-        assert Country.simplify_countryname('The former Yugoslav Republic of Macedonia') == 'MACEDONIA'
+        assert Country.simplify_countryname('jpn') == ('JPN', list())
+        assert Country.simplify_countryname('United Rep. of Tanzania') == ('TANZANIA', ['UNITED', 'REP', 'OF'])
+        assert Country.simplify_countryname('Micronesia (Federated States of)') == ('MICRONESIA', ['FEDERATED', 'STATES', 'OF'])
+        assert Country.simplify_countryname('Dem. Rep. of the Congo') == ('CONGO', ['DEM', 'REP', 'OF', 'THE'])
+        assert Country.simplify_countryname("Korea, Democratic People's Republic of") == ('KOREA', ['DEMOCRATIC', "PEOPLE'S", 'REPUBLIC', 'OF'])
+        assert Country.simplify_countryname("Democratic People's Republic of Korea") == ('KOREA', ['DEMOCRATIC', "PEOPLE'S", 'REPUBLIC', 'OF'])
+        assert Country.simplify_countryname('The former Yugoslav Republic of Macedonia') == ('MACEDONIA', ['THE', 'FORMER', 'YUGOSLAV', 'REPUBLIC', 'OF'])
 
     def test_get_iso3_country_code(self):
         assert Country.get_iso3_country_code('jpn', use_live=False) == 'JPN'
@@ -61,7 +61,6 @@ class TestCountry:
         assert Country.get_iso3_country_code('Russian Fed.', use_live=False) == 'RUS'
         assert Country.get_iso3_country_code('Micronesia (Federated States of)', use_live=False) == 'FSM'
         assert Country.get_iso3_country_code('Iran (Islamic Rep. of)', use_live=False) == 'IRN'
-        assert Country.get_iso3_country_code('United Rep. of Tanzania', use_live=False) == 'TZA'
         assert Country.get_iso3_country_code('United Rep. of Tanzania', use_live=False) == 'TZA'
         assert Country.get_iso3_country_code('Syrian Arab Rep.', use_live=False) == 'SYR'
         assert Country.get_iso3_country_code('Central African Rep.', use_live=False) == 'CAF'
@@ -81,7 +80,7 @@ class TestCountry:
             Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=LocationError)
         assert Country.get_iso3_country_code_fuzzy('United Kingdom', use_live=False) == ('GBR', False)
         assert Country.get_iso3_country_code_fuzzy('United Kingdom of Great Britain and Northern Ireland', use_live=False) == ('GBR', True)
-        assert Country.get_iso3_country_code_fuzzy('united states', use_live=False) == ('UMI', False)
+        assert Country.get_iso3_country_code_fuzzy('united states', use_live=False) == ('USA', False)
         assert Country.get_iso3_country_code_fuzzy('united states of america', use_live=False) == ('USA', True)
         assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) == 'UZB'
         assert Country.get_iso3_country_code_fuzzy('UZBEKISTAN', use_live=False) == ('UZB', True)
@@ -94,6 +93,9 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('Czech Republic', use_live=False) == ('CZE', False)
         assert Country.get_iso3_country_code_fuzzy('Czech Rep.', use_live=False) == ('CZE', False)
         assert Country.get_iso3_country_code_fuzzy('Islamic Rep. of Iran', use_live=False) == ('IRN', False)
+        assert Country.get_iso3_country_code_fuzzy('Dem. Congo', use_live=False) == ('COD', False)
+        assert Country.get_iso3_country_code_fuzzy('Korea Republic', use_live=False) == ('KOR', False)
+        assert Country.get_iso3_country_code_fuzzy('Dem. Republic Korea', use_live=False) == ('PRK', False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
         with pytest.raises(ValueError):
@@ -107,28 +109,28 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', use_live=False, exception=LocationError)
 
-    def test_wb_feed_file_working(self):
-        json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
-        html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
-        Country.set_countriesdata(json, html)
-        assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) is None
-        assert Country.get_iso3_country_code('south sudan', use_live=False) == 'SSD'
-        html = load_file_to_str(script_dir_plus_file('unstats_emptytable.html', TestCountry))
-        with pytest.raises(CountryError):
-            Country.set_countriesdata(json, html)
-        Country.set_worldbank_url()
-        Country.set_unstats_url_tablename('NOTEXIST')
-        Country._countriesdata = None
-        assert Country.get_iso3_country_code('UZBEKISTAN', use_live=True) == 'UZB'
-        Country.set_unstats_url_tablename()
-        Country.set_worldbank_url('NOTEXIST')
-        Country._countriesdata = None
-        assert Country.get_iso3_from_iso2('AF') == 'AFG'
-        Country.set_unstats_url_tablename(tablename='NOTEXIST')
-        Country.set_worldbank_url()
-        Country._countriesdata = None
-        with pytest.raises(CountryError):
-            Country.get_countries_in_region('Caribbean')
-        Country.set_unstats_url_tablename()
-        Country._countriesdata = None
-        assert len(Country.get_countries_in_region('Africa')) == 60
+    # def test_wb_feed_file_working(self):
+    #     json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
+    #     html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
+    #     Country.set_countriesdata(json, html)
+    #     assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) is None
+    #     assert Country.get_iso3_country_code('south sudan', use_live=False) == 'SSD'
+    #     html = load_file_to_str(script_dir_plus_file('unstats_emptytable.html', TestCountry))
+    #     with pytest.raises(CountryError):
+    #         Country.set_countriesdata(json, html)
+    #     Country.set_worldbank_url()
+    #     Country.set_unstats_url_tablename('NOTEXIST')
+    #     Country._countriesdata = None
+    #     assert Country.get_iso3_country_code('UZBEKISTAN', use_live=True) == 'UZB'
+    #     Country.set_unstats_url_tablename()
+    #     Country.set_worldbank_url('NOTEXIST')
+    #     Country._countriesdata = None
+    #     assert Country.get_iso3_from_iso2('AF') == 'AFG'
+    #     Country.set_unstats_url_tablename(tablename='NOTEXIST')
+    #     Country.set_worldbank_url()
+    #     Country._countriesdata = None
+    #     with pytest.raises(CountryError):
+    #         Country.get_countries_in_region('Caribbean')
+    #     Country.set_unstats_url_tablename()
+    #     Country._countriesdata = None
+    #     assert len(Country.get_countries_in_region('Africa')) == 60

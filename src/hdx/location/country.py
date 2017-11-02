@@ -2,6 +2,7 @@
 """Country location"""
 import copy
 import logging
+import string
 from typing import List, Tuple, Optional, TypeVar, Dict, Any
 
 import re
@@ -10,6 +11,7 @@ from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.html import get_soup, extract_table
 from hdx.utilities.loader import load_json, load_file_to_str
 from hdx.utilities.path import script_dir_plus_file
+from hdx.utilities.text import get_words_in_sentence
 
 ExceptionUpperBound = TypeVar('T', bound='Exception')
 
@@ -272,7 +274,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Optional[str]: country name
+            Optional[str]: Country name
         """
         countryinfo = cls.get_country_info_from_iso3(iso3, use_live=use_live, exception=exception)
         if countryinfo is not None:
@@ -312,7 +314,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Optional[Dict[str]]: country information
+            Optional[Dict[str]]: Country information
         """
         iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
         if iso3 is not None:
@@ -330,7 +332,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Optional[str]: country name
+            Optional[str]: Country name
         """
         iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
         if iso3 is not None:
@@ -346,7 +348,7 @@ class Country(object):
             country (str): Country with abbreviation(s)to expand
 
         Returns:
-            List[str]: Return uppercase country name with abbreviation(s) expanded in various ways
+            List[str]: Uppercase country name with abbreviation(s) expanded in various ways
         """
         countryupper = country.upper()
         for abbreviation in cls.abbreviations:
@@ -358,18 +360,23 @@ class Country(object):
                     candidates.append(countryupper.replace(abbreviation, expanded))
         return candidates
 
+    @staticmethod
+    def get_words(sentence):
+        return re.sub('[' + string.punctuation.replace("'", "") + ']', '', sentence).split()
+
     @classmethod
     def simplify_countryname(cls, country):
-        # type: (str) -> str
+        # type: (str) -> (str, List[str])
         """Simplifies country name by removing descriptive text eg. DEMOCRATIC, REPUBLIC OF etc.
 
         Args:
             country (str): Country name to simplify
 
         Returns:
-            str: Returns uppercase simplified country name
+            Tuple[str, List[str]]: Uppercase simplified country name and list of removed words
         """
         countryupper = country.upper()
+        words = get_words_in_sentence(countryupper)
         index = countryupper.find(',')
         if index != -1:
             countryupper = countryupper[:index]
@@ -386,7 +393,10 @@ class Country(object):
         remove = '|'.join(remove)
         regex = re.compile(r'\b(' + remove + r')\b', flags=re.IGNORECASE)
         countryupper = regex.sub('', countryupper)
-        return countryupper.strip()
+        countryupper = countryupper.strip()
+        if countryupper:
+            words.remove(countryupper)
+        return countryupper, words
 
     @classmethod
     def get_iso3_country_code(cls, country, use_live=True, exception=None):
@@ -399,7 +409,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Optional[str]: Return iso 3 country code or None
+            Optional[str]: ISO 3 country code or None
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         countryupper = country.upper()
@@ -437,7 +447,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Tuple[[Optional[str], bool]]: Return iso 3 code and if the match is exact or (None, False).
+            Tuple[[Optional[str], bool]]: ISO 3 code and if the match is exact or (None, False).
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         iso3 = cls.get_iso3_country_code(country)  # don't put exception param here as we don't want it to throw
@@ -445,15 +455,34 @@ class Country(object):
         if iso3 is not None:
             return iso3, True
 
-        for countryname in sorted(countriesdata['countrynames2iso3']):
-            for candidate in cls.expand_countryname_abbrevs(country):
-                if candidate in countryname or countryname in candidate:
-                    return countriesdata['countrynames2iso3'][countryname], False
+        def remove_matching_from_list(wordlist, word_or_part):
+            for word in wordlist:
+                if word_or_part in word:
+                    wordlist.remove(word)
 
+        expanded_country_candidates = cls.expand_countryname_abbrevs(country)
+        match_strength = 0
         for countryname in sorted(countriesdata['countrynames2iso3']):
-            simplified_country = cls.simplify_countryname(country)
-            if simplified_country in countryname or countryname in simplified_country:
-                return countriesdata['countrynames2iso3'][countryname], False
+            for candidate in expanded_country_candidates:
+                simplified_country, removed_words = cls.simplify_countryname(candidate)
+                if simplified_country in countryname:
+                    words = get_words_in_sentence(countryname)
+                    new_match_strength = 0
+                    if simplified_country:
+                        remove_matching_from_list(words, simplified_country)
+                        new_match_strength += 16
+                    for word in removed_words:
+                        if word in countryname:
+                            remove_matching_from_list(words, word)
+                            new_match_strength += 4
+                        else:
+                            new_match_strength -= 1
+                    new_match_strength -= len(words)
+                    if new_match_strength > match_strength:
+                        match_strength = new_match_strength
+                        iso3 = countriesdata['countrynames2iso3'][countryname]
+        if match_strength != 0:
+            return iso3, False
 
         if exception is not None:
             raise exception
