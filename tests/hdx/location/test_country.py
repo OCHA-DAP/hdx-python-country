@@ -109,28 +109,28 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', use_live=False, exception=LocationError)
 
-    # def test_wb_feed_file_working(self):
-    #     json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
-    #     html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
-    #     Country.set_countriesdata(json, html)
-    #     assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) is None
-    #     assert Country.get_iso3_country_code('south sudan', use_live=False) == 'SSD'
-    #     html = load_file_to_str(script_dir_plus_file('unstats_emptytable.html', TestCountry))
-    #     with pytest.raises(CountryError):
-    #         Country.set_countriesdata(json, html)
-    #     Country.set_worldbank_url()
-    #     Country.set_unstats_url_tablename('NOTEXIST')
-    #     Country._countriesdata = None
-    #     assert Country.get_iso3_country_code('UZBEKISTAN', use_live=True) == 'UZB'
-    #     Country.set_unstats_url_tablename()
-    #     Country.set_worldbank_url('NOTEXIST')
-    #     Country._countriesdata = None
-    #     assert Country.get_iso3_from_iso2('AF') == 'AFG'
-    #     Country.set_unstats_url_tablename(tablename='NOTEXIST')
-    #     Country.set_worldbank_url()
-    #     Country._countriesdata = None
-    #     with pytest.raises(CountryError):
-    #         Country.get_countries_in_region('Caribbean')
-    #     Country.set_unstats_url_tablename()
-    #     Country._countriesdata = None
-    #     assert len(Country.get_countries_in_region('Africa')) == 60
+    def test_wb_feed_file_working(self):
+        json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
+        html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
+        Country.set_countriesdata(json, html)
+        assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) is None
+        assert Country.get_iso3_country_code('south sudan', use_live=False) == 'SSD'
+        html = load_file_to_str(script_dir_plus_file('unstats_emptytable.html', TestCountry))
+        with pytest.raises(CountryError):
+            Country.set_countriesdata(json, html)
+        Country.set_worldbank_url()
+        Country.set_unstats_url_tablename('NOTEXIST')
+        Country._countriesdata = None
+        assert Country.get_iso3_country_code('UZBEKISTAN', use_live=True) == 'UZB'
+        Country.set_unstats_url_tablename()
+        Country.set_worldbank_url('NOTEXIST')
+        Country._countriesdata = None
+        assert Country.get_iso3_from_iso2('AF') == 'AFG'
+        Country.set_unstats_url_tablename(tablename='NOTEXIST')
+        Country.set_worldbank_url()
+        Country._countriesdata = None
+        with pytest.raises(CountryError):
+            Country.get_countries_in_region('Caribbean')
+        Country.set_unstats_url_tablename()
+        Country._countriesdata = None
+        assert len(Country.get_countries_in_region('Africa')) == 60
