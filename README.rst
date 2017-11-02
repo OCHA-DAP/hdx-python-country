@@ -1,10 +1,13 @@
 |Build_Status| |Coverage_Status|
 
 The HDX Python Country Library provides country mappings including ISO 2 and ISO 3
-letter codes (ISO 3166) and regions using live data from the `UNStats M49`_ website
-and `World Bank`_ api with fallbacks to internal static files if there is any problem
-with retrieving data from the urls. (Also it is possible to force the use of the
-internal static files.)
+letter codes (ISO 3166) and regions using live official data from the `UNStats M49`_
+website and `World Bank`_ api with fallbacks to internal static files if there is any
+problem with retrieving data from the urls. (Also it is possible to force the use of
+the internal static files.)
+
+There is a fuzzy matching look up that can handle abbreviations in country names like
+Dem. for Democratic and Rep. for Republic.
 
 This library is part of the `Humanitarian Data Exchange`_ (HDX) project. If you have
 humanitarian related data, please upload your datasets to HDX.
