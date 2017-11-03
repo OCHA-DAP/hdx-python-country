@@ -360,10 +360,6 @@ class Country(object):
                     candidates.append(countryupper.replace(abbreviation, expanded))
         return candidates
 
-    @staticmethod
-    def get_words(sentence):
-        return re.sub('[' + string.punctuation.replace("'", "") + ']', '', sentence).split()
-
     @classmethod
     def simplify_countryname(cls, country):
         # type: (str) -> (str, List[str])
@@ -380,6 +376,9 @@ class Country(object):
         index = countryupper.find(',')
         if index != -1:
             countryupper = countryupper[:index]
+        index = countryupper.find(':')
+        if index != -1:
+            countryupper = countryupper[:index]
         regex = re.compile('\(.+?\)')
         countryupper = regex.sub('', countryupper)
         remove = copy.deepcopy(cls.simplifications)
@@ -394,6 +393,9 @@ class Country(object):
         regex = re.compile(r'\b(' + remove + r')\b', flags=re.IGNORECASE)
         countryupper = regex.sub('', countryupper)
         countryupper = countryupper.strip()
+        countryupper_words = get_words_in_sentence(countryupper)
+        if len(countryupper_words) > 1:
+            countryupper = countryupper_words[0]
         if countryupper:
             words.remove(countryupper)
         return countryupper, words

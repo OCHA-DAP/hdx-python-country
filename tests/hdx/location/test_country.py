@@ -96,6 +96,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('Dem. Congo', use_live=False) == ('COD', False)
         assert Country.get_iso3_country_code_fuzzy('Korea Republic', use_live=False) == ('KOR', False)
         assert Country.get_iso3_country_code_fuzzy('Dem. Republic Korea', use_live=False) == ('PRK', False)
+        assert Country.get_iso3_country_code_fuzzy('Serbia and Kosovo: S/RES/1244 (1999)', use_live=False) == ('SRB', False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
         with pytest.raises(ValueError):
@@ -109,7 +110,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', use_live=False, exception=LocationError)
 
-    def test_wb_feed_file_working(self):
+    def tst_wb_feed_file_working(self):
         json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
         html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
         Country.set_countriesdata(json, html)
