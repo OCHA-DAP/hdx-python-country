@@ -82,10 +82,11 @@ class Country(object):
     """
 
     abbreviations = {'DEM.': 'DEMOCRATIC', 'FMR.': 'FORMER', 'PROV.': 'PROVINCE', 'REP.': 'REPUBLIC', 'ST.': 'SAINT',
-                     'UTD.': 'UNITED', 'N.': 'NORTH', 'S.': 'SOUTH', 'E.': 'EAST', 'W.': 'WEST'}
-    major_differentiators = ['DEMOCRATIC', 'NORTH', 'SOUTH', 'EAST', 'WEST']
+                     'UTD.': 'UNITED', 'U.': 'UNITED', 'N.': 'NORTH', 'E.': 'EAST', 'W.': 'WEST', 'K.': 'KINGDOM'}
+    major_differentiators = ['DEMOCRATIC', 'NORTH', 'SOUTH', 'EAST', 'WEST', 'STATES']
     multiple_abbreviations = {'FED.': ['FEDERATION', 'FEDERAL', 'FEDERATED'],
                               'ISL.': ['ISLAND', 'ISLANDS'],
+                              'S.': ['SOUTH', 'STATES'],
                               'TERR.': ['TERRITORY', 'TERRITORIES']}
     simplifications = ['THE', 'OF', 'ISLAMIC', 'STATES', 'BOLIVARIAN', 'PLURINATIONAL', "PEOPLE'S",
                        'DUTCH PART', 'FRENCH PART', 'MALVINAS', 'YUGOSLAV', 'KINGDOM', 'PROTECTORATE']
@@ -359,14 +360,16 @@ class Country(object):
         Returns:
             List[str]: Uppercase country name with abbreviation(s) expanded in various ways
         """
+        def replace_ensure_space(word, replace, replacement):
+            return word.replace(replace, '%s ' % replacement).replace('  ', ' ').strip()
         countryupper = country.upper()
         for abbreviation in cls.abbreviations:
-            countryupper = countryupper.replace(abbreviation, cls.abbreviations[abbreviation])
+            countryupper = replace_ensure_space(countryupper, abbreviation, cls.abbreviations[abbreviation])
         candidates = [countryupper]
         for abbreviation in cls.multiple_abbreviations:
             if abbreviation in countryupper:
                 for expanded in cls.multiple_abbreviations[abbreviation]:
-                    candidates.append(countryupper.replace(abbreviation, expanded))
+                    candidates.append(replace_ensure_space(countryupper, abbreviation, expanded))
         return candidates
 
     @classmethod

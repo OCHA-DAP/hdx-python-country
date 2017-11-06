@@ -102,6 +102,8 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('Dem. Republic Korea', use_live=False) == ('PRK', False)
         assert Country.get_iso3_country_code_fuzzy('North Korea', use_live=False) == ('PRK', False)
         assert Country.get_iso3_country_code_fuzzy('Serbia and Kosovo: S/RES/1244 (1999)', use_live=False) == ('SRB', False)
+        assert Country.get_iso3_country_code_fuzzy('U.S. Virgin Islands', use_live=False) == ('VIR', True)
+        assert Country.get_iso3_country_code_fuzzy('U.K. Virgin Islands', use_live=False) == ('VGB', False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
         with pytest.raises(ValueError):
