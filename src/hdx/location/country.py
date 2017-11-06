@@ -172,8 +172,7 @@ class Country(object):
                 iso3 = country['id'].upper()
                 cls._countriesdata['iso2iso3'][iso2] = iso3
 
-        for countryname in aliases:
-            cls._countriesdata['aliases'][aliases[countryname].upper()] = Country.get_iso3_country_code(countryname)
+        cls._countriesdata['aliases'] = aliases
 
 
     @classmethod
@@ -208,8 +207,10 @@ class Country(object):
             if html is None:
                 html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
             downloader.session = None  # Hack for Tabulator fail on extra param http_session to local reader
-            aliases = downloader.download_tabular_key_value(script_dir_plus_file('country_name_lookups.csv', Country))
-            del aliases['country.name.en']
+            stream = downloader.get_tabular_stream(script_dir_plus_file('country_data.csv', Country), headers=1)
+            aliases = dict()
+            for country in stream.iter(keyed=True):
+                aliases[country['ISO3']] = re.compile(country['regex'], re.IGNORECASE)
             cls.set_countriesdata(json, html, aliases)
         return cls._countriesdata
 
@@ -470,8 +471,10 @@ class Country(object):
                 if word_or_part in word:
                     wordlist.remove(word)
 
+        # fuzzy matching
         expanded_country_candidates = cls.expand_countryname_abbrevs(country)
         match_strength = 0
+        matches = set()
         for countryname in sorted(countriesdata['countrynames2iso3']):
             for candidate in expanded_country_candidates:
                 simplified_country, removed_words = cls.simplify_countryname(candidate)
@@ -495,20 +498,21 @@ class Country(object):
                             new_match_strength -= 16
                         else:
                             new_match_strength -= 1
+                    iso3 = countriesdata['countrynames2iso3'][countryname]
                     if new_match_strength > match_strength:
                         match_strength = new_match_strength
-                        iso3 = countriesdata['countrynames2iso3'][countryname]
+                        matches = set()
+                    if new_match_strength == match_strength:
+                        matches.add(iso3)
 
-        for alias in countriesdata['aliases']:
-            index = re.search(alias, country.upper())
+        if len(matches) == 1 and match_strength > 16:
+            return matches.pop(), False
+
+        # regex lookup
+        for iso3, regex in countriesdata['aliases'].items():
+            index = re.search(regex, country.upper())
             if index is not None:
-                altiso3 = countriesdata['aliases'][alias]
-                if altiso3 and altiso3 != iso3:
-                    logger.info('Using regular expression match %s instead of %s!')
-                    return altiso3, False
-
-        if match_strength != 0:
-            return iso3, False
+                return iso3, False
 
         if exception is not None:
             raise exception
