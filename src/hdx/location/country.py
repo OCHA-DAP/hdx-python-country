@@ -82,12 +82,13 @@ class Country(object):
     """
 
     abbreviations = {'DEM.': 'DEMOCRATIC', 'FMR.': 'FORMER', 'PROV.': 'PROVINCE', 'REP.': 'REPUBLIC', 'ST.': 'SAINT',
-                     'UTD.': 'UNITED'}
+                     'UTD.': 'UNITED', 'N.': 'NORTH', 'S.': 'SOUTH', 'E.': 'EAST', 'W.': 'WEST'}
+    major_differentiators = ['DEMOCRATIC', 'NORTH', 'SOUTH', 'EAST', 'WEST']
     multiple_abbreviations = {'FED.': ['FEDERATION', 'FEDERAL', 'FEDERATED'],
                               'ISL.': ['ISLAND', 'ISLANDS'],
                               'TERR.': ['TERRITORY', 'TERRITORIES']}
     simplifications = ['THE', 'OF', 'ISLAMIC', 'STATES', 'BOLIVARIAN', 'PLURINATIONAL', "PEOPLE'S",
-                       'DUTCH PART', 'FRENCH PART', 'MALVINAS', 'YUGOSLAV']
+                       'DUTCH PART', 'FRENCH PART', 'MALVINAS', 'YUGOSLAV', 'KINGDOM', 'PROTECTORATE']
     _countriesdata = None
     _wburl_int = 'http://api.worldbank.org/countries?format=json&per_page=10000'
     _wburl = _wburl_int
@@ -97,7 +98,7 @@ class Country(object):
     _unstatstablename = _unstatstablename_int
 
     @classmethod
-    def set_countriesdata(cls, json, html):
+    def set_countriesdata(cls, json, html, aliases):
         # type: (Any, str) -> None
         """
         Set up countries data from data in form provided by UNStats and World Bank
@@ -122,6 +123,7 @@ class Country(object):
         cls._countriesdata['regioncodes2countries'] = dict()
         cls._countriesdata['regioncodes2names'] = dict()
         cls._countriesdata['regionnames2codes'] = dict()
+        cls._countriesdata['aliases'] = dict()
 
         def add_country_to_set(colname, idval, iso3):
             value = cls._countriesdata[colname].get(idval)
@@ -170,6 +172,9 @@ class Country(object):
                 iso3 = country['id'].upper()
                 cls._countriesdata['iso2iso3'][iso2] = iso3
 
+        for countryname in aliases:
+            cls._countriesdata['aliases'][aliases[countryname].upper()] = Country.get_iso3_country_code(countryname)
+
 
     @classmethod
     def countriesdata(cls, use_live=True):
@@ -202,7 +207,10 @@ class Country(object):
                 json = load_json(script_dir_plus_file('worldbank.json', Country))
             if html is None:
                 html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
-            cls.set_countriesdata(json, html)
+            downloader.session = None  # Hack for Tabulator fail on extra param http_session to local reader
+            aliases = downloader.download_tabular_key_value(script_dir_plus_file('country_name_lookups.csv', Country))
+            del aliases['country.name.en']
+            cls.set_countriesdata(json, html, aliases)
         return cls._countriesdata
 
     @classmethod
@@ -472,17 +480,33 @@ class Country(object):
                     new_match_strength = 0
                     if simplified_country:
                         remove_matching_from_list(words, simplified_country)
-                        new_match_strength += 16
+                        new_match_strength += 32
                     for word in removed_words:
                         if word in countryname:
                             remove_matching_from_list(words, word)
                             new_match_strength += 4
                         else:
+                            if word in cls.major_differentiators:
+                                new_match_strength -= 16
+                            else:
+                                new_match_strength -= 1
+                    for word in words:
+                        if word in cls.major_differentiators:
+                            new_match_strength -= 16
+                        else:
                             new_match_strength -= 1
-                    new_match_strength -= len(words)
                     if new_match_strength > match_strength:
                         match_strength = new_match_strength
                         iso3 = countriesdata['countrynames2iso3'][countryname]
+
+        for alias in countriesdata['aliases']:
+            index = re.search(alias, country.upper())
+            if index is not None:
+                altiso3 = countriesdata['aliases'][alias]
+                if altiso3 and altiso3 != iso3:
+                    logger.info('Using regular expression match %s instead of %s!')
+                    return altiso3, False
+
         if match_strength != 0:
             return iso3, False
 

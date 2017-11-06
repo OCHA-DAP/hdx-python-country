@@ -94,8 +94,13 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('Czech Rep.', use_live=False) == ('CZE', False)
         assert Country.get_iso3_country_code_fuzzy('Islamic Rep. of Iran', use_live=False) == ('IRN', False)
         assert Country.get_iso3_country_code_fuzzy('Dem. Congo', use_live=False) == ('COD', False)
+        assert Country.get_iso3_country_code_fuzzy('Congo, Republic of', use_live=False) == ('COG', False)
+        assert Country.get_iso3_country_code_fuzzy('Republic of the Congo', use_live=False) == ('COG', False)
+        assert Country.get_iso3_country_code_fuzzy('Vietnam', use_live=False) == ('VNM', False)
+        assert Country.get_iso3_country_code_fuzzy('South Korea', use_live=False) == ('KOR', False)
         assert Country.get_iso3_country_code_fuzzy('Korea Republic', use_live=False) == ('KOR', False)
         assert Country.get_iso3_country_code_fuzzy('Dem. Republic Korea', use_live=False) == ('PRK', False)
+        assert Country.get_iso3_country_code_fuzzy('North Korea', use_live=False) == ('PRK', False)
         assert Country.get_iso3_country_code_fuzzy('Serbia and Kosovo: S/RES/1244 (1999)', use_live=False) == ('SRB', False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
