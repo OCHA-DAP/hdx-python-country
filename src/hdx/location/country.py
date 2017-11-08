@@ -142,23 +142,23 @@ class Country(object):
             cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
             regionid = country['Region Code']
             regionname = country['Region Name']
-            intermediate_regionid = country['Intermediate Region Code']
-            intermediate_regionname = country['Intermediate Region Name']
             sub_regionid = country['Sub-region Code']
             sub_regionname = country['Sub-region Name']
-            # region, intermediate region and subregion codes do not clash so only need one dict
+            intermediate_regionid = country['Intermediate Region Code']
+            intermediate_regionname = country['Intermediate Region Name']
+            # region, subregion and intermediate region codes do not clash so only need one dict
             add_country_to_set('regioncodes2countries', regionid, iso3)
             cls._countriesdata['regioncodes2names'][regionid] = regionname
             cls._countriesdata['regionnames2codes'][regionname.upper()] = regionid
+            if sub_regionid:
+                add_country_to_set('regioncodes2countries', sub_regionid, iso3)
+                cls._countriesdata['regioncodes2names'][sub_regionid] = sub_regionname
+                cls._countriesdata['regionnames2codes'][sub_regionname.upper()] = sub_regionid
             if intermediate_regionid:
                 add_country_to_set('regioncodes2countries', intermediate_regionid, iso3)
                 cls._countriesdata['regioncodes2names'][intermediate_regionid] = intermediate_regionname
                 cls._countriesdata['regionnames2codes'][intermediate_regionname.upper()] = \
                     intermediate_regionid
-            if sub_regionid:
-                add_country_to_set('regioncodes2countries', sub_regionid, iso3)
-                cls._countriesdata['regioncodes2names'][sub_regionid] = sub_regionname
-                cls._countriesdata['regionnames2codes'][sub_regionname.upper()] = sub_regionid
 
         def sort_list(colname):
             for idval in cls._countriesdata[colname]:
