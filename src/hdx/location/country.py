@@ -207,7 +207,6 @@ class Country(object):
                 json = load_json(script_dir_plus_file('worldbank.json', Country))
             if html is None:
                 html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
-            downloader.session = None  # Hack for Tabulator fail on extra param http_session to local reader
             aliases = dict()
             for country in downloader.get_tabular_rows(script_dir_plus_file('country_data.csv', Country),
                                                        dict_rows=True, headers=1):
