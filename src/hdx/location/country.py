@@ -2,13 +2,12 @@
 """Country location"""
 import copy
 import logging
-import string
+import re
 from typing import List, Tuple, Optional, TypeVar, Dict, Any
 
-import re
 from bs4 import BeautifulSoup
 from hdx.utilities.downloader import Download, DownloadError
-from hdx.utilities.html import get_soup, extract_table
+from hdx.utilities.html import extract_table
 from hdx.utilities.loader import load_json, load_file_to_str
 from hdx.utilities.path import script_dir_plus_file
 from hdx.utilities.text import get_words_in_sentence

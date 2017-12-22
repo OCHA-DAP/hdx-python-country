@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
 """location Tests"""
 import pytest
-
 from hdx.utilities.loader import load_json, load_file_to_str
-from hdx.location.country import Country, CountryError
 from hdx.utilities.path import script_dir_plus_file
+
+from hdx.location.country import Country, CountryError
 
 
 class LocationError(Exception):
