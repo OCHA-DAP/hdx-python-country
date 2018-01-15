@@ -119,6 +119,7 @@ class Country(object):
         cls._countriesdata = dict()
         cls._countriesdata['countries'] = dict()
         cls._countriesdata['iso2iso3'] = dict()
+        cls._countriesdata['m49iso3'] = dict()
         cls._countriesdata['countrynames2iso3'] = dict()
         cls._countriesdata['regioncodes2countries'] = dict()
         cls._countriesdata['regioncodes2names'] = dict()
@@ -139,6 +140,10 @@ class Country(object):
             cls._countriesdata['countries'][iso3] = country
             countryname = country['Country or Area']
             cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
+            m49 = int(country['M49 Code'])
+            cls._countriesdata['m49iso3'][m49] = iso3
+            # different types so keys won't clash
+            cls._countriesdata['m49iso3'][iso3] = m49
             regionid = country['Region Code']
             regionname = country['Region Name']
             sub_regionid = country['Sub-region Code']
@@ -171,6 +176,8 @@ class Country(object):
                 iso2 = country['iso2Code'].upper()
                 iso3 = country['id'].upper()
                 cls._countriesdata['iso2iso3'][iso2] = iso3
+                # different no. of chars so keys won't clash
+                cls._countriesdata['iso2iso3'][iso3] = iso2
 
         cls._countriesdata['aliases'] = aliases
 
@@ -252,10 +259,10 @@ class Country(object):
     @classmethod
     def get_country_info_from_iso3(cls, iso3, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[Dict[str]]
-        """Get country information from iso3 code
+        """Get country information from ISO3 code
 
         Args:
-            iso3 (str): Iso 3 code for which to get country name
+            iso3 (str): ISO3 code for which to get country information
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
@@ -274,10 +281,10 @@ class Country(object):
     @classmethod
     def get_country_name_from_iso3(cls, iso3, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
-        """Get country name from iso3 code
+        """Get country name from ISO3 code
 
         Args:
-            iso3 (str): Iso 3 code for which to get country name
+            iso3 (str): ISO3 code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
@@ -290,17 +297,39 @@ class Country(object):
         return None
 
     @classmethod
-    def get_iso3_from_iso2(cls, iso2, use_live=True, exception=None):
+    def get_iso2_from_iso3(cls, iso3, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
-        """Get iso3 from iso2 code
+        """Get ISO2 from ISO3 code
 
         Args:
-            iso2 (str): Iso 2 code for which to get country name
+            iso3 (str): ISO3 code for which to get ISO2 code
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Optional[str]: Iso 3 code
+            Optional[str]: ISO2 code
+        """
+        countriesdata = cls.countriesdata(use_live=use_live)
+        iso2 = countriesdata['iso2iso3'].get(iso3.upper())
+        if iso2 is not None:
+            return iso2
+
+        if exception is not None:
+            raise exception
+        return None
+
+    @classmethod
+    def get_iso3_from_iso2(cls, iso2, use_live=True, exception=None):
+        # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
+        """Get ISO3 from ISO2 code
+
+        Args:
+            iso2 (str): ISO2 code for which to get ISO3 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[str]: ISO3 code
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         iso3 = countriesdata['iso2iso3'].get(iso2.upper())
@@ -314,10 +343,10 @@ class Country(object):
     @classmethod
     def get_country_info_from_iso2(cls, iso2, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[Dict[str]]
-        """Get country name from iso2 code
+        """Get country name from ISO2 code
 
         Args:
-            iso2 (str): Iso 2 code for which to get country name
+            iso2 (str): ISO2 code for which to get country information
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
@@ -332,10 +361,10 @@ class Country(object):
     @classmethod
     def get_country_name_from_iso2(cls, iso2, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
-        """Get country name from iso2 code
+        """Get country name from ISO2 code
 
         Args:
-            iso2 (str): Iso 2 code for which to get country name
+            iso2 (str): ISO2 code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
@@ -343,6 +372,86 @@ class Country(object):
             Optional[str]: Country name
         """
         iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        if iso3 is not None:
+            return cls.get_country_name_from_iso3(iso3, exception=exception)
+        return None
+
+    @classmethod
+    def get_m49_from_iso3(cls, iso3, use_live=True, exception=None):
+        # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[int]
+        """Get M49 from ISO3 code
+
+        Args:
+            iso3 (str): ISO3 code for which to get M49 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[int]: M49 code
+        """
+        countriesdata = cls.countriesdata(use_live=use_live)
+        m49 = countriesdata['m49iso3'].get(iso3)
+        if m49 is not None:
+            return m49
+
+        if exception is not None:
+            raise exception
+        return None
+
+    @classmethod
+    def get_iso3_from_m49(cls, m49, use_live=True, exception=None):
+        # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[str]
+        """Get ISO3 from M49 code
+
+        Args:
+            m49 (int): M49 numeric code for which to get ISO3 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[str]: ISO3 code
+        """
+        countriesdata = cls.countriesdata(use_live=use_live)
+        iso3 = countriesdata['m49iso3'].get(m49)
+        if iso3 is not None:
+            return iso3
+
+        if exception is not None:
+            raise exception
+        return None
+
+    @classmethod
+    def get_country_info_from_m49(cls, m49, use_live=True, exception=None):
+        # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[Dict[str]]
+        """Get country name from M49 code
+
+        Args:
+            m49 (int): M49 numeric code for which to get country information
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[Dict[str]]: Country information
+        """
+        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        if iso3 is not None:
+            return cls.get_country_info_from_iso3(iso3, exception=exception)
+        return None
+
+    @classmethod
+    def get_country_name_from_m49(cls, m49, use_live=True, exception=None):
+        # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[str]
+        """Get country name from M49 code
+
+        Args:
+            m49 (int): M49 numeric code for which to get country name
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[str]: Country name
+        """
+        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
         if iso3 is not None:
             return cls.get_country_name_from_iso3(iso3, exception=exception)
         return None
@@ -413,15 +522,15 @@ class Country(object):
     @classmethod
     def get_iso3_country_code(cls, country, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
-        """Get iso 3 code for cls. Only exact matches or None are returned.
+        """Get ISO3 code for cls. Only exact matches or None are returned.
 
         Args:
-            country (str): Country for which to get iso 3 code
+            country (str): Country for which to get ISO3 code
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Optional[str]: ISO 3 country code or None
+            Optional[str]: ISO3 country code or None
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         countryupper = country.upper()
@@ -450,16 +559,16 @@ class Country(object):
     @classmethod
     def get_iso3_country_code_fuzzy(cls, country, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Tuple[[Optional[str], bool]]
-        """Get iso 3 code for cls. A tuple is returned with the first value being the iso 3 code and the second
+        """Get ISO3 code for cls. A tuple is returned with the first value being the ISO3 code and the second
         showing if the match is exact or not.
 
         Args:
-            country (str): Country for which to get iso 3 code
+            country (str): Country for which to get ISO3 code
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Tuple[[Optional[str], bool]]: ISO 3 code and if the match is exact or (None, False).
+            Tuple[[Optional[str], bool]]: ISO3 code and if the match is exact or (None, False).
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         iso3 = cls.get_iso3_country_code(country)  # don't put exception param here as we don't want it to throw
@@ -522,7 +631,7 @@ class Country(object):
     @classmethod
     def get_countries_in_region(cls, region, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> List[str]
-        """Get countries (iso 3 codes) in region
+        """Get countries (ISO3 codes) in region
 
         Args:
             region (str): Three digit UNStats M49 region code or region name
@@ -530,7 +639,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if region not found. Defaults to None.
 
         Returns:
-            List(str): Sorted list of iso 3 country names
+            List(str): Sorted list of ISO3 country names
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         try:
