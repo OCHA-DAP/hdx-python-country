@@ -22,6 +22,7 @@ class TestCountry:
             Country.get_country_name_from_iso3('uy', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso3('uy', use_live=False) is None
         assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela (Bolivarian Republic of)'
+        assert Country.get_country_name_from_iso3('TWN', use_live=False) == 'Taiwan, China'
 
     def test_get_iso2_from_iso3(self):
         assert Country.get_iso2_from_iso3('jpn', use_live=False) == 'JP'
@@ -38,6 +39,7 @@ class TestCountry:
     def test_get_country_info_from_iso2(self):
         assert Country.get_country_info_from_iso2('jp', use_live=False) == {'Sub-region Name': 'Eastern Asia', 'M49 Code': '392', 'ISO-alpha3 Code': 'JPN', 'Developed / Developing Countries': 'Developed', 'Land Locked Developing Countries (LLDC)': '', 'Global Name': 'World', 'Region Name': 'Asia', 'Least Developed Countries (LDC)': '', 'Intermediate Region Code': '', 'Region Code': '142', 'Country or Area': 'Japan', 'Sub-region Code': '030', 'Intermediate Region Name': '', 'Small Island Developing States (SIDS)': '', 'Global Code': '001'}
         assert Country.get_country_info_from_iso2('ab', use_live=False) is None
+        assert Country.get_country_info_from_iso2('TW', use_live=False) == {'Country or Area': 'Taiwan, China'}
         with pytest.raises(LocationError):
             Country.get_country_info_from_iso2('ab', use_live=False, exception=LocationError)
 
@@ -50,6 +52,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_country_name_from_iso2('SGP', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
+        assert Country.get_country_name_from_iso2('TW', use_live=False) == 'Taiwan, China'
 
     def test_get_m49_from_iso3(self):
         assert Country.get_m49_from_iso3('AFG') == 4
@@ -134,6 +137,7 @@ class TestCountry:
         assert Country.get_iso3_country_code('Christmas Isl.', use_live=False) == 'CXR'
         assert Country.get_iso3_country_code('Cayman Isl.', use_live=False) == 'CYM'
         assert Country.get_iso3_country_code('jp', use_live=False) == 'JPN'
+        assert Country.get_iso3_country_code('Taiwan, China', use_live=False) == 'TWN'
         assert Country.get_iso3_country_code_fuzzy('jpn', use_live=False) == ('JPN', True)
         assert Country.get_iso3_country_code_fuzzy('ZWE', use_live=False) == ('ZWE', True)
         assert Country.get_iso3_country_code_fuzzy('Vut', use_live=False) == ('VUT', True)
@@ -169,6 +173,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('Serbia and Kosovo: S/RES/1244 (1999)', use_live=False) == ('SRB', False)
         assert Country.get_iso3_country_code_fuzzy('U.S. Virgin Islands', use_live=False) == ('VIR', True)
         assert Country.get_iso3_country_code_fuzzy('U.K. Virgin Islands', use_live=False) == ('VGB', False)
+        assert Country.get_iso3_country_code_fuzzy('Taiwan', use_live=False) == ('TWN', False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
         with pytest.raises(ValueError):

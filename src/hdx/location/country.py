@@ -173,11 +173,15 @@ class Country(object):
 
         for country in json[1]:
             if country['region']['value'] != 'Aggregates':
+                countryname = country['name']
                 iso2 = country['iso2Code'].upper()
                 iso3 = country['id'].upper()
                 cls._countriesdata['iso2iso3'][iso2] = iso3
                 # different no. of chars so keys won't clash
                 cls._countriesdata['iso2iso3'][iso3] = iso2
+                if iso3 not in cls._countriesdata['countries']:
+                    cls._countriesdata['countries'][iso3] = {'Country or Area': countryname}
+                    cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
 
         cls._countriesdata['aliases'] = aliases
 
