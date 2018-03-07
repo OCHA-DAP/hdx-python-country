@@ -116,7 +116,7 @@
 "Kenya"	"Republic of Kenya"	"kenya|british.?east.?africa|east.?africa.?prot"	"KE"	"KEN"	404	404	"Africa"	"Eastern Africa"	"WW"	"WF"	"WF"	"ROW"				1963
 "Kiribati"	"Republic of Kiribati"	"kiribati"	"KI"	"KIR"	296	296	"Oceania"	"Micronesia"	"WW"	"WA"	"WA"	"ROW"				1999
 "North Korea"	"Democratic People's Republic of Korea"	"^(?=.*dem).*\bkorea|^(?=.*peo).*\bkorea|^(?=.*nor).*\bkorea|\bd\.?p\.?r\.?k"	"KP"	"PRK"	408	408	"Asia"	"Eastern Asia"	"WW"	"WA"	"WA"	"ROW"				1991
-"Kosovo"	"Republic of Kosovo"	"kosovo"	"XK"	"KSV"			"Europe"	"Southern Europe"	"WW"	"WE"	"WE"	"ROW"				
+"Kosovo"	"Republic of Kosovo"	"kosovo"	"XK"	"XKX"			"Europe"	"Southern Europe"	"WW"	"WE"	"WE"	"ROW"				
 "Kuwait"	"State of Kuwait"	"kuwait"	"KW"	"KWT"	414	414	"Asia"	"Western Asia"	"WW"	"WM"	"WM"	"ROW"				1963
 "Kyrgyz Republic"	"Kyrgyz Republic"	"kyrgyz|kirghiz"	"KG"	"KGZ"	417	417	"Asia"	"Central Asia"	"WW"	"WA"	"WA"	"ROW"				1992
 "Laos"	"Lao People's Democratic Republic"	"\blaos?\b"	"LA"	"LAO"	418	418	"Asia"	"South-Eastern Asia"	"WW"	"WA"	"WA"	"ROW"				1955

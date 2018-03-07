@@ -22,7 +22,7 @@ class TestCountry:
             Country.get_country_name_from_iso3('uy', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso3('uy', use_live=False) is None
         assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela (Bolivarian Republic of)'
-        assert Country.get_country_name_from_iso3('TWN', use_live=False) == 'Taiwan, China'
+        assert Country.get_country_name_from_iso3('TWN', use_live=False) == 'Republic of China'
 
     def test_get_iso2_from_iso3(self):
         assert Country.get_iso2_from_iso3('jpn', use_live=False) == 'JP'
@@ -36,10 +36,45 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_iso3_from_iso2('ab', use_live=False, exception=LocationError)
 
+    def test_get_country_info_from_iso3(self):
+        assert Country.get_country_info_from_iso3('xkx', use_live=False) == {'Intermediate Region Name': '',
+                                                                             'Sub-region Name': 'Southern Europe',
+                                                                             'ISO-alpha2 Code': 'XK',
+                                                                             'Capital City': 'Pristina',
+                                                                             'Intermediate Region Code': '',
+                                                                             'Region Name': 'Europe',
+                                                                             'Country or Area': 'Republic of Kosovo',
+                                                                             'ISO-alpha3 Code': 'XKX', 'M49 Code': '',
+                                                                             'ISO-numeric Code': ''}
+
     def test_get_country_info_from_iso2(self):
-        assert Country.get_country_info_from_iso2('jp', use_live=False) == {'Sub-region Name': 'Eastern Asia', 'M49 Code': '392', 'ISO-alpha3 Code': 'JPN', 'Developed / Developing Countries': 'Developed', 'Land Locked Developing Countries (LLDC)': '', 'Global Name': 'World', 'Region Name': 'Asia', 'Least Developed Countries (LDC)': '', 'Intermediate Region Code': '', 'Region Code': '142', 'Country or Area': 'Japan', 'Sub-region Code': '030', 'Intermediate Region Name': '', 'Small Island Developing States (SIDS)': '', 'Global Code': '001'}
+        assert Country.get_country_info_from_iso2('jp', use_live=False) == {'ISO-alpha2 Code': 'JP',
+                                                                            'ISO-numeric Code': '392',
+                                                                            'Sub-region Name': 'Eastern Asia',
+                                                                            'M49 Code': '392', 'ISO-alpha3 Code': 'JPN',
+                                                                            'Developed / Developing Countries': 'Developed',
+                                                                            'Land Locked Developing Countries (LLDC)': '',
+                                                                            'Global Name': 'World',
+                                                                            'Region Name': 'Asia',
+                                                                            'Least Developed Countries (LDC)': '',
+                                                                            'Intermediate Region Code': '',
+                                                                            'Region Code': '142',
+                                                                            'Country or Area': 'Japan',
+                                                                            'Sub-region Code': '030',
+                                                                            'Intermediate Region Name': '',
+                                                                            'Small Island Developing States (SIDS)': '',
+                                                                            'Global Code': '001',
+                                                                            'Capital City': 'Tokyo'}
         assert Country.get_country_info_from_iso2('ab', use_live=False) is None
-        assert Country.get_country_info_from_iso2('TW', use_live=False) == {'Country or Area': 'Taiwan, China'}
+        assert Country.get_country_info_from_iso2('TW', use_live=False) == {'Capital City': '',
+                                                                            'Country or Area': 'Republic of China',
+                                                                            'ISO-alpha3 Code': 'TWN',
+                                                                            'ISO-numeric Code': '158',
+                                                                            'Sub-region Name': 'Eastern Asia',
+                                                                            'Region Name': 'Asia',
+                                                                            'ISO-alpha2 Code': 'TW', 'M49 Code': '',
+                                                                            'Intermediate Region Code': '',
+                                                                            'Intermediate Region Name': ''}
         with pytest.raises(LocationError):
             Country.get_country_info_from_iso2('ab', use_live=False, exception=LocationError)
 
@@ -52,18 +87,19 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_country_name_from_iso2('SGP', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
-        assert Country.get_country_name_from_iso2('TW', use_live=False) == 'Taiwan, China'
+        assert Country.get_country_name_from_iso2('TW', use_live=False) == 'Republic of China'
 
     def test_get_m49_from_iso3(self):
-        assert Country.get_m49_from_iso3('AFG') == 4
-        assert Country.get_m49_from_iso3('WSM') == 882
+        assert Country.get_m49_from_iso3('AFG', use_live=False) == 4
+        assert Country.get_m49_from_iso3('WSM', use_live=False) == 882
         assert Country.get_m49_from_iso3('ABC', use_live=False) is None
+        assert Country.get_m49_from_iso3('TWN', use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_m49_from_iso3('ABC', use_live=False, exception=LocationError)
 
     def test_get_iso3_from_m49(self):
-        assert Country.get_iso3_from_m49(4) == 'AFG'
-        assert Country.get_iso3_from_m49(882) == 'WSM'
+        assert Country.get_iso3_from_m49(4, use_live=False) == 'AFG'
+        assert Country.get_iso3_from_m49(882, use_live=False) == 'WSM'
         assert Country.get_iso3_from_m49(9999, use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_iso3_from_m49(9999, use_live=False, exception=LocationError)
@@ -81,7 +117,10 @@ class TestCountry:
                                                                         'Intermediate Region Name': '',
                                                                         'Region Code': '142',
                                                                         'Land Locked Developing Countries (LLDC)': 'x',
-                                                                        'Sub-region Code': '034'}
+                                                                        'Sub-region Code': '034',
+                                                                        'Capital City': 'Kabul',
+                                                                        'ISO-alpha2 Code': 'AF',
+                                                                        'ISO-numeric Code': '004'}
         assert Country.get_country_info_from_m49(882, use_live=False) == {'Global Name': 'World',
                                                                           'Least Developed Countries (LDC)': '',
                                                                           'Land Locked Developing Countries (LLDC)': '',
@@ -95,7 +134,10 @@ class TestCountry:
                                                                           'ISO-alpha3 Code': 'WSM',
                                                                           'Sub-region Code': '061',
                                                                           'Country or Area': 'Samoa',
-                                                                          'Intermediate Region Name': ''}
+                                                                          'Intermediate Region Name': '',
+                                                                          'Capital City': 'Apia',
+                                                                          'ISO-alpha2 Code': 'WS',
+                                                                          'ISO-numeric Code': '882'}
         assert Country.get_country_info_from_m49(9999, use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_country_info_from_m49(9999, use_live=False, exception=LocationError)
@@ -106,6 +148,66 @@ class TestCountry:
         assert Country.get_country_name_from_m49(9999, use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_country_name_from_m49(9999, use_live=False, exception=LocationError)
+
+    def test_get_ison_from_iso3(self):
+        assert Country.get_ison_from_iso3('AFG', use_live=False) == 4
+        assert Country.get_ison_from_iso3('WSM', use_live=False) == 882
+        assert Country.get_ison_from_iso3('TWN', use_live=False) == 158
+        assert Country.get_ison_from_iso3('ABC', use_live=False) is None
+        with pytest.raises(LocationError):
+            Country.get_ison_from_iso3('ABC', use_live=False, exception=LocationError)
+
+    def test_get_iso3_from_ison(self):
+        assert Country.get_iso3_from_ison(4, use_live=False) == 'AFG'
+        assert Country.get_iso3_from_ison(882, use_live=False) == 'WSM'
+        assert Country.get_iso3_from_ison(9999, use_live=False) is None
+        with pytest.raises(LocationError):
+            Country.get_iso3_from_ison(9999, use_live=False, exception=LocationError)
+
+    def test_get_country_info_from_ison(self):
+        assert Country.get_country_info_from_ison(4, use_live=False) == {'Global Name': 'World', 'M49 Code': '004',
+                                                                         'Sub-region Name': 'Southern Asia',
+                                                                         'ISO-alpha3 Code': 'AFG', 'Global Code': '001',
+                                                                         'Small Island Developing States (SIDS)': '',
+                                                                         'Intermediate Region Code': '',
+                                                                         'Least Developed Countries (LDC)': 'x',
+                                                                         'Country or Area': 'Afghanistan',
+                                                                         'Region Name': 'Asia',
+                                                                         'Developed / Developing Countries': 'Developing',
+                                                                         'Intermediate Region Name': '',
+                                                                         'Region Code': '142',
+                                                                         'Land Locked Developing Countries (LLDC)': 'x',
+                                                                         'Sub-region Code': '034',
+                                                                         'Capital City': 'Kabul',
+                                                                         'ISO-alpha2 Code': 'AF',
+                                                                         'ISO-numeric Code': '004'}
+        assert Country.get_country_info_from_ison(882, use_live=False) == {'Global Name': 'World',
+                                                                           'Least Developed Countries (LDC)': '',
+                                                                           'Land Locked Developing Countries (LLDC)': '',
+                                                                           'Sub-region Name': 'Polynesia',
+                                                                           'Developed / Developing Countries': 'Developing',
+                                                                           'Region Name': 'Oceania',
+                                                                           'Global Code': '001',
+                                                                           'Small Island Developing States (SIDS)': 'x',
+                                                                           'Region Code': '009', 'M49 Code': '882',
+                                                                           'Intermediate Region Code': '',
+                                                                           'ISO-alpha3 Code': 'WSM',
+                                                                           'Sub-region Code': '061',
+                                                                           'Country or Area': 'Samoa',
+                                                                           'Intermediate Region Name': '',
+                                                                           'Capital City': 'Apia',
+                                                                           'ISO-alpha2 Code': 'WS',
+                                                                           'ISO-numeric Code': '882'}
+        assert Country.get_country_info_from_ison(9999, use_live=False) is None
+        with pytest.raises(LocationError):
+            Country.get_country_info_from_ison(9999, use_live=False, exception=LocationError)
+
+    def test_get_country_name_from_ison(self):
+        assert Country.get_country_name_from_ison(4, use_live=False) == 'Afghanistan'
+        assert Country.get_country_name_from_ison(882, use_live=False) == 'Samoa'
+        assert Country.get_country_name_from_ison(9999, use_live=False) is None
+        with pytest.raises(LocationError):
+            Country.get_country_name_from_ison(9999, use_live=False, exception=LocationError)
 
     def test_expand_countryname_abbrevs(self):
         assert Country.expand_countryname_abbrevs('jpn') == ['JPN']
@@ -180,22 +282,25 @@ class TestCountry:
             Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=ValueError)
 
     def test_get_countries_in_region(self):
+        assert Country.get_countries_in_region('Eastern Asia', use_live=False) == ['CHN', 'HKG', 'JPN', 'KOR', 'MAC',
+                                                                                   'MNG', 'PRK', 'TWN']
         assert len(Country.get_countries_in_region('Africa', use_live=False)) == 60
-        assert Country.get_countries_in_region('013', use_live=False) == ['BLZ', 'CRI', 'GTM', 'HND', 'MEX', 'NIC', 'PAN', 'SLV']
+        assert Country.get_countries_in_region(13, use_live=False) == ['BLZ', 'CRI', 'GTM', 'HND', 'MEX', 'NIC', 'PAN',
+                                                                       'SLV']
         assert Country.get_countries_in_region('Channel Islands', use_live=False) == ['GGY', 'JEY']
         assert len(Country.get_countries_in_region('NOTEXIST', use_live=False)) == 0
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', use_live=False, exception=LocationError)
 
-    def tst_wb_feed_file_working(self):
+    def test_wb_feed_file_working(self):
         json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
         html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
-        Country.set_countriesdata(json, html, dict())
+        Country.set_countriesdata(json, html, dict(), dict())
         assert Country.get_iso3_country_code('UZBEKISTAN', use_live=False) is None
         assert Country.get_iso3_country_code('south sudan', use_live=False) == 'SSD'
         html = load_file_to_str(script_dir_plus_file('unstats_emptytable.html', TestCountry))
         with pytest.raises(CountryError):
-            Country.set_countriesdata(json, html, dict())
+            Country.set_countriesdata(json, html, dict(), dict())
         Country.set_worldbank_url()
         Country.set_unstats_url_tablename('NOTEXIST')
         Country._countriesdata = None

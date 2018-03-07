@@ -3,7 +3,7 @@
 import copy
 import logging
 import re
-from typing import List, Tuple, Optional, TypeVar, Dict, Any
+from typing import List, Tuple, Optional, TypeVar, Dict, Any, Union
 
 from bs4 import BeautifulSoup
 from hdx.utilities.downloader import Download, DownloadError
@@ -98,14 +98,84 @@ class Country(object):
     _unstatstablename = _unstatstablename_int
 
     @classmethod
-    def set_countriesdata(cls, json, html, aliases):
-        # type: (Any, str) -> None
+    def _add_countriesdata(cls, iso3, country, regioncodefromname=False):
+        # type: (str, Dict, bool) -> None
+        """
+        Set up countries data from data in form provided by UNStats and World Bank
+
+        Args:
+            iso3 (str): ISO3 code for country
+            country (Dict): Country information
+            regioncodefromname (bool): Whether to read region code from existing mapping
+
+        Returns:
+            None
+        """
+        countryname = country['Country or Area']
+        cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
+        m49 = country['M49 Code']
+        if m49:
+            m49 = int(m49)
+            cls._countriesdata['m49iso3'][m49] = iso3
+            # different types so keys won't clash
+            cls._countriesdata['m49iso3'][iso3] = m49
+        ison = country['ISO-numeric Code']
+        if ison:
+            ison = int(ison)
+            cls._countriesdata['isoniso3'][ison] = iso3
+            # different types so keys won't clash
+            cls._countriesdata['isoniso3'][iso3] = ison
+        regionname = country['Region Name']
+        sub_regionname = country['Sub-region Name']
+        intermediate_regionname = country['Intermediate Region Name']
+        if regioncodefromname:
+            regionid = cls._countriesdata['regionnames2codes'].get(regionname.upper())
+            sub_regionid = cls._countriesdata['regionnames2codes'].get(sub_regionname.upper())
+            intermediate_regionid = cls._countriesdata['regionnames2codes'].get(intermediate_regionname.upper())
+        else:
+            regionid = country['Region Code']
+            if regionid:
+                regionid = int(regionid)
+            sub_regionid = country['Sub-region Code']
+            if sub_regionid:
+                sub_regionid = int(sub_regionid)
+            intermediate_regionid = country['Intermediate Region Code']
+            if intermediate_regionid:
+                intermediate_regionid = int(intermediate_regionid)
+
+        # region, subregion and intermediate region codes do not clash so only need one dict
+        def add_country_to_set(colname, idval, iso3):
+            value = cls._countriesdata[colname].get(idval)
+            if value is None:
+                value = set()
+                cls._countriesdata['regioncodes2countries'][idval] = value
+            value.add(iso3)
+
+        if regionid:
+            add_country_to_set('regioncodes2countries', regionid, iso3)
+            cls._countriesdata['regioncodes2names'][regionid] = regionname
+            cls._countriesdata['regionnames2codes'][regionname.upper()] = regionid
+        if sub_regionid:
+            add_country_to_set('regioncodes2countries', sub_regionid, iso3)
+            cls._countriesdata['regioncodes2names'][sub_regionid] = sub_regionname
+            cls._countriesdata['regionnames2codes'][sub_regionname.upper()] = sub_regionid
+        if intermediate_regionid:
+            add_country_to_set('regioncodes2countries', intermediate_regionid, iso3)
+            cls._countriesdata['regioncodes2names'][intermediate_regionid] = intermediate_regionname
+            cls._countriesdata['regionnames2codes'][intermediate_regionname.upper()] = \
+                intermediate_regionid
+
+    @classmethod
+    def set_countriesdata(cls, json, html, fallbacks, aliases):
+        # type: (Any, str, Dict, Dict) -> None
         """
         Set up countries data from data in form provided by UNStats and World Bank
 
         Args:
             json (Any): Countries data in JSON format provided by World Bank
             html (str): Countries data in HTML format provided by UNStats
+            fallbacks (Dict): Fallback internal table
+            aliases (Dict): Country regex
 
         Returns:
             None
@@ -120,49 +190,59 @@ class Country(object):
         cls._countriesdata['countries'] = dict()
         cls._countriesdata['iso2iso3'] = dict()
         cls._countriesdata['m49iso3'] = dict()
+        cls._countriesdata['isoniso3'] = dict()
         cls._countriesdata['countrynames2iso3'] = dict()
         cls._countriesdata['regioncodes2countries'] = dict()
         cls._countriesdata['regioncodes2names'] = dict()
         cls._countriesdata['regionnames2codes'] = dict()
         cls._countriesdata['aliases'] = dict()
 
-        def add_country_to_set(colname, idval, iso3):
-            value = cls._countriesdata[colname].get(idval)
-            if value is None:
-                value = set()
-                cls._countriesdata['regioncodes2countries'][idval] = value
-            value.add(iso3)
-
         for country in unstatstable:
             iso3 = country['ISO-alpha3 Code'].upper()
             if not iso3:
                 continue
+            country['ISO-numeric Code'] = country['M49 Code']
             cls._countriesdata['countries'][iso3] = country
-            countryname = country['Country or Area']
-            cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
-            m49 = int(country['M49 Code'])
-            cls._countriesdata['m49iso3'][m49] = iso3
-            # different types so keys won't clash
-            cls._countriesdata['m49iso3'][iso3] = m49
-            regionid = country['Region Code']
-            regionname = country['Region Name']
-            sub_regionid = country['Sub-region Code']
-            sub_regionname = country['Sub-region Name']
-            intermediate_regionid = country['Intermediate Region Code']
-            intermediate_regionname = country['Intermediate Region Name']
-            # region, subregion and intermediate region codes do not clash so only need one dict
-            add_country_to_set('regioncodes2countries', regionid, iso3)
-            cls._countriesdata['regioncodes2names'][regionid] = regionname
-            cls._countriesdata['regionnames2codes'][regionname.upper()] = regionid
-            if sub_regionid:
-                add_country_to_set('regioncodes2countries', sub_regionid, iso3)
-                cls._countriesdata['regioncodes2names'][sub_regionid] = sub_regionname
-                cls._countriesdata['regionnames2codes'][sub_regionname.upper()] = sub_regionid
-            if intermediate_regionid:
-                add_country_to_set('regioncodes2countries', intermediate_regionid, iso3)
-                cls._countriesdata['regioncodes2names'][intermediate_regionid] = intermediate_regionname
-                cls._countriesdata['regionnames2codes'][intermediate_regionname.upper()] = \
-                    intermediate_regionid
+            cls._add_countriesdata(iso3, country)
+
+        missing_from_unstats = list()
+        for wbcountry in json[1]:
+            if wbcountry['region']['value'] != 'Aggregates':
+                countryname = wbcountry['name']
+                iso2 = wbcountry['iso2Code'].upper()
+                iso3 = wbcountry['id'].upper()
+                capital = wbcountry['capitalCity']
+                cls._countriesdata['iso2iso3'][iso2] = iso3
+                # different no. of chars so keys won't clash
+                cls._countriesdata['iso2iso3'][iso3] = iso2
+                country = cls._countriesdata['countries'].get(iso3)
+                if country:
+                    country['ISO-alpha2 Code'] = iso2
+                    country['Capital City'] = capital
+                else:
+                    fallbackcountry = fallbacks.get(iso3)
+                    if not fallbackcountry or fallbackcountry['ISO-alpha2 Code']:
+                        cls._countriesdata['countries'][iso3] = {'Country or Area': countryname,
+                                                                 'ISO-alpha2 Code': iso2,
+                                                                 'ISO-alpha3 Code': iso3,
+                                                                 'Capital City': capital}
+                        cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
+                        missing_from_unstats.append(iso3)
+
+        for iso3 in missing_from_unstats:
+            fallbackcountry = fallbacks.get(iso3)
+            if fallbackcountry:
+                cls._countriesdata['countries'][iso3].update(fallbackcountry)
+                cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
+
+        for iso3 in fallbacks:
+            country = cls._countriesdata['countries'].get(iso3)
+            fallbackcountry = fallbacks[iso3]
+            if not country and fallbackcountry['ISO-alpha2 Code']:
+                cls._countriesdata['countries'][iso3] = fallbackcountry
+                cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
+
+        cls._countriesdata['aliases'] = aliases
 
         def sort_list(colname):
             for idval in cls._countriesdata[colname]:
@@ -170,21 +250,6 @@ class Country(object):
                     sorted(list(cls._countriesdata[colname][idval]))
 
         sort_list('regioncodes2countries')
-
-        for country in json[1]:
-            if country['region']['value'] != 'Aggregates':
-                countryname = country['name']
-                iso2 = country['iso2Code'].upper()
-                iso3 = country['id'].upper()
-                cls._countriesdata['iso2iso3'][iso2] = iso3
-                # different no. of chars so keys won't clash
-                cls._countriesdata['iso2iso3'][iso3] = iso2
-                if iso3 not in cls._countriesdata['countries']:
-                    cls._countriesdata['countries'][iso3] = {'Country or Area': countryname}
-                    cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
-
-        cls._countriesdata['aliases'] = aliases
-
 
     @classmethod
     def countriesdata(cls, use_live=True):
@@ -217,11 +282,21 @@ class Country(object):
                 json = load_json(script_dir_plus_file('worldbank.json', Country))
             if html is None:
                 html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
+            fallbacks = dict()
             aliases = dict()
             for country in downloader.get_tabular_rows(script_dir_plus_file('country_data.csv', Country),
                                                        dict_rows=True, headers=1):
-                aliases[country['ISO3']] = re.compile(country['regex'], re.IGNORECASE)
-            cls.set_countriesdata(json, html, aliases)
+                iso3 = country['ISO3']
+                aliases[iso3] = re.compile(country['regex'], re.IGNORECASE)
+                fallbacks[iso3] = {'Country or Area': country['name_official'],
+                                   'ISO-alpha2 Code': country['ISO2'],
+                                   'M49 Code': country['UNcode'],
+                                   'ISO-numeric Code': country['ISOnumeric'],
+                                   'Region Name': country['continent'],
+                                   'Sub-region Name': country['UNregion'],
+                                   'Intermediate Region Code': '',
+                                   'Intermediate Region Name': ''}
+            cls.set_countriesdata(json, html, fallbacks, aliases)
         return cls._countriesdata
 
     @classmethod
@@ -461,6 +536,86 @@ class Country(object):
         return None
 
     @classmethod
+    def get_ison_from_iso3(cls, iso3, use_live=True, exception=None):
+        # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[int]
+        """Get ISO numeric code from ISO3 code
+
+        Args:
+            iso3 (str): ISO3 code for which to get M49 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[int]: ISO numeric code
+        """
+        countriesdata = cls.countriesdata(use_live=use_live)
+        ison = countriesdata['isoniso3'].get(iso3)
+        if ison is not None:
+            return ison
+
+        if exception is not None:
+            raise exception
+        return None
+
+    @classmethod
+    def get_iso3_from_ison(cls, ison, use_live=True, exception=None):
+        # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[str]
+        """Get ISO3 from ISO numeric code
+
+        Args:
+            ison (int): ISO numeric code for which to get ISO3 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[str]: ISO3 code
+        """
+        countriesdata = cls.countriesdata(use_live=use_live)
+        iso3 = countriesdata['isoniso3'].get(ison)
+        if iso3 is not None:
+            return iso3
+
+        if exception is not None:
+            raise exception
+        return None
+
+    @classmethod
+    def get_country_info_from_ison(cls, ison, use_live=True, exception=None):
+        # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[Dict[str]]
+        """Get country name from M49 code
+
+        Args:
+            ison (int): ISO numeric code for which to get country information
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[Dict[str]]: Country information
+        """
+        iso3 = cls.get_iso3_from_ison(ison, use_live=use_live, exception=exception)
+        if iso3 is not None:
+            return cls.get_country_info_from_iso3(iso3, exception=exception)
+        return None
+
+    @classmethod
+    def get_country_name_from_ison(cls, ison, use_live=True, exception=None):
+        # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[str]
+        """Get country name from M49 code
+
+        Args:
+            ison (int): ISO numeric code for which to get country name
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[str]: Country name
+        """
+        iso3 = cls.get_iso3_from_ison(ison, use_live=use_live, exception=exception)
+        if iso3 is not None:
+            return cls.get_country_name_from_iso3(iso3, exception=exception)
+        return None
+
+    @classmethod
     def expand_countryname_abbrevs(cls, country):
         # type: (str) -> List[str]
         """Expands abbreviation(s) in country name in various ways (eg. FED -> FEDERATED, FEDERAL etc.)
@@ -634,11 +789,11 @@ class Country(object):
 
     @classmethod
     def get_countries_in_region(cls, region, use_live=True, exception=None):
-        # type: (str, bool, Optional[ExceptionUpperBound]) -> List[str]
+        # type: (Union[int,str], bool, Optional[ExceptionUpperBound]) -> List[str]
         """Get countries (ISO3 codes) in region
 
         Args:
-            region (str): Three digit UNStats M49 region code or region name
+            region (Union[int,str]): Three digit UNStats M49 region code or region name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if region not found. Defaults to None.
 
@@ -646,10 +801,9 @@ class Country(object):
             List(str): Sorted list of ISO3 country names
         """
         countriesdata = cls.countriesdata(use_live=use_live)
-        try:
-            int(region)  # M49 code is integer
+        if isinstance(region, int):
             regioncode = region
-        except ValueError:
+        else:
             regionupper = region.upper()
             regioncode = countriesdata['regionnames2codes'].get(regionupper)
 
