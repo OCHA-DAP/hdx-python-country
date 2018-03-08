@@ -205,7 +205,6 @@ class Country(object):
             cls._countriesdata['countries'][iso3] = country
             cls._add_countriesdata(iso3, country)
 
-        missing_from_unstats = list()
         for wbcountry in json[1]:
             if wbcountry['region']['value'] != 'Aggregates':
                 countryname = wbcountry['name']
@@ -221,25 +220,23 @@ class Country(object):
                     country['Capital City'] = capital
                 else:
                     fallbackcountry = fallbacks.get(iso3)
-                    if not fallbackcountry or fallbackcountry['ISO-alpha2 Code']:
+                    if not fallbackcountry or fallbackcountry['obsolete'] != 'Y':
                         cls._countriesdata['countries'][iso3] = {'Country or Area': countryname,
                                                                  'ISO-alpha2 Code': iso2,
                                                                  'ISO-alpha3 Code': iso3,
                                                                  'Capital City': capital}
                         cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
-                        missing_from_unstats.append(iso3)
-
-        for iso3 in missing_from_unstats:
-            fallbackcountry = fallbacks.get(iso3)
-            if fallbackcountry:
-                cls._countriesdata['countries'][iso3].update(fallbackcountry)
-                cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
+                    if fallbackcountry and fallbackcountry['obsolete'] != 'Y':
+                        cls._countriesdata['countries'][iso3].update(fallbackcountry)
+                        del cls._countriesdata['countries'][iso3]['obsolete']
+                        cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
 
         for iso3 in fallbacks:
             country = cls._countriesdata['countries'].get(iso3)
             fallbackcountry = fallbacks[iso3]
-            if not country and fallbackcountry['ISO-alpha2 Code']:
+            if not country and fallbackcountry['obsolete'] != 'Y':
                 cls._countriesdata['countries'][iso3] = fallbackcountry
+                del cls._countriesdata['countries'][iso3]['obsolete']
                 cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
 
         cls._countriesdata['aliases'] = aliases
@@ -284,8 +281,8 @@ class Country(object):
                 html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
             fallbacks = dict()
             aliases = dict()
-            for country in downloader.get_tabular_rows(script_dir_plus_file('country_data.csv', Country),
-                                                       dict_rows=True, headers=1):
+            for country in downloader.get_tabular_rows(script_dir_plus_file('country_data.tsv', Country), format='csv',
+                                                       delimiter='\t', dict_rows=True, headers=1):
                 iso3 = country['ISO3']
                 aliases[iso3] = re.compile(country['regex'], re.IGNORECASE)
                 fallbacks[iso3] = {'Country or Area': country['name_official'],
@@ -295,7 +292,8 @@ class Country(object):
                                    'Region Name': country['continent'],
                                    'Sub-region Name': country['UNregion'],
                                    'Intermediate Region Code': '',
-                                   'Intermediate Region Name': ''}
+                                   'Intermediate Region Name': '',
+                                   'obsolete': country['obsolete']}
             cls.set_countriesdata(json, html, fallbacks, aliases)
         return cls._countriesdata
 
