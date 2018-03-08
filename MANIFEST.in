@@ -12,6 +12,7 @@ recursive-include src *.yml
 recursive-include src *.json
 recursive-include src *.html
 recursive-include src *.csv
+recursive-include src *.tsv
 recursive-include tests *.py
 recursive-include tests *.json
 recursive-include tests *.html
