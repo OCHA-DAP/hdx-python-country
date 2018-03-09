@@ -1,2 +1,2 @@
-hdx-python-utilities==1.2.6
+hdx-python-utilities==1.2.8
 

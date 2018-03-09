@@ -220,13 +220,13 @@ class Country(object):
                     country['Capital City'] = capital
                 else:
                     fallbackcountry = fallbacks.get(iso3)
-                    if not fallbackcountry or fallbackcountry['obsolete'] != 'Y':
+                    if not fallbackcountry or not fallbackcountry['obsolete']:
                         cls._countriesdata['countries'][iso3] = {'Country or Area': countryname,
                                                                  'ISO-alpha2 Code': iso2,
                                                                  'ISO-alpha3 Code': iso3,
                                                                  'Capital City': capital}
                         cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
-                    if fallbackcountry and fallbackcountry['obsolete'] != 'Y':
+                    if fallbackcountry and not fallbackcountry['obsolete']:
                         cls._countriesdata['countries'][iso3].update(fallbackcountry)
                         del cls._countriesdata['countries'][iso3]['obsolete']
                         cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
@@ -234,7 +234,7 @@ class Country(object):
         for iso3 in fallbacks:
             country = cls._countriesdata['countries'].get(iso3)
             fallbackcountry = fallbacks[iso3]
-            if not country and fallbackcountry['obsolete'] != 'Y':
+            if not country and not fallbackcountry['obsolete']:
                 cls._countriesdata['countries'][iso3] = fallbackcountry
                 del cls._countriesdata['countries'][iso3]['obsolete']
                 cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
@@ -261,40 +261,41 @@ class Country(object):
             List[Dict[Dict]]: Countries dictionaries
         """
         if cls._countriesdata is None:
-            downloader = Download()
-            json = None
-            html = None
-            if use_live:
-                try:
-                    response = downloader.download(cls._wburl)
-                    json = response.json()
-                except DownloadError:
-                    logger.exception('Download from World Bank API failed! Falling back to stored file.')
-                try:
-                    response = downloader.download(cls._unstatsurl)
-                    html = response.text
-                except DownloadError:
-                    logger.exception('Scrape from UNStats website failed! Falling back to stored file.')
-            if json is None:
-                json = load_json(script_dir_plus_file('worldbank.json', Country))
-            if html is None:
-                html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
-            fallbacks = dict()
-            aliases = dict()
-            for country in downloader.get_tabular_rows(script_dir_plus_file('country_data.tsv', Country), format='csv',
-                                                       delimiter='\t', dict_rows=True, headers=1):
-                iso3 = country['ISO3']
-                aliases[iso3] = re.compile(country['regex'], re.IGNORECASE)
-                fallbacks[iso3] = {'Country or Area': country['name_official'],
-                                   'ISO-alpha2 Code': country['ISO2'],
-                                   'M49 Code': country['UNcode'],
-                                   'ISO-numeric Code': country['ISOnumeric'],
-                                   'Region Name': country['continent'],
-                                   'Sub-region Name': country['UNregion'],
-                                   'Intermediate Region Code': '',
-                                   'Intermediate Region Name': '',
-                                   'obsolete': country['obsolete']}
-            cls.set_countriesdata(json, html, fallbacks, aliases)
+            with Download() as downloader:
+                json = None
+                html = None
+                if use_live:
+                    try:
+                        response = downloader.download(cls._wburl)
+                        json = response.json()
+                    except DownloadError:
+                        logger.exception('Download from World Bank API failed! Falling back to stored file.')
+                    try:
+                        response = downloader.download(cls._unstatsurl)
+                        html = response.text
+                    except DownloadError:
+                        logger.exception('Scrape from UNStats website failed! Falling back to stored file.')
+                if json is None:
+                    json = load_json(script_dir_plus_file('worldbank.json', Country))
+                if html is None:
+                    html = load_file_to_str(script_dir_plus_file('unstats.html', Country))
+                fallbacks = dict()
+                aliases = dict()
+                for country in downloader.get_tabular_rows(script_dir_plus_file('country_data.tsv', Country),
+                                                           format='csv',
+                                                           delimiter='\t', dict_rows=True, headers=1):
+                    iso3 = country['ISO3']
+                    aliases[iso3] = re.compile(country['regex'], re.IGNORECASE)
+                    fallbacks[iso3] = {'Country or Area': country['name_official'],
+                                       'ISO-alpha2 Code': country['ISO2'],
+                                       'M49 Code': country['UNcode'],
+                                       'ISO-numeric Code': country['ISOnumeric'],
+                                       'Region Name': country['continent'],
+                                       'Sub-region Name': country['UNregion'],
+                                       'Intermediate Region Code': '',
+                                       'Intermediate Region Name': '',
+                                       'obsolete': country['obsolete']}
+                cls.set_countriesdata(json, html, fallbacks, aliases)
         return cls._countriesdata
 
     @classmethod
