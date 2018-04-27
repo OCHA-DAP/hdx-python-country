@@ -51,7 +51,7 @@ def get_readme():
     return readme_file.read()
 
 
-requirements = ['hdx-python-utilities>=1.2.8']
+requirements = ['hdx-python-utilities>=1.2.9']
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -69,7 +69,7 @@ setup(
     name='hdx-python-country',
     description='HDX Python country mapping utilities',
     license='MIT',
-    url='https://github.com/OCHA-DAP/hdx-python-location',
+    url='https://github.com/OCHA-DAP/hdx-python-country',
     version=get_version(),
     author='Michael Rans',
     author_email='rans@email.com',
