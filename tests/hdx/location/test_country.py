@@ -300,7 +300,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', use_live=False, exception=LocationError)
 
-    def atest_wb_feed_file_working(self):
+    def test_wb_feed_file_working(self):
         json = load_json(script_dir_plus_file('worldbank.json', TestCountry))
         html = load_file_to_str(script_dir_plus_file('unstats.html', TestCountry))
         Country.set_countriesdata(json, html, dict(), dict())
