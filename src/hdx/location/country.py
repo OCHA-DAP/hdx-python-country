@@ -96,6 +96,7 @@ class Country(object):
     _unstatsurl = _unstatsurl_int
     _unstatstablename_int = 'downloadTableEN'
     _unstatstablename = _unstatstablename_int
+    _globalname = None
 
     @classmethod
     def _add_countriesdata(cls, iso3, country, regioncodefromname=False):
@@ -116,32 +117,52 @@ class Country(object):
         m49 = country['M49 Code']
         if m49:
             m49 = int(m49)
+            country['M49 Code'] = m49
             cls._countriesdata['m49iso3'][m49] = iso3
             # different types so keys won't clash
             cls._countriesdata['m49iso3'][iso3] = m49
         ison = country['ISO-numeric Code']
         if ison:
             ison = int(ison)
+            country['ISO-numeric Code'] = ison
             cls._countriesdata['isoniso3'][ison] = iso3
             # different types so keys won't clash
             cls._countriesdata['isoniso3'][iso3] = ison
+        globalname = country.get('Global Name', Country._globalname)
+        Country._globalname = globalname
+        country['Global Name'] = globalname
         regionname = country['Region Name']
         sub_regionname = country['Sub-region Name']
         intermediate_regionname = country['Intermediate Region Name']
         if regioncodefromname:
-            regionid = cls._countriesdata['regionnames2codes'].get(regionname.upper())
-            sub_regionid = cls._countriesdata['regionnames2codes'].get(sub_regionname.upper())
-            intermediate_regionid = cls._countriesdata['regionnames2codes'].get(intermediate_regionname.upper())
+            globalid = cls._countriesdata['regionnames2codes'].get(globalname.upper())
+            country['Global Code'] = globalid
+            if regionname:
+                regionid = cls._countriesdata['regionnames2codes'].get(regionname.upper())
+                country['Region Code'] = regionid
+            if sub_regionname:
+                sub_regionid = cls._countriesdata['regionnames2codes'].get(sub_regionname.upper())
+                country['Sub-region Code'] = sub_regionid
+            if intermediate_regionname:
+                intermediate_regionid = cls._countriesdata['regionnames2codes'].get(intermediate_regionname.upper())
+                country['Intermediate Region Code'] = intermediate_regionid
         else:
+            globalid = country['Global Code']
+            if globalid:
+                globalid = int(globalid)
+                country['Global Code'] = globalid
             regionid = country['Region Code']
             if regionid:
                 regionid = int(regionid)
+                country['Region Code'] = regionid
             sub_regionid = country['Sub-region Code']
             if sub_regionid:
                 sub_regionid = int(sub_regionid)
+                country['Sub-region Code'] = sub_regionid
             intermediate_regionid = country['Intermediate Region Code']
             if intermediate_regionid:
                 intermediate_regionid = int(intermediate_regionid)
+                country['Intermediate Region Code'] = intermediate_regionid
 
         # region, subregion and intermediate region codes do not clash so only need one dict
         def add_country_to_set(colname, idval, iso3):
@@ -151,15 +172,19 @@ class Country(object):
                 cls._countriesdata['regioncodes2countries'][idval] = value
             value.add(iso3)
 
-        if regionid:
+        if globalname:
+            add_country_to_set('regioncodes2countries', globalid, iso3)
+            cls._countriesdata['regioncodes2names'][globalid] = globalname
+            cls._countriesdata['regionnames2codes'][globalname.upper()] = globalid
+        if regionname:
             add_country_to_set('regioncodes2countries', regionid, iso3)
             cls._countriesdata['regioncodes2names'][regionid] = regionname
             cls._countriesdata['regionnames2codes'][regionname.upper()] = regionid
-        if sub_regionid:
+        if sub_regionname:
             add_country_to_set('regioncodes2countries', sub_regionid, iso3)
             cls._countriesdata['regioncodes2names'][sub_regionid] = sub_regionname
             cls._countriesdata['regionnames2codes'][sub_regionname.upper()] = sub_regionid
-        if intermediate_regionid:
+        if intermediate_regionname:
             add_country_to_set('regioncodes2countries', intermediate_regionid, iso3)
             cls._countriesdata['regioncodes2names'][intermediate_regionid] = intermediate_regionname
             cls._countriesdata['regionnames2codes'][intermediate_regionname.upper()] = \
@@ -202,8 +227,23 @@ class Country(object):
             if not iso3:
                 continue
             country['ISO-numeric Code'] = country['M49 Code']
-            cls._countriesdata['countries'][iso3] = country
             cls._add_countriesdata(iso3, country)
+            for key in country:
+                if not country[key]:
+                    country[key] = None
+            cls._countriesdata['countries'][iso3] = country
+
+        def fix_fallback(fallbackcountry):
+            for key in fallbackcountry:
+                val = fallbackcountry[key]
+                if val:
+                    try:
+                        val = int(fallbackcountry[key])
+                        fallbackcountry[key] = val
+                    except ValueError:
+                        pass
+                else:
+                    fallbackcountry[key] = None
 
         for wbcountry in json[1]:
             if wbcountry['region']['value'] != 'Aggregates':
@@ -211,8 +251,10 @@ class Country(object):
                 iso2 = wbcountry['iso2Code'].upper()
                 iso3 = wbcountry['id'].upper()
                 capital = wbcountry['capitalCity']
-                cls._countriesdata['iso2iso3'][iso2] = iso3
+                if not capital:
+                    capital = None
                 # different no. of chars so keys won't clash
+                cls._countriesdata['iso2iso3'][iso2] = iso3
                 cls._countriesdata['iso2iso3'][iso3] = iso2
                 country = cls._countriesdata['countries'].get(iso3)
                 if country:
@@ -227,14 +269,16 @@ class Country(object):
                                                                  'Capital City': capital}
                         cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
                     if fallbackcountry and not fallbackcountry['obsolete']:
+                        cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
+                        fix_fallback(fallbackcountry)
                         cls._countriesdata['countries'][iso3].update(fallbackcountry)
                         del cls._countriesdata['countries'][iso3]['obsolete']
-                        cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
 
         for iso3 in fallbacks:
             country = cls._countriesdata['countries'].get(iso3)
             fallbackcountry = fallbacks[iso3]
             if not country and not fallbackcountry['obsolete']:
+                fix_fallback(fallbackcountry)
                 cls._countriesdata['countries'][iso3] = fallbackcountry
                 del cls._countriesdata['countries'][iso3]['obsolete']
                 cls._add_countriesdata(iso3, fallbackcountry, regioncodefromname=True)
@@ -433,7 +477,7 @@ class Country(object):
         """
         iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
         if iso3 is not None:
-            return cls.get_country_info_from_iso3(iso3, exception=exception)
+            return cls.get_country_info_from_iso3(iso3, use_live=use_live, exception=exception)
         return None
 
     @classmethod
@@ -729,7 +773,8 @@ class Country(object):
             Tuple[[Optional[str], bool]]: ISO3 code and if the match is exact or (None, False).
         """
         countriesdata = cls.countriesdata(use_live=use_live)
-        iso3 = cls.get_iso3_country_code(country)  # don't put exception param here as we don't want it to throw
+        iso3 = cls.get_iso3_country_code(country,
+                                         use_live=use_live)  # don't put exception param here as we don't want it to throw
 
         if iso3 is not None:
             return iso3, True
