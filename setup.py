@@ -51,7 +51,7 @@ def get_readme():
     return readme_file.read()
 
 
-requirements = ['hdx-python-utilities>=1.4.9']
+requirements = ['hdx-python-utilities>=1.5.0']
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
