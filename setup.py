@@ -42,7 +42,8 @@ def script_dir_plus_file(filename, pyobject, follow_symlinks=True):
 
 
 def get_version():
-    version_file = open(script_dir_plus_file(join('src', 'hdx', 'version.txt'), get_version), encoding='utf-8')
+    version_file = open(script_dir_plus_file(join('src', 'hdx', 'location', 'version.txt'), get_version),
+                        encoding='utf-8')
     return version_file.read().strip()
 
 
@@ -51,7 +52,7 @@ def get_readme():
     return readme_file.read()
 
 
-requirements = ['hdx-python-utilities>=1.6.2']
+requirements = ['hdx-python-utilities>=1.6.4']
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",

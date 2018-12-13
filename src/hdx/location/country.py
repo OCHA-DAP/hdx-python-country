@@ -12,6 +12,8 @@ from hdx.utilities.loader import load_json, load_file_to_str
 from hdx.utilities.path import script_dir_plus_file
 from hdx.utilities.text import get_words_in_sentence
 
+from hdx.location.version import get_country_version
+
 ExceptionUpperBound = TypeVar('T', bound='Exception')
 
 
@@ -305,7 +307,7 @@ class Country(object):
             List[Dict[Dict]]: Countries dictionaries
         """
         if cls._countriesdata is None:
-            with Download() as downloader:
+            with Download(user_agent='read', prefix='HDXPythonCountry/%s' % get_country_version()) as downloader:
                 json = None
                 html = None
                 if use_live:
