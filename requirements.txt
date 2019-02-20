@@ -1,1 +1,2 @@
 hdx-python-utilities==1.6.8
+libhxl==4.13.2
