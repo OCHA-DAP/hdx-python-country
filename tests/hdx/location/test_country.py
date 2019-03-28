@@ -21,7 +21,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_country_name_from_iso3('uy', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso3('uy', use_live=False) is None
-        assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela (Bolivarian Republic of)'
+        assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela (Bolivarian Republic of)'
         assert Country.get_country_name_from_iso3('TWN', use_live=False) == 'Taiwan (Province of China)'
 
     def test_get_iso2_from_iso3(self):
@@ -147,7 +147,7 @@ class TestCountry:
         assert Country.get_country_name_from_iso2('SGP', use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_country_name_from_iso2('SGP', use_live=False, exception=LocationError)
-        assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
+        assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
         assert Country.get_country_name_from_iso2('TW', use_live=False) == 'Taiwan (Province of China)'
 
     def test_get_m49_from_iso3(self):
