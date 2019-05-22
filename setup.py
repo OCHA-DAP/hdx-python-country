@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from os.path import join
 
+from hdx.utilities import CleanCommand, PackageCommand, PublishCommand
 from setuptools import setup, find_packages
 
-from hdx.utilities import CleanMore
 from hdx.utilities.loader import load_file_to_str
 
-requirements = ['hdx-python-utilities>=1.7.0',
+requirements = ['hdx-python-utilities>=1.7.1',
                 'libhxl==4.5.1;python_version<"3"',
                 'libhxl>=4.15.1:python_version>="3"']
 
@@ -40,5 +40,5 @@ setup(
     zip_safe=True,
     classifiers=classifiers,
     install_requires=requirements,
-    cmdclass={'clean': CleanMore}
+    cmdclass={'clean': CleanCommand, 'package': PackageCommand, 'publish': PublishCommand},
 )
