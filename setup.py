@@ -5,9 +5,8 @@ from hdx.utilities import CleanCommand, PackageCommand, PublishCommand
 from setuptools import setup, find_packages
 
 from hdx.utilities.loader import load_file_to_str
-import hdx.utilities
 
-requirements = ['hdx-python-utilities>=1.7.1',
+requirements = ['hdx-python-utilities>=1.7.3',
                 'libhxl==4.5.1;python_version<"3"',
                 'libhxl>=4.15.1:python_version>="3"']
 
@@ -23,14 +22,14 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-hdx.utilities.project_version = load_file_to_str(join('src', 'hdx', 'location', 'version.txt'), strip=True)
+PublishCommand.version = load_file_to_str(join('src', 'hdx', 'location', 'version.txt'), strip=True)
 
 setup(
     name='hdx-python-country',
     description='HDX Python country mapping utilities',
     license='MIT',
     url='https://github.com/OCHA-DAP/hdx-python-country',
-    version=hdx.utilities.project_version,
+    version=PublishCommand.version,
     author='Michael Rans',
     author_email='rans@email.com',
     keywords=['HDX', 'location', 'country code', 'country', 'iso 3166', 'iso2', 'iso3', 'region'],
