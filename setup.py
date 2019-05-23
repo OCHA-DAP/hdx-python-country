@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 from hdx.utilities.loader import load_file_to_str
 
-requirements = ['hdx-python-utilities>=1.7.3',
+requirements = ['hdx-python-utilities>=1.7.4',
                 'libhxl==4.5.1;python_version<"3"',
                 'libhxl>=4.15.1:python_version>="3"']
 
@@ -33,7 +33,8 @@ setup(
     author='Michael Rans',
     author_email='rans@email.com',
     keywords=['HDX', 'location', 'country code', 'country', 'iso 3166', 'iso2', 'iso3', 'region'],
-    long_description=load_file_to_str('README.rst'),
+    long_description=load_file_to_str('README.md'),
+    long_description_content_type='text/markdown',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     include_package_data=True,
