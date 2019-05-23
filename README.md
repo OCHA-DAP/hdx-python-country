@@ -51,4 +51,17 @@ The usage of the country mappings functionality is best illustrated by some exam
     # '#country+alt+name+v_iso': '', '#country+alt+name+v_m49': '',
     # '#country+alt+name+v_reliefweb': '', '#country+alt+name+v_unterm': '',
     # '#country+code+num+v_m49': '392', '#country+code+v_fts': '112',
-    # '#country+code+v_hrinfo_country'
+    # '#country+code+v_hrinfo_country': '292', '#country+code+v_iso2': 'JP',
+    # '#country+code+v_iso3': 'JPN', '#country+code+v_reliefweb': '128',
+    # '#country+name+preferred': 'Japan', '#country+name+short+v_reliefweb': '',
+    # '#country+regex': 'japan', '#geo+admin_level': '0', '#geo+lat': '37.63209801',
+    # '#geo+lon': '138.0812256', '#meta+id': '112', '#region+code+intermediate': '',
+    # '#region+code+main': '142', '#region+code+sub': '30', '#region+intermediate+name+preferred': '',
+    # '#region+main+name+preferred': 'Asia', '#region+name+preferred+sub': 'Eastern Asia'}
+    
+    Country.get_countries_in_region('Channel Islands')
+    # ['GGY', 'JEY']
+    len(Country.get_countries_in_region('Africa'))
+    # 60
+    Country.get_countries_in_region(13)
+    # ['BLZ', 'CRI', 'GTM', 'HND', 'MEX', 'NIC', 'PAN', 'SLV']
