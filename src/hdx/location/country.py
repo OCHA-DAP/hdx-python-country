@@ -484,7 +484,7 @@ class Country(object):
 
     @classmethod
     def get_iso3_country_code_fuzzy(cls, country, use_live=True, exception=None):
-        # type: (str, bool, Optional[ExceptionUpperBound]) -> Tuple[[Optional[str], bool]]
+        # type: (str, bool, Optional[ExceptionUpperBound]) -> Tuple[Optional[str], bool]]
         """Get ISO3 code for cls. A tuple is returned with the first value being the ISO3 code and the second
         showing if the match is exact or not.
 
@@ -494,7 +494,7 @@ class Country(object):
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
 
         Returns:
-            Tuple[[Optional[str], bool]]: ISO3 code and if the match is exact or (None, False).
+            Tuple[Optional[str], bool]]: ISO3 code and if the match is exact or (None, False).
         """
         countriesdata = cls.countriesdata(use_live=use_live)
         iso3 = cls.get_iso3_country_code(country,
