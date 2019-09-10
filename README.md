@@ -10,9 +10,9 @@ Republic.
 Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
 (UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
 return full country information do so in a different format to 1.x.x. The format they use is a dictionary using
-[Humanitarian Exchange Language]() (HXL) hashtags as keys.
+[Humanitarian Exchange Language](http://hxlstandard.org/) (HXL) hashtags as keys.
 
-This library is part of the [Humanitarian Data Exchange]() (HDX) project. If you have humanitarian related data, please 
+This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) (HDX) project. If you have humanitarian related data, please 
 upload your datasets to HDX.
 
   - [Usage](#usage)
