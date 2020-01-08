@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 from hdx.utilities.loader import load_file_to_str
 
-requirements = ['hdx-python-utilities>=1.9.4',
+requirements = ['hdx-python-utilities>=1.9.5',
                 'libhxl==4.5.1;python_version<"3"',
                 'libhxl>=4.15.1;python_version>="3"']
 
