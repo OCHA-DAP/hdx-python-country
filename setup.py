@@ -6,9 +6,9 @@ from setuptools import setup, find_packages
 
 from hdx.utilities.loader import load_file_to_str
 
-requirements = ['hdx-python-utilities>=2.2.3',
+requirements = ['hdx-python-utilities>=2.2.4',
                 'libhxl==4.5.1;python_version<"3"',
-                'libhxl>=4.17;python_version>="3"']
+                'libhxl>=4.18;python_version>="3"']
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
