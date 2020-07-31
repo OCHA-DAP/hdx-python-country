@@ -277,9 +277,11 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('ZWE', use_live=False) == ('ZWE', True)
         assert Country.get_iso3_country_code_fuzzy('Vut', use_live=False) == ('VUT', True)
         assert Country.get_iso3_country_code('abc', use_live=False) is None
+        assert Country.get_iso3_country_code('-', use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_iso3_country_code('abc', use_live=False, exception=LocationError)
         assert Country.get_iso3_country_code_fuzzy('abc', use_live=False) == (None, False)
+        assert Country.get_iso3_country_code_fuzzy('-', use_live=False) == (None, False)
         with pytest.raises(LocationError):
             Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=LocationError)
         assert Country.get_iso3_country_code_fuzzy('United Kingdom', use_live=False) == ('GBR', False)

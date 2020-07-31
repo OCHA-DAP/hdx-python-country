@@ -459,24 +459,25 @@ class Country(object):
             Optional[str]: ISO3 country code or None
         """
         countriesdata = cls.countriesdata(use_live=use_live)
-        countryupper = country.upper()
-        len_countryupper = len(countryupper)
-        if len_countryupper == 3:
-            if countryupper in countriesdata['countries']:
-                return countryupper
-        elif len_countryupper == 2:
-            iso3 = countriesdata['iso2iso3'].get(countryupper)
+        countryupper = country.strip().upper()
+        if countryupper.isupper():
+            len_countryupper = len(countryupper)
+            if len_countryupper == 3:
+                if countryupper in countriesdata['countries']:
+                    return countryupper
+            elif len_countryupper == 2:
+                iso3 = countriesdata['iso2iso3'].get(countryupper)
+                if iso3 is not None:
+                    return iso3
+
+            iso3 = countriesdata['countrynames2iso3'].get(countryupper)
             if iso3 is not None:
                 return iso3
 
-        iso3 = countriesdata['countrynames2iso3'].get(countryupper)
-        if iso3 is not None:
-            return iso3
-
-        for candidate in cls.expand_countryname_abbrevs(countryupper):
-            iso3 = countriesdata['countrynames2iso3'].get(candidate)
-            if iso3 is not None:
-                return iso3
+            for candidate in cls.expand_countryname_abbrevs(countryupper):
+                iso3 = countriesdata['countrynames2iso3'].get(candidate)
+                if iso3 is not None:
+                    return iso3
 
         if exception is not None:
             raise exception
@@ -497,8 +498,12 @@ class Country(object):
             Tuple[Optional[str], bool]]: ISO3 code and if the match is exact or (None, False).
         """
         countriesdata = cls.countriesdata(use_live=use_live)
-        iso3 = cls.get_iso3_country_code(country,
-                                         use_live=use_live)  # don't put exception param here as we don't want it to throw
+        country = country.strip()
+        if not country.upper().isupper():
+            return None, False
+
+        iso3 = cls.get_iso3_country_code(country, use_live=use_live)
+        # don't put exception param here as we don't want it to throw
 
         if iso3 is not None:
             return iso3, True
