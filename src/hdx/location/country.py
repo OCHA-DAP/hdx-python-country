@@ -484,8 +484,8 @@ class Country(object):
         return None
 
     @classmethod
-    def get_iso3_country_code_fuzzy(cls, country, use_live=True, exception=None):
-        # type: (str, bool, Optional[ExceptionUpperBound]) -> Tuple[Optional[str], bool]]
+    def get_iso3_country_code_fuzzy(cls, country, use_live=True, exception=None, min_chars=5):
+        # type: (str, bool, Optional[ExceptionUpperBound], int) -> Tuple[Optional[str], bool]]
         """Get ISO3 code for cls. A tuple is returned with the first value being the ISO3 code and the second
         showing if the match is exact or not.
 
@@ -493,6 +493,7 @@ class Country(object):
             country (str): Country for which to get ISO3 code
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+            min_chars (int): Minimum number of characters for fuzzy matching to be tried. Defaults to 5.
 
         Returns:
             Tuple[Optional[str], bool]]: ISO3 code and if the match is exact or (None, False).
@@ -507,6 +508,9 @@ class Country(object):
 
         if iso3 is not None:
             return iso3, True
+
+        if len(country) < min_chars:
+            return None, False
 
         def remove_matching_from_list(wordlist, word_or_part):
             for word in wordlist:

@@ -283,7 +283,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('abc', use_live=False) == (None, False)
         assert Country.get_iso3_country_code_fuzzy('-', use_live=False) == (None, False)
         with pytest.raises(LocationError):
-            Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=LocationError)
+            Country.get_iso3_country_code_fuzzy('abcde', use_live=False, exception=LocationError)
         assert Country.get_iso3_country_code_fuzzy('United Kingdom', use_live=False) == ('GBR', False)
         assert Country.get_iso3_country_code_fuzzy('United Kingdom of Great Britain and Northern Ireland', use_live=False) == ('GBR', True)
         assert Country.get_iso3_country_code_fuzzy('united states', use_live=False) == ('USA', False)
@@ -314,7 +314,7 @@ class TestCountry:
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', use_live=False, exception=ValueError)
         with pytest.raises(ValueError):
-            Country.get_iso3_country_code_fuzzy('abc', use_live=False, exception=ValueError)
+            Country.get_iso3_country_code_fuzzy('abcde', use_live=False, exception=ValueError)
 
     def test_get_countries_in_region(self):
         assert Country.get_countries_in_region('Eastern Asia', use_live=False) == ['CHN', 'HKG', 'JPN', 'KOR', 'MAC',
