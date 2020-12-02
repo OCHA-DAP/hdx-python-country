@@ -29,6 +29,8 @@ The usage of the country mappings functionality is best illustrated by some exam
 
     from hdx.location.country import Country
     
+    Country.set_country_name_overrides({'PSE': 'oPt'})
+    # Override default country name
     Country.get_country_name_from_iso3('jpn', use_live=False)  # returns 'Japan'
     # uselive=False forces the use of internal files instead of accessing the live feeds.
     # It only needs to be supplied to the first call as the data once loaded is held
@@ -58,7 +60,6 @@ The usage of the country mappings functionality is best illustrated by some exam
     # '#geo+lon': '138.0812256', '#meta+id': '112', '#region+code+intermediate': '',
     # '#region+code+main': '142', '#region+code+sub': '30', '#region+intermediate+name+preferred': '',
     # '#region+main+name+preferred': 'Asia', '#region+name+preferred+sub': 'Eastern Asia'}
-    
     Country.get_countries_in_region('Channel Islands')
     # ['GGY', 'JEY']
     len(Country.get_countries_in_region('Africa'))

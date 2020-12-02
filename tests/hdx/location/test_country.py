@@ -12,7 +12,11 @@ class LocationError(Exception):
 
 
 class TestCountry:
-    def test_get_country_name_from_iso3(self):
+    @pytest.fixture(scope='function')
+    def overrides(self):
+        Country.set_country_name_overrides({'PSE': 'oPt'})
+
+    def test_get_country_name_from_iso3(self, overrides):
         assert Country.get_country_name_from_iso3('jpn', use_live=False) == 'Japan'
         assert Country.get_country_name_from_iso3('awe', use_live=False) is None
         assert Country.get_country_name_from_iso3('Pol', use_live=False) == 'Poland'
@@ -23,6 +27,7 @@ class TestCountry:
         assert Country.get_country_name_from_iso3('uy', use_live=False) is None
         assert Country.get_country_name_from_iso3('VeN', use_live=False) == 'Venezuela (Bolivarian Republic of)'
         assert Country.get_country_name_from_iso3('TWN', use_live=False) == 'Taiwan (Province of China)'
+        assert Country.get_country_name_from_iso3('PSE', use_live=False) == 'oPt'
 
     def test_get_iso2_from_iso3(self):
         assert Country.get_iso2_from_iso3('jpn', use_live=False) == 'JP'
@@ -36,7 +41,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_iso3_from_iso2('ab', use_live=False, exception=LocationError)
 
-    def test_get_country_info_from_iso3(self):
+    def test_get_country_info_from_iso3(self, overrides):
         assert Country.get_country_info_from_iso3('bih', use_live=False) == {
             '#country+alt+i_ar+name+v_unterm': 'البوسنة والهرسك',
             '#country+alt+i_en+name+v_unterm': 'Bonaire, Saint Eustatius and Saba',
@@ -69,8 +74,41 @@ class TestCountry:
             '#region+intermediate+name+preferred': '',
             '#region+main+name+preferred': 'Europe',
             '#region+name+preferred+sub': 'Southern Europe'}
+        assert Country.get_country_info_from_iso3('PSE', use_live=False) == {
+            '#meta+id': '170',
+            '#country+code+v_hrinfo_country': '351',
+            '#country+code+v_reliefweb': '180',
+            '#country+code+num+v_m49': '275',
+            '#country+code+v_fts': '171',
+            '#country+code+v_iso2': 'PS',
+            '#country+code+v_iso3': 'PSE',
+            '#country+name+preferred': 'State of Palestine',
+            '#country+alt+name+v_m49': '',
+            '#country+alt+name+v_iso': 'Palestine, State of',
+            '#country+alt+name+v_unterm': '',
+            '#country+alt+name+v_fts': 'occupied Palestinian territory',
+            '#country+alt+name+v_hrinfo_country': 'occupied Palestinian territory',
+            '#country+name+short+v_reliefweb': 'oPt',
+            '#country+alt+name+v_reliefweb': 'occupied Palestinian territory',
+            '#country+alt+i_en+name+v_unterm': 'Palestine',
+            '#country+alt+i_fr+name+v_unterm': 'État de Palestine',
+            '#country+alt+i_es+name+v_unterm': 'Estado de Palestina',
+            '#country+alt+i_ru+name+v_unterm': 'Государство Палестина',
+            '#country+alt+i_zh+name+v_unterm': '巴勒斯坦国',
+            '#country+alt+i_ar+name+v_unterm': 'دولة فلسطين',
+            '#geo+admin_level': '0',
+            '#geo+lat': '31.99084142',
+            '#geo+lon': '35.30744047',
+            '#region+code+main': '142',
+            '#region+main+name+preferred': 'Asia',
+            '#region+code+sub': '145',
+            '#region+name+preferred+sub': 'Western Asia',
+            '#region+code+intermediate': '',
+            '#region+intermediate+name+preferred': '',
+            '#country+regex': 'palestin|\\bgaza|west.?bank',
+            '#country+name+override': 'oPt'}
 
-    def test_get_country_info_from_iso2(self):
+    def test_get_country_info_from_iso2(self, overrides):
         assert Country.get_country_info_from_iso2('jp', use_live=False) == {
             '#country+alt+i_ar+name+v_unterm': 'اليابان',
             '#country+alt+i_en+name+v_unterm': 'Japan',
@@ -136,10 +174,44 @@ class TestCountry:
             '#region+intermediate+name+preferred': '',
             '#region+main+name+preferred': 'Asia',
             '#region+name+preferred+sub': 'Eastern Asia'}
+
+        assert Country.get_country_info_from_iso2('PS', use_live=False) == {
+            '#meta+id': '170',
+            '#country+code+v_hrinfo_country': '351',
+            '#country+code+v_reliefweb': '180',
+            '#country+code+num+v_m49': '275',
+            '#country+code+v_fts': '171',
+            '#country+code+v_iso2': 'PS',
+            '#country+code+v_iso3': 'PSE',
+            '#country+name+preferred': 'State of Palestine',
+            '#country+alt+name+v_m49': '',
+            '#country+alt+name+v_iso': 'Palestine, State of',
+            '#country+alt+name+v_unterm': '',
+            '#country+alt+name+v_fts': 'occupied Palestinian territory',
+            '#country+alt+name+v_hrinfo_country': 'occupied Palestinian territory',
+            '#country+name+short+v_reliefweb': 'oPt',
+            '#country+alt+name+v_reliefweb': 'occupied Palestinian territory',
+            '#country+alt+i_en+name+v_unterm': 'Palestine',
+            '#country+alt+i_fr+name+v_unterm': 'État de Palestine',
+            '#country+alt+i_es+name+v_unterm': 'Estado de Palestina',
+            '#country+alt+i_ru+name+v_unterm': 'Государство Палестина',
+            '#country+alt+i_zh+name+v_unterm': '巴勒斯坦国',
+            '#country+alt+i_ar+name+v_unterm': 'دولة فلسطين',
+            '#geo+admin_level': '0',
+            '#geo+lat': '31.99084142',
+            '#geo+lon': '35.30744047',
+            '#region+code+main': '142',
+            '#region+main+name+preferred': 'Asia',
+            '#region+code+sub': '145',
+            '#region+name+preferred+sub': 'Western Asia',
+            '#region+code+intermediate': '',
+            '#region+intermediate+name+preferred': '',
+            '#country+regex': 'palestin|\\bgaza|west.?bank',
+            '#country+name+override': 'oPt'}
         with pytest.raises(LocationError):
             Country.get_country_info_from_iso2('ab', use_live=False, exception=LocationError)
 
-    def test_get_country_name_from_iso2(self):
+    def test_get_country_name_from_iso2(self, overrides):
         assert Country.get_country_name_from_iso2('jp', use_live=False) == 'Japan'
         assert Country.get_country_name_from_iso2('ab', use_live=False) is None
         assert Country.get_country_name_from_iso2('Pl', use_live=False) == 'Poland'
@@ -149,6 +221,7 @@ class TestCountry:
             Country.get_country_name_from_iso2('SGP', use_live=False, exception=LocationError)
         assert Country.get_country_name_from_iso2('VE', use_live=False) == 'Venezuela (Bolivarian Republic of)'
         assert Country.get_country_name_from_iso2('TW', use_live=False) == 'Taiwan (Province of China)'
+        assert Country.get_country_name_from_iso2('PS', use_live=False) == 'oPt'
 
     def test_get_m49_from_iso3(self):
         assert Country.get_m49_from_iso3('AFG', use_live=False) == 4
@@ -165,7 +238,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_iso3_from_m49(9999, use_live=False, exception=LocationError)
 
-    def test_get_country_info_from_m49(self):
+    def test_get_country_info_from_m49(self, overrides):
         assert Country.get_country_info_from_m49(4, use_live=False) == {
             '#country+alt+i_ar+name+v_unterm': 'أفغانستان',
             '#country+alt+i_en+name+v_unterm': 'Afghanistan',
@@ -230,15 +303,49 @@ class TestCountry:
             '#region+intermediate+name+preferred': '',
             '#region+main+name+preferred': 'Oceania',
             '#region+name+preferred+sub': 'Polynesia'}
+        assert Country.get_country_info_from_m49(275, use_live=False) == {
+            '#meta+id': '170',
+            '#country+code+v_hrinfo_country': '351',
+            '#country+code+v_reliefweb': '180',
+            '#country+code+num+v_m49': '275',
+            '#country+code+v_fts': '171',
+            '#country+code+v_iso2': 'PS',
+            '#country+code+v_iso3': 'PSE',
+            '#country+name+preferred': 'State of Palestine',
+            '#country+alt+name+v_m49': '',
+            '#country+alt+name+v_iso': 'Palestine, State of',
+            '#country+alt+name+v_unterm': '',
+            '#country+alt+name+v_fts': 'occupied Palestinian territory',
+            '#country+alt+name+v_hrinfo_country': 'occupied Palestinian territory',
+            '#country+name+short+v_reliefweb': 'oPt',
+            '#country+alt+name+v_reliefweb': 'occupied Palestinian territory',
+            '#country+alt+i_en+name+v_unterm': 'Palestine',
+            '#country+alt+i_fr+name+v_unterm': 'État de Palestine',
+            '#country+alt+i_es+name+v_unterm': 'Estado de Palestina',
+            '#country+alt+i_ru+name+v_unterm': 'Государство Палестина',
+            '#country+alt+i_zh+name+v_unterm': '巴勒斯坦国',
+            '#country+alt+i_ar+name+v_unterm': 'دولة فلسطين',
+            '#geo+admin_level': '0',
+            '#geo+lat': '31.99084142',
+            '#geo+lon': '35.30744047',
+            '#region+code+main': '142',
+            '#region+main+name+preferred': 'Asia',
+            '#region+code+sub': '145',
+            '#region+name+preferred+sub': 'Western Asia',
+            '#region+code+intermediate': '',
+            '#region+intermediate+name+preferred': '',
+            '#country+regex': 'palestin|\\bgaza|west.?bank',
+            '#country+name+override': 'oPt'}
 
         assert Country.get_country_info_from_m49(9999, use_live=False) is None
         with pytest.raises(LocationError):
             Country.get_country_info_from_m49(9999, use_live=False, exception=LocationError)
 
-    def test_get_country_name_from_m49(self):
+    def test_get_country_name_from_m49(self, overrides):
         assert Country.get_country_name_from_m49(4, use_live=False) == 'Afghanistan'
         assert Country.get_country_name_from_m49(882, use_live=False) == 'Samoa'
         assert Country.get_country_name_from_m49(9999, use_live=False) is None
+        assert Country.get_country_name_from_m49(275, use_live=False) == 'oPt'
         with pytest.raises(LocationError):
             Country.get_country_name_from_m49(9999, use_live=False, exception=LocationError)
 

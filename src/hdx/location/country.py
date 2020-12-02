@@ -40,10 +40,11 @@ class Country(object):
     _countriesdata = None
     _ochaurl_int = 'https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596'
     _ochaurl = _ochaurl_int
+    _country_name_overrides = dict()
 
     @classmethod
     def _add_countriesdata(cls, iso3, country):
-        # type: (str, hxl.Row) -> None
+        # type: (str, hxl.Row) -> Dict
         """
         Set up countries data from data in form provided by UNStats and World Bank
 
@@ -52,9 +53,15 @@ class Country(object):
             country (hxl.Row): Country information
 
         Returns:
-            None
+            Dict: Country dictionary
         """
-        countryname = country.get('#country+name+preferred')
+
+        country = country.dictionary
+        countryname = cls._country_name_overrides.get(iso3)
+        if countryname is None:
+            countryname = country.get('#country+name+preferred')
+        else:
+            country['#country+name+override'] = countryname
         cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
         iso2 = country.get('#country+code+v_iso2')
         if iso2:
@@ -69,15 +76,15 @@ class Country(object):
             cls._countriesdata['m49iso3'][iso3] = m49
         cls._countriesdata['aliases'][iso3] = re.compile(country.get('#country+regex'), re.IGNORECASE)
         regionname = country.get('#region+main+name+preferred')
-        sub_regionname = country.get('#region+sub+name+preferred')
+        sub_regionname = country.get('#region+name+preferred+sub')
         intermediate_regionname = country.get('#region+intermediate+name+preferred')
-        regionid = country.get('#region+main+code')
+        regionid = country.get('#region+code+main')
         if regionid:
             regionid = int(regionid)
-        sub_regionid = country.get('#region+sub+code')
+        sub_regionid = country.get('#region+code+sub')
         if sub_regionid:
             sub_regionid = int(sub_regionid)
-        intermediate_regionid = country.get('#region+intermediate+code')
+        intermediate_regionid = country.get('#region+code+intermediate')
         if intermediate_regionid:
             intermediate_regionid = int(intermediate_regionid)
 
@@ -102,6 +109,7 @@ class Country(object):
             cls._countriesdata['regioncodes2names'][intermediate_regionid] = intermediate_regionname
             cls._countriesdata['regionnames2codes'][intermediate_regionname.upper()] = \
                 intermediate_regionid
+        return country
 
     @classmethod
     def set_countriesdata(cls, countries):
@@ -130,8 +138,8 @@ class Country(object):
             if not iso3:
                 continue
             iso3 = iso3.upper()
-            cls._add_countriesdata(iso3, country)
-            cls._countriesdata['countries'][iso3] = country.dictionary
+            countrydict = cls._add_countriesdata(iso3, country)
+            cls._countriesdata['countries'][iso3] = countrydict
 
         def sort_list(colname):
             for idval in cls._countriesdata[colname]:
@@ -183,6 +191,20 @@ class Country(object):
         cls._ochaurl = url
 
     @classmethod
+    def set_country_name_overrides(cls, country_name_overrides):
+        # type: (Dict) -> None
+        """
+        Setup name overrides using dictionary of mappings from iso3 to country name
+
+        Args:
+            country_name_overrides (Dict): Dictionary of mappings from iso3 to country name
+
+        Returns:
+            None
+        """
+        cls._country_name_overrides = country_name_overrides
+
+    @classmethod
     def get_country_info_from_iso3(cls, iso3, use_live=True, exception=None):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[Dict[str]]
         """Get country information from ISO3 code
@@ -219,6 +241,9 @@ class Country(object):
         """
         countryinfo = cls.get_country_info_from_iso3(iso3, use_live=use_live, exception=exception)
         if countryinfo is not None:
+            countryname = countryinfo.get('#country+name+override')
+            if countryname is not None:
+                return countryname
             return countryinfo.get('#country+name+preferred')
         return None
 
