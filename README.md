@@ -29,8 +29,9 @@ The usage of the country mappings functionality is best illustrated by some exam
 
     from hdx.location.country import Country
     
-    Country.set_country_name_overrides({'PSE': 'oPt'})
-    # Override default country name
+    Country.countriesdata(use_live=False, country_name_overrides={'PSE': 'oPt'})
+    # Set up using non live data from repo rather and override default country name
+    # (Leaving out this step will use live data and no overrides)
     Country.get_country_name_from_iso3('jpn', use_live=False)  # returns 'Japan'
     # uselive=False forces the use of internal files instead of accessing the live feeds.
     # It only needs to be supplied to the first call as the data once loaded is held

@@ -149,19 +149,22 @@ class Country(object):
         sort_list('regioncodes2countries')
 
     @classmethod
-    def countriesdata(cls, use_live=True):
-        # type: (bool) -> List[Dict[Dict]]
+    def countriesdata(cls, use_live=True, country_name_overrides=None):
+        # type: (bool, Dict) -> List[Dict[Dict]]
         """
         Read countries data from OCHA countries feed (falling back to file)
 
         Args:
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            country_name_overrides (Dict): Dictionary of mappings from iso3 to country name
 
         Returns:
             List[Dict[Dict]]: Countries dictionaries
         """
         if cls._countriesdata is None:
             countries = None
+            if country_name_overrides is not None:
+                cls.set_country_name_overrides(country_name_overrides)
             if use_live:
                 try:
                     countries = hxl.data(cls._ochaurl)
