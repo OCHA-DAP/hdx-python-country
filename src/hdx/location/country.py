@@ -41,6 +41,7 @@ class Country(object):
     _ochaurl_int = 'https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596'
     _ochaurl = _ochaurl_int
     _country_name_overrides = dict()
+    _country_name_mappings = dict()
 
     @classmethod
     def _add_countriesdata(cls, iso3, country):
@@ -57,12 +58,14 @@ class Country(object):
         """
 
         country = country.dictionary
+        for key in country:
+            if key[:13] == '#country+name':
+                value = country[key]
+                if value:
+                    cls._countriesdata['countrynames2iso3'][value.upper()] = iso3
         countryname = cls._country_name_overrides.get(iso3)
-        if countryname is None:
-            countryname = country.get('#country+name+preferred')
-        else:
+        if countryname is not None:
             country['#country+name+override'] = countryname
-        cls._countriesdata['countrynames2iso3'][countryname.upper()] = iso3
         iso2 = country.get('#country+code+v_iso2')
         if iso2:
             cls._countriesdata['iso2iso3'][iso2] = iso3
@@ -133,6 +136,9 @@ class Country(object):
         cls._countriesdata['regionnames2codes'] = dict()
         cls._countriesdata['aliases'] = dict()
 
+        for key, value in cls._country_name_mappings.items():
+            cls._countriesdata['countrynames2iso3'][key.upper()] = value.upper()
+
         for country in countries:
             iso3 = country.get('#country+code+v_iso3')
             if not iso3:
@@ -149,14 +155,15 @@ class Country(object):
         sort_list('regioncodes2countries')
 
     @classmethod
-    def countriesdata(cls, use_live=True, country_name_overrides=None):
-        # type: (bool, Dict) -> List[Dict[Dict]]
+    def countriesdata(cls, use_live=True, country_name_overrides=None, country_name_mappings=None):
+        # type: (bool, Dict, Dict) -> List[Dict[Dict]]
         """
         Read countries data from OCHA countries feed (falling back to file)
 
         Args:
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             country_name_overrides (Dict): Dictionary of mappings from iso3 to country name
+            country_name_mappings (Dict): Dictionary of mappings from country name to iso3
 
         Returns:
             List[Dict[Dict]]: Countries dictionaries
@@ -165,6 +172,8 @@ class Country(object):
             countries = None
             if country_name_overrides is not None:
                 cls.set_country_name_overrides(country_name_overrides)
+            if country_name_mappings is not None:
+                cls.set_country_name_mappings(country_name_mappings)
             if use_live:
                 try:
                     countries = hxl.data(cls._ochaurl)
@@ -206,6 +215,20 @@ class Country(object):
             None
         """
         cls._country_name_overrides = country_name_overrides
+
+    @classmethod
+    def set_country_name_mappings(cls, country_name_mappings):
+        # type: (Dict) -> None
+        """
+        Setup additional name mappings using dictionary of mappings from country name to iso3
+
+        Args:
+            country_name_mappings (Dict): Dictionary of mappings from country name to iso3
+
+        Returns:
+            None
+        """
+        cls._country_name_mappings = country_name_mappings
 
     @classmethod
     def get_country_info_from_iso3(cls, iso3, use_live=True, exception=None):

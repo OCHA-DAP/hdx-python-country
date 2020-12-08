@@ -14,7 +14,7 @@ class LocationError(Exception):
 class TestCountry:
     @pytest.fixture(scope='function')
     def setup(self):
-        Country.countriesdata(use_live=False, country_name_overrides={'PSE': 'oPt'})
+        Country.countriesdata(use_live=False, country_name_overrides={'PSE': 'oPt'}, country_name_mappings={'Congo DR': 'COD'})
 
     def test_get_country_name_from_iso3(self, setup):
         assert Country.get_country_name_from_iso3('jpn') == 'Japan'
@@ -380,9 +380,12 @@ class TestCountry:
         assert Country.get_iso3_country_code('Cayman Isl.') == 'CYM'
         assert Country.get_iso3_country_code('jp') == 'JPN'
         assert Country.get_iso3_country_code('Taiwan (Province of China)') == 'TWN'
+        assert Country.get_iso3_country_code('Congo DR') == 'COD'
+        assert Country.get_iso3_country_code('oPt') == 'PSE'
         assert Country.get_iso3_country_code_fuzzy('jpn') == ('JPN', True)
         assert Country.get_iso3_country_code_fuzzy('ZWE') == ('ZWE', True)
         assert Country.get_iso3_country_code_fuzzy('Vut') == ('VUT', True)
+        assert Country.get_iso3_country_code_fuzzy('Congo DR') == ('COD', True)
         assert Country.get_iso3_country_code('abc') is None
         assert Country.get_iso3_country_code('-') is None
         with pytest.raises(LocationError):
@@ -399,8 +402,8 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('UZBEKISTAN') == ('UZB', True)
         assert Country.get_iso3_country_code('Sierra') is None
         assert Country.get_iso3_country_code_fuzzy('Sierra') == ('SLE', False)
-        assert Country.get_iso3_country_code('Venezuela') is None
-        assert Country.get_iso3_country_code_fuzzy('Venezuela') == ('VEN', False)
+        assert Country.get_iso3_country_code('Venezuela') == 'VEN'
+        assert Country.get_iso3_country_code_fuzzy('Venezuela') == ('VEN', True)
         assert Country.get_iso3_country_code_fuzzy('Heard Isl.') == ('HMD', False)
         assert Country.get_iso3_country_code_fuzzy('Falkland Isl.') == ('FLK', False)
         assert Country.get_iso3_country_code_fuzzy('Czech Republic') == ('CZE', False)
