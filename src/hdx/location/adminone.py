@@ -158,21 +158,20 @@ class AdminOne(object):
             mindistance = None
             match = None
 
-            def check_name(lookup, mapname, index):
-                nonlocal mindistance, match
-
+            def check_name(mindistance, match, lookup, mapname, index):
                 distance = rs.distance(lookup, mapname)
                 if mindistance is None or distance < mindistance:
                     mindistance = distance
                     match = index
+                return mindistance, match
 
             for i, mapname in enumerate(lower_mapnames):
-                check_name(adm1_name_lookup, mapname, i)
+                mindistance, match = check_name(mindistance, match, adm1_name_lookup, mapname, i)
             for i, mapname in enumerate(lower_mapnames):
                 if mapname[:3] == 'al ':
-                    check_name(adm1_name_lookup, 'ad %s' % mapname[3:], i)
-                    check_name(adm1_name_lookup, mapname[3:], i)
-                check_name(adm1_name_lookup2, mapname, i)
+                    mindistance, match = check_name(mindistance, match, adm1_name_lookup, 'ad %s' % mapname[3:], i)
+                    mindistance, match = check_name(mindistance, match, adm1_name_lookup, mapname[3:], i)
+                mindistance, match = check_name(mindistance, match, adm1_name_lookup2, mapname, i)
 
             if mindistance is None or mindistance > match_threshold:
                 self.errors.add((scrapername, countryiso3, name))
