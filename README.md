@@ -1,19 +1,22 @@
 [![Build Status](https://travis-ci.org/OCHA-DAP/hdx-python-country.svg?branch=master&ts=1)](https://travis-ci.org/OCHA-DAP/hdx-python-country) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-python-country/badge.svg?branch=master&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-python-country?branch=master)
 
 The HDX Python Country Library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
-using live official data from the [UN OCHA]() feed with fallbacks to an internal static file if there is any problem 
-with retrieving data from the url. (Also it is possible to force the use of the internal static files.)
+using live official data from the [UN OCHA](https://vocabulary.unocha.org/) feed with fallbacks to an internal static 
+file if there is any problem with retrieving data from the url. (Also it is possible to force the use of the internal 
+static files.)
 
 There is a fuzzy matching look up that can handle abbreviations in country names like Dem. for Democratic and Rep. for 
 Republic.
 
+Mapping administration level one names from a source to a base set is also handled including phonetic fuzzy name matching.  
+
 Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
 (UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
 return full country information do so in a different format to 1.x.x. The format they use is a dictionary using
-[Humanitarian Exchange Language]() (HXL) hashtags as keys.
+[Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags as keys.
 
-This library is part of the [Humanitarian Data Exchange]() (HDX) project. If you have humanitarian related data, please 
-upload your datasets to HDX.
+This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) (HDX) project. If you have 
+humanitarian related data, please upload your datasets to HDX.
 
   - [Usage](#usage)
   - [Countries](#countries)
@@ -67,3 +70,21 @@ The usage of the country mappings functionality is best illustrated by some exam
     # 60
     Country.get_countries_in_region(13)
     # ['BLZ', 'CRI', 'GTM', 'HND', 'MEX', 'NIC', 'PAN', 'SLV']
+    
+The administration level one mappings requires using an input configuration dictionary, admin_config, with key 
+*admin1_info* which is a list with values of the form:
+
+    {'iso3': 'AFG', 'pcode': 'AF01', 'name': 'Kabul'}
+
+Various other keys are optional:
+
+*countries_fuzzy_try* are countries (iso3 codes) for which to try fuzzy matching. Default is all countries.
+*admin1_name_mappings* is a dictionary of mappings from name to pcode (for where fuzzy matching fails)
+*admin1_name_replacements* is a dictionary of textual replacements to try when fuzzy matching
+*admin1_fuzzy_dont* is a list of names for which fuzzy matching should not be tried
+
+Examples of usage:
+
+    adminone = AdminOne(config)
+    assert adminone.get_pcode('YEM', 'YEM030', scrapername='test')  # returns ('YE30', True)
+    assert adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test')  # returns ('YE30', False)

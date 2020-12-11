@@ -20,7 +20,7 @@ class CountryError(Exception):
 
 
 class Country(object):
-    """Location class with various methods to help with countries and regions. Uses OCHA countries feed which
+    """Country class with various methods to help with countries and regions. Uses OCHA countries feed which
     supplies data in form:
     ::
         ID,HRinfo ID,RW ID,m49 numerical code,FTS API ID,Appears in UNTERM list,Appears in DGACM list,ISO 3166-1 Alpha 2-Codes,ISO 3166-1 Alpha 3-Codes,x Alpha2 codes,x Alpha3 codes,Preferred Term,m49 Alt Term,ISO Alt Term,UNTERM Alt Term,FTS Alt Term,HRinfo Alt Term,RW Short Name,RW API Alt Term,English Short,French Short,Spanish Short,Russian Short,Chinese Short,Arabic Short,Admin Level,Latitude,Longitude,Region Code,Region Name,Sub-region Code,Sub-region Name,Intermediate Region Code,Intermediate Region Name,Regex,Concatenation
@@ -536,7 +536,7 @@ class Country(object):
 
     @classmethod
     def get_iso3_country_code_fuzzy(cls, country, use_live=True, exception=None, min_chars=5):
-        # type: (str, bool, Optional[ExceptionUpperBound], int) -> Tuple[Optional[str], bool]]
+        # type: (str, bool, Optional[ExceptionUpperBound], int) -> Tuple[Optional[str], bool]
         """Get ISO3 code for cls. A tuple is returned with the first value being the ISO3 code and the second
         showing if the match is exact or not.
 
