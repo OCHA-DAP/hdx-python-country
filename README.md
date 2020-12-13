@@ -8,7 +8,8 @@ static files.)
 There is a fuzzy matching look up that can handle abbreviations in country names like Dem. for Democratic and Rep. for 
 Republic.
 
-Mapping administration level one names from a source to a base set is also handled including phonetic fuzzy name matching.  
+Mapping administration level one names from a source to a base set is also handled including phonetic fuzzy name 
+matching if you are running Python 3.  
 
 Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
 (UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
@@ -87,4 +88,5 @@ Examples of usage:
 
     adminone = AdminOne(config)
     assert adminone.get_pcode('YEM', 'YEM030', scrapername='test')  # returns ('YE30', True)
+    # Fuzzy matching in Python 3 only
     assert adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test')  # returns ('YE30', False)

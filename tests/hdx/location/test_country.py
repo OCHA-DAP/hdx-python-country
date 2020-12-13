@@ -11,12 +11,9 @@ class LocationError(Exception):
     pass
 
 
+# Note that the Country class is set up in __init__.py
 class TestCountry:
-    @pytest.fixture(scope='function')
-    def setup(self):
-        Country.countriesdata(use_live=False, country_name_overrides={'PSE': 'oPt'}, country_name_mappings={'Congo DR': 'COD'})
-
-    def test_get_country_name_from_iso3(self, setup):
+    def test_get_country_name_from_iso3(self):
         assert Country.get_country_name_from_iso3('jpn') == 'Japan'
         assert Country.get_country_name_from_iso3('awe') is None
         assert Country.get_country_name_from_iso3('Pol') == 'Poland'
@@ -29,19 +26,19 @@ class TestCountry:
         assert Country.get_country_name_from_iso3('TWN') == 'Taiwan (Province of China)'
         assert Country.get_country_name_from_iso3('PSE') == 'oPt'
 
-    def test_get_iso2_from_iso3(self, setup):
+    def test_get_iso2_from_iso3(self):
         assert Country.get_iso2_from_iso3('jpn') == 'JP'
         assert Country.get_iso2_from_iso3('abc') is None
         with pytest.raises(LocationError):
             Country.get_iso2_from_iso3('abc', exception=LocationError)
 
-    def test_get_iso3_from_iso2(self, setup):
+    def test_get_iso3_from_iso2(self):
         assert Country.get_iso3_from_iso2('jp') == 'JPN'
         assert Country.get_iso3_from_iso2('ab') is None
         with pytest.raises(LocationError):
             Country.get_iso3_from_iso2('ab', exception=LocationError)
 
-    def test_get_country_info_from_iso3(self, setup):
+    def test_get_country_info_from_iso3(self):
         assert Country.get_country_info_from_iso3('bih') == {
             '#country+alt+i_ar+name+v_unterm': 'البوسنة والهرسك',
             '#country+alt+i_en+name+v_unterm': 'Bonaire, Saint Eustatius and Saba',
@@ -108,7 +105,7 @@ class TestCountry:
             '#country+regex': 'palestin|\\bgaza|west.?bank',
             '#country+name+override': 'oPt'}
 
-    def test_get_country_info_from_iso2(self, setup):
+    def test_get_country_info_from_iso2(self):
         assert Country.get_country_info_from_iso2('jp') == {
             '#country+alt+i_ar+name+v_unterm': 'اليابان',
             '#country+alt+i_en+name+v_unterm': 'Japan',
@@ -211,7 +208,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_country_info_from_iso2('ab', exception=LocationError)
 
-    def test_get_country_name_from_iso2(self, setup):
+    def test_get_country_name_from_iso2(self):
         assert Country.get_country_name_from_iso2('jp') == 'Japan'
         assert Country.get_country_name_from_iso2('ab') is None
         assert Country.get_country_name_from_iso2('Pl') == 'Poland'
@@ -223,7 +220,7 @@ class TestCountry:
         assert Country.get_country_name_from_iso2('TW') == 'Taiwan (Province of China)'
         assert Country.get_country_name_from_iso2('PS') == 'oPt'
 
-    def test_get_m49_from_iso3(self, setup):
+    def test_get_m49_from_iso3(self):
         assert Country.get_m49_from_iso3('AFG') == 4
         assert Country.get_m49_from_iso3('WSM') == 882
         assert Country.get_m49_from_iso3('TWN') is 158
@@ -231,14 +228,14 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_m49_from_iso3('ABC', exception=LocationError)
 
-    def test_get_iso3_from_m49(self, setup):
+    def test_get_iso3_from_m49(self):
         assert Country.get_iso3_from_m49(4) == 'AFG'
         assert Country.get_iso3_from_m49(882) == 'WSM'
         assert Country.get_iso3_from_m49(9999) is None
         with pytest.raises(LocationError):
             Country.get_iso3_from_m49(9999, exception=LocationError)
 
-    def test_get_country_info_from_m49(self, setup):
+    def test_get_country_info_from_m49(self):
         assert Country.get_country_info_from_m49(4) == {
             '#country+alt+i_ar+name+v_unterm': 'أفغانستان',
             '#country+alt+i_en+name+v_unterm': 'Afghanistan',
@@ -341,7 +338,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_country_info_from_m49(9999, exception=LocationError)
 
-    def test_get_country_name_from_m49(self, setup):
+    def test_get_country_name_from_m49(self):
         assert Country.get_country_name_from_m49(4) == 'Afghanistan'
         assert Country.get_country_name_from_m49(882) == 'Samoa'
         assert Country.get_country_name_from_m49(9999) is None
@@ -426,7 +423,7 @@ class TestCountry:
         with pytest.raises(ValueError):
             Country.get_iso3_country_code_fuzzy('abcde', exception=ValueError)
 
-    def test_get_countries_in_region(self, setup):
+    def test_get_countries_in_region(self):
         assert Country.get_countries_in_region('Eastern Asia') == ['CHN', 'HKG', 'JPN', 'KOR', 'MAC',
                                                                                    'MNG', 'PRK', 'TWN']
         assert len(Country.get_countries_in_region('Africa')) == 60
@@ -437,7 +434,7 @@ class TestCountry:
         with pytest.raises(LocationError):
             Country.get_countries_in_region('NOTEXIST', exception=LocationError)
 
-    def test_ocha_feed_file_working(self, setup):
+    def test_ocha_feed_file_working(self):
         countries = hxl.data(script_dir_plus_file('Countries_UZB_Deleted.csv', TestCountry), allow_local=True)
         Country.set_countriesdata(countries)
         assert Country.get_iso3_country_code('UZBEKISTAN') is None

@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
+import sys
 import logging
 import re
 import unicodedata
+
+import six
 from typing import Dict, Optional, Tuple, List
 
 from hdx.location.country import Country
 from hdx.utilities.text import multiple_replace
-import pyphonetics
+if sys.version_info[0] == 3:
+    import pyphonetics
 from unidecode import unidecode
 
 logger = logging.getLogger(__name__)
@@ -133,7 +137,7 @@ class AdminOne(object):
             self.ignored.add((scrapername, countryiso3, name))
             return None
         # Replace accented characters with non accented ones
-        adm1_name_lookup = ''.join((c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn'))
+        adm1_name_lookup = ''.join((c for c in unicodedata.normalize('NFD', six.u(name)) if unicodedata.category(c) != 'Mn'))
         # Remove all non-ASCII characters
         adm1_name_lookup = re.sub(ascii, ' ', adm1_name_lookup)
         adm1_name_lookup = unidecode(adm1_name_lookup)
@@ -152,6 +156,9 @@ class AdminOne(object):
                     self.matches.add((scrapername, countryiso3, name, self.pcode_to_name[pcode], 'substring'))
                     break
         if not pcode:
+            if sys.version_info[0] == 2:
+                self.errors.add((scrapername, countryiso3, name))
+                return None
             map_names = list(name_to_pcode.keys())
             lower_mapnames = [x.lower() for x in map_names]
             rs = pyphonetics.RefinedSoundex()

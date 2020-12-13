@@ -1,15 +1,12 @@
 # -*- coding: UTF-8 -*-
 """location Tests"""
+import sys
 from os.path import join
 
 import pytest
 from hdx.utilities.loader import load_yaml
 
 from hdx.location.adminone import AdminOne
-
-
-class LocationError(Exception):
-    pass
 
 
 class TestAdminOne:
@@ -35,8 +32,6 @@ class TestAdminOne:
         assert adminone.get_pcode('NER', 'ABCDEFGH', scrapername='test') == (None, False)
         assert adminone.get_pcode('YEM', 'Ad Dali', scrapername='test') == ('YE30', True)
         assert adminone.get_pcode('YEM', 'Ad Dal', scrapername='test') == ('YE30', False)
-        assert adminone.get_pcode('YEM', 'Al Dali', scrapername='test') == ('YE30', False)
-        assert adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test') == ('YE30', False)
         assert adminone.get_pcode('YEM', 'nord', scrapername='test') == (None, False)
         assert adminone.get_pcode('NGA', 'FCT (Abuja)', scrapername='test') == ('NG015', True)
         assert adminone.get_pcode('UKR', 'Chernihiv Oblast', scrapername='test') == ('UA74', False)
@@ -46,8 +41,6 @@ class TestAdminOne:
                           'test - NGA: Matching (pcode length conversion) NG015 to Federal Capital Territory on map',
                           'test - UKR: Matching (substring) Chernihiv Oblast to Chernihivska on map',
                           'test - YEM: Matching (substring) Ad Dal to Ad Dali on map',
-                          'test - YEM: Matching (fuzzy) Al Dali to Ad Dali on map',
-                          "test - YEM: Matching (fuzzy) Al Dhale'e / الضالع to Ad Dali on map",
                           'test - YEM: Matching (pcode length conversion) YE30 to Ad Dali on map']
         output = adminone.output_ignored()
         assert output == ['test - Ignored ABC!',
@@ -57,3 +50,12 @@ class TestAdminOne:
         output = adminone.output_errors()
         assert output == ['test - Could not find ABC in map names!',
                           'test - NER: Could not find ABCDEFGH in map names!']
+
+    @pytest.mark.skipif(sys.version_info[0] == 2, reason='Requires Python 3 or higher')
+    def test_adminone_fuzzy(self, config):
+        adminone = AdminOne(config)
+        assert adminone.get_pcode('YEM', 'Al Dali', scrapername='test') == ('YE30', False)
+        assert adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test') == ('YE30', False)
+        output = adminone.output_matches()
+        assert output == ['test - YEM: Matching (fuzzy) Al Dali to Ad Dali on map',
+                          "test - YEM: Matching (fuzzy) Al Dhale'e / الضالع to Ad Dali on map"]
