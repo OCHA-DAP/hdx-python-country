@@ -223,7 +223,7 @@ class TestCountry:
     def test_get_m49_from_iso3(self):
         assert Country.get_m49_from_iso3('AFG') == 4
         assert Country.get_m49_from_iso3('WSM') == 882
-        assert Country.get_m49_from_iso3('TWN') is 158
+        assert Country.get_m49_from_iso3('TWN') == 158
         assert Country.get_m49_from_iso3('ABC') is None
         with pytest.raises(LocationError):
             Country.get_m49_from_iso3('ABC', exception=LocationError)
