@@ -20,14 +20,14 @@ This library is part of the [Humanitarian Data Exchange](https://data.humdata.or
 humanitarian related data, please upload your datasets to HDX.
 
   - [Usage](#usage)
-  - [Countries](#countries)
+  - [Examples](#examples)
 
 ## Usage
 
 The library has detailed API documentation which can be found here: <http://ocha-dap.github.io/hdx-python-country/>. 
 The code for the library is here: <https://github.com/ocha-dap/hdx-python-country>.
 
-### Countries
+### Examples
 
 The usage of the country mappings functionality is best illustrated by some examples:
 
