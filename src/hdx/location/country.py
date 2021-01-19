@@ -567,6 +567,15 @@ class Country(object):
             for word in wordlist:
                 if word_or_part in word:
                     wordlist.remove(word)
+                    if word_or_part == word:
+                        return 35
+                    return 17
+
+        # regex lookup
+        for iso3, regex in countriesdata['aliases'].items():
+            index = re.search(regex, country.upper())
+            if index is not None:
+                return iso3, False
 
         # fuzzy matching
         expanded_country_candidates = cls.expand_countryname_abbrevs(country)
@@ -579,8 +588,8 @@ class Country(object):
                     words = get_words_in_sentence(countryname)
                     new_match_strength = 0
                     if simplified_country:
-                        remove_matching_from_list(words, simplified_country)
-                        new_match_strength += 32
+                        strength_to_add = remove_matching_from_list(words, simplified_country)
+                        new_match_strength += strength_to_add
                     for word in removed_words:
                         if word in countryname:
                             remove_matching_from_list(words, word)
@@ -604,12 +613,6 @@ class Country(object):
 
         if len(matches) == 1 and match_strength > 16:
             return matches.pop(), False
-
-        # regex lookup
-        for iso3, regex in countriesdata['aliases'].items():
-            index = re.search(regex, country.upper())
-            if index is not None:
-                return iso3, False
 
         if exception is not None:
             raise exception

@@ -41,7 +41,7 @@ class TestCountry:
     def test_get_country_info_from_iso3(self):
         assert Country.get_country_info_from_iso3('bih') == {
             '#country+alt+i_ar+name+v_unterm': 'البوسنة والهرسك',
-            '#country+alt+i_en+name+v_unterm': 'Bonaire, Saint Eustatius and Saba',
+            '#country+alt+i_en+name+v_unterm': 'Bosnia and Herzegovina',
             '#country+alt+i_es+name+v_unterm': 'Bosnia y Herzegovina',
             '#country+alt+i_fr+name+v_unterm': 'Bosnie-Herzégovine (la)',
             '#country+alt+i_ru+name+v_unterm': 'Босния и Герцеговина',
@@ -395,6 +395,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('United Kingdom of Great Britain and Northern Ireland') == ('GBR', True)
         assert Country.get_iso3_country_code_fuzzy('united states') == ('USA', False)
         assert Country.get_iso3_country_code_fuzzy('united states of america') == ('USA', True)
+        assert Country.get_iso3_country_code_fuzzy('america') == ('USA', False)
         assert Country.get_iso3_country_code('UZBEKISTAN') == 'UZB'
         assert Country.get_iso3_country_code_fuzzy('UZBEKISTAN') == ('UZB', True)
         assert Country.get_iso3_country_code('Sierra') is None
