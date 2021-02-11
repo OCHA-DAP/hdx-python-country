@@ -8,7 +8,7 @@ from hdx.utilities.loader import load_file_to_str
 
 requirements = ['hdx-python-utilities>=2.5.7',
                 'libhxl==4.5.1;python_version<"3"',
-                'libhxl>=4.22;python_version>="3"',
+                'libhxl>=4.23;python_version>="3"',
                 'pyphonetics']
 
 classifiers = [
