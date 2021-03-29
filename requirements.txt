@@ -1,4 +1,4 @@
-hdx-python-utilities==2.6.1
+hdx-python-utilities==2.6.2
 libhxl==4.5.1;python_version<'3'
 libhxl==4.23;python_version>='3'
 pyphonetics==0.5.3
