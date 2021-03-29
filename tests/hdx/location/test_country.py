@@ -160,7 +160,7 @@ class TestCountry:
             '#country+code+v_reliefweb': '61',
             '#country+name+preferred': 'Taiwan (Province of China)',
             '#country+name+short+v_reliefweb': '',
-            '#country+regex': '.*taiwan|.*taipei|.*formosa|^(?!.*\\bdem)(?!.*\\bpe)(?!.*\\bdr)(^rep.*).*\\bchina.*(?!.*\\bdem.*)(?!\\bpe.*)(?!.*\\bdr.*).*|^ROC$',
+            '#country+regex': '.*taiwan|.*taipei|.*formosa|^(?!.*\\bdem)(?!.*\\bpe)(?!.*\\bdr)(^rep.*).*\\bchina.*(?!.*\\bdem.*)(?!\\bpe.*)(?!.*\\bdr.*).*|^ROC$|^taiwan r\.?o\.?c\.?$',
             '#geo+admin_level': '0',
             '#geo+lat': '23.74652012',
             '#geo+lon': '120.9621301',
@@ -289,7 +289,7 @@ class TestCountry:
             '#country+code+v_reliefweb': '204',
             '#country+name+preferred': 'Samoa',
             '#country+name+short+v_reliefweb': '',
-            '#country+regex': '^(?!.*amer.*)samoa|(\\bindep.*samoa)',
+            '#country+regex': '^(?!.*amer.*)samoa|(\\bindep.*samoa)|^west.*samoa',
             '#geo+admin_level': '0',
             '#geo+lat': '-13.16992041',
             '#geo+lon': '-173.5139768',
@@ -408,6 +408,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('Czech Rep.') == ('CZE', False)
         assert Country.get_iso3_country_code_fuzzy('Islamic Rep. of Iran') == ('IRN', False)
         assert Country.get_iso3_country_code_fuzzy('Dem. Congo') == ('COD', False)
+        assert Country.get_iso3_country_code_fuzzy('Congo, Democratic Republic') == ('COD', False)
         assert Country.get_iso3_country_code_fuzzy('Congo, Republic of') == ('COG', False)
         assert Country.get_iso3_country_code_fuzzy('Republic of the Congo') == ('COG', False)
         assert Country.get_iso3_country_code_fuzzy('Vietnam') == ('VNM', False)
