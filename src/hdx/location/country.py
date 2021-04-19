@@ -44,50 +44,48 @@ class Country(object):
     _country_name_mappings = dict()
 
     @classmethod
-    def _add_countriesdata(cls, iso3, country):
+    def _add_countriesdata(cls, iso3, hxlcountry):
         # type: (str, hxl.Row) -> Dict
         """
         Set up countries data from data in form provided by UNStats and World Bank
 
         Args:
             iso3 (str): ISO3 code for country
-            country (hxl.Row): Country information
+            hxlcountry (hxl.Row): Country information
 
         Returns:
             Dict: Country dictionary
         """
 
-        country = country.dictionary
-        for key in country:
-            if key[:13] == '#country+name':
-                value = country[key]
-                if value:
-                    cls._countriesdata['countrynames2iso3'][value.upper()] = iso3
+        country = hxlcountry.dictionary
+        for value in hxlcountry.get_all('#country+name'):
+            if value:
+                cls._countriesdata['countrynames2iso3'][value.upper()] = iso3
         countryname = cls._country_name_overrides.get(iso3)
         if countryname is not None:
             country['#country+name+override'] = countryname
-        iso2 = country.get('#country+code+v_iso2')
+        iso2 = hxlcountry.get('#country+code+v_iso2')
         if iso2:
             cls._countriesdata['iso2iso3'][iso2] = iso3
             # different types so keys won't clash
             cls._countriesdata['iso2iso3'][iso3] = iso2
-        m49 = country.get('#country+code+num+v_m49')
+        m49 = hxlcountry.get('#country+code+num+v_m49')
         if m49:
             m49 = int(m49)
             cls._countriesdata['m49iso3'][m49] = iso3
             # different types so keys won't clash
             cls._countriesdata['m49iso3'][iso3] = m49
-        cls._countriesdata['aliases'][iso3] = re.compile(country.get('#country+regex'), re.IGNORECASE)
-        regionname = country.get('#region+main+name+preferred')
-        sub_regionname = country.get('#region+name+preferred+sub')
-        intermediate_regionname = country.get('#region+intermediate+name+preferred')
-        regionid = country.get('#region+code+main')
+        cls._countriesdata['aliases'][iso3] = re.compile(hxlcountry.get('#country+regex'), re.IGNORECASE)
+        regionname = hxlcountry.get('#region+main+name+preferred')
+        sub_regionname = hxlcountry.get('#region+name+preferred+sub')
+        intermediate_regionname = hxlcountry.get('#region+intermediate+name+preferred')
+        regionid = hxlcountry.get('#region+code+main')
         if regionid:
             regionid = int(regionid)
-        sub_regionid = country.get('#region+code+sub')
+        sub_regionid = hxlcountry.get('#region+code+sub')
         if sub_regionid:
             sub_regionid = int(sub_regionid)
-        intermediate_regionid = country.get('#region+code+intermediate')
+        intermediate_regionid = hxlcountry.get('#region+code+intermediate')
         if intermediate_regionid:
             intermediate_regionid = int(intermediate_regionid)
 

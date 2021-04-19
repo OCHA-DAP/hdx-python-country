@@ -379,10 +379,12 @@ class TestCountry:
         assert Country.get_iso3_country_code('Taiwan (Province of China)') == 'TWN'
         assert Country.get_iso3_country_code('Congo DR') == 'COD'
         assert Country.get_iso3_country_code('oPt') == 'PSE'
+        assert Country.get_iso3_country_code('Laos') == 'LAO'
         assert Country.get_iso3_country_code_fuzzy('jpn') == ('JPN', True)
         assert Country.get_iso3_country_code_fuzzy('ZWE') == ('ZWE', True)
         assert Country.get_iso3_country_code_fuzzy('Vut') == ('VUT', True)
         assert Country.get_iso3_country_code_fuzzy('Congo DR') == ('COD', True)
+        assert Country.get_iso3_country_code_fuzzy('laos') == ('LAO', True)
         assert Country.get_iso3_country_code('abc') is None
         assert Country.get_iso3_country_code('-') is None
         with pytest.raises(LocationError):
@@ -391,9 +393,9 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy('-') == (None, False)
         with pytest.raises(LocationError):
             Country.get_iso3_country_code_fuzzy('abcde', exception=LocationError)
-        assert Country.get_iso3_country_code_fuzzy('United Kingdom') == ('GBR', False)
+        assert Country.get_iso3_country_code_fuzzy('United Kingdom') == ('GBR', True)
         assert Country.get_iso3_country_code_fuzzy('United Kingdom of Great Britain and Northern Ireland') == ('GBR', True)
-        assert Country.get_iso3_country_code_fuzzy('united states') == ('USA', False)
+        assert Country.get_iso3_country_code_fuzzy('united states') == ('USA', True)
         assert Country.get_iso3_country_code_fuzzy('united states of america') == ('USA', True)
         assert Country.get_iso3_country_code_fuzzy('america') == ('USA', False)
         assert Country.get_iso3_country_code('UZBEKISTAN') == 'UZB'
@@ -403,23 +405,23 @@ class TestCountry:
         assert Country.get_iso3_country_code('Venezuela') == 'VEN'
         assert Country.get_iso3_country_code_fuzzy('Venezuela') == ('VEN', True)
         assert Country.get_iso3_country_code_fuzzy('Heard Isl.') == ('HMD', False)
-        assert Country.get_iso3_country_code_fuzzy('Falkland Isl.') == ('FLK', False)
-        assert Country.get_iso3_country_code_fuzzy('Czech Republic') == ('CZE', False)
-        assert Country.get_iso3_country_code_fuzzy('Czech Rep.') == ('CZE', False)
+        assert Country.get_iso3_country_code_fuzzy('Falkland Isl.') == ('FLK', True)
+        assert Country.get_iso3_country_code_fuzzy('Czech Republic') == ('CZE', True)
+        assert Country.get_iso3_country_code_fuzzy('Czech Rep.') == ('CZE', True)
         assert Country.get_iso3_country_code_fuzzy('Islamic Rep. of Iran') == ('IRN', False)
         assert Country.get_iso3_country_code_fuzzy('Dem. Congo') == ('COD', False)
         assert Country.get_iso3_country_code_fuzzy('Congo, Democratic Republic') == ('COD', False)
         assert Country.get_iso3_country_code_fuzzy('Congo, Republic of') == ('COG', False)
         assert Country.get_iso3_country_code_fuzzy('Republic of the Congo') == ('COG', False)
         assert Country.get_iso3_country_code_fuzzy('Vietnam') == ('VNM', False)
-        assert Country.get_iso3_country_code_fuzzy('South Korea') == ('KOR', False)
+        assert Country.get_iso3_country_code_fuzzy('South Korea') == ('KOR', True)
         assert Country.get_iso3_country_code_fuzzy('Korea Republic') == ('KOR', False)
         assert Country.get_iso3_country_code_fuzzy('Dem. Republic Korea') == ('PRK', False)
-        assert Country.get_iso3_country_code_fuzzy('North Korea') == ('PRK', False)
+        assert Country.get_iso3_country_code_fuzzy('North Korea') == ('PRK', True)
         assert Country.get_iso3_country_code_fuzzy('Serbia and Kosovo: S/RES/1244 (1999)') == ('SRB', False)
         assert Country.get_iso3_country_code_fuzzy('U.S. Virgin Islands') == ('VIR', True)
         assert Country.get_iso3_country_code_fuzzy('U.K. Virgin Islands') == ('VGB', False)
-        assert Country.get_iso3_country_code_fuzzy('Taiwan') == ('TWN', False)
+        assert Country.get_iso3_country_code_fuzzy('Taiwan') == ('TWN', True)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code('abc', exception=ValueError)
         with pytest.raises(ValueError):
