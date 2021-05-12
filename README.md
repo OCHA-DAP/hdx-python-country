@@ -5,8 +5,8 @@ using live official data from the [UN OCHA](https://vocabulary.unocha.org/) feed
 file if there is any problem with retrieving data from the url. (Also it is possible to force the use of the internal 
 static files.)
 
-There is a fuzzy matching look up that can handle abbreviations in country names like Dem. for Democratic and Rep. for 
-Republic.
+It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a fuzzy matching for English look up 
+that can handle abbreviations in country names like Dem. for Democratic and Rep. for Republic.
 
 Mapping administration level one names from a source to a base set is also handled including phonetic fuzzy name 
 matching if you are running Python 3.  
