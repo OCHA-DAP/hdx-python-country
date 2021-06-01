@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 import sys
 import logging
-import re
-import unicodedata
-
-import six
 from typing import Dict, Optional, Tuple, List
 
+from hdx.location import clean_name
 from hdx.location.country import Country
 from hdx.utilities.text import multiple_replace
-if sys.version_info[0] == 3:
-    import pyphonetics
 from unidecode import unidecode
 
-logger = logging.getLogger(__name__)
+from hdx.location.phonetics import Phonetics
 
-ascii = '([^\x00-\x7F])+'
-match_threshold = 2
+logger = logging.getLogger(__name__)
 
 
 class AdminOne(object):
@@ -33,6 +27,7 @@ class AdminOne(object):
 
     Args:
         admin_config (Dict): Configuration dictionary
+        phonetics (Phonetics): Phonetics object to use. Defaults to None (new instance).
     """
 
     _admininfo = None
@@ -42,8 +37,8 @@ class AdminOne(object):
     pcode_to_name = dict()
     pcode_to_iso3 = dict()
 
-    def __init__(self, admin_config):
-        # type: (Dict) -> None
+    def __init__(self, admin_config, phonetics=None):
+        # type: (Dict, Phonetics) -> None
         admin_info1 = admin_config['admin1_info']
         self.countries_fuzzy_try = admin_config.get('countries_fuzzy_try')
         self.admin1_name_mappings = admin_config.get('admin1_name_mappings', dict())
@@ -61,6 +56,9 @@ class AdminOne(object):
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
         self.init_matches_errors()
+        if phonetics is None:
+            phonetics = Phonetics()
+        self.phonetics = phonetics
 
     def init_matches_errors(self):
         # type: () -> None
@@ -136,12 +134,7 @@ class AdminOne(object):
         if name.lower() in self.admin1_fuzzy_dont:
             self.ignored.add((scrapername, countryiso3, name))
             return None
-        # Replace accented characters with non accented ones
-        adm1_name_lookup = ''.join((c for c in unicodedata.normalize('NFD', six.u(name)) if unicodedata.category(c) != 'Mn'))
-        # Remove all non-ASCII characters
-        adm1_name_lookup = re.sub(ascii, ' ', adm1_name_lookup)
-        adm1_name_lookup = unidecode(adm1_name_lookup)
-        adm1_name_lookup = adm1_name_lookup.strip().lower()
+        adm1_name_lookup = clean_name(name)
         adm1_name_lookup2 = multiple_replace(adm1_name_lookup, self.admin1_name_replacements)
         pcode = name_to_pcode.get(adm1_name_lookup, name_to_pcode.get(adm1_name_lookup2))
         if not pcode:
@@ -156,35 +149,29 @@ class AdminOne(object):
                     self.matches.add((scrapername, countryiso3, name, self.pcode_to_name[pcode], 'substring'))
                     break
         if not pcode:
-            if sys.version_info[0] == 2:
-                self.errors.add((scrapername, countryiso3, name))
-                return None
             map_names = list(name_to_pcode.keys())
             lower_mapnames = [x.lower() for x in map_names]
-            rs = pyphonetics.RefinedSoundex()
-            mindistance = None
-            match = None
 
-            def check_name(mindistance, match, lookup, mapname, index):
-                distance = rs.distance(lookup, mapname)
-                if mindistance is None or distance < mindistance:
-                    mindistance = distance
-                    match = index
-                return mindistance, match
+            def al_transform_1(name):
+                if name[:3] == 'al ':
+                    return 'ad %s' % name[3:]
+                else:
+                    return None
 
-            for i, mapname in enumerate(lower_mapnames):
-                mindistance, match = check_name(mindistance, match, adm1_name_lookup, mapname, i)
-            for i, mapname in enumerate(lower_mapnames):
-                if mapname[:3] == 'al ':
-                    mindistance, match = check_name(mindistance, match, adm1_name_lookup, 'ad %s' % mapname[3:], i)
-                    mindistance, match = check_name(mindistance, match, adm1_name_lookup, mapname[3:], i)
-                mindistance, match = check_name(mindistance, match, adm1_name_lookup2, mapname, i)
+            def al_transform_2(name):
+                if name[:3] == 'al ':
+                    return name[3:]
+                else:
+                    return None
 
-            if mindistance is None or mindistance > match_threshold:
+            matching_index = self.phonetics.match(lower_mapnames, adm1_name_lookup, alternative_name=adm1_name_lookup2,
+                                                  transform_possible_names=[al_transform_1, al_transform_2])
+
+            if matching_index is None:
                 self.errors.add((scrapername, countryiso3, name))
                 return None
 
-            map_name = map_names[match]
+            map_name = map_names[matching_index]
             pcode = name_to_pcode[map_name]
             self.matches.add((scrapername, countryiso3, name, self.pcode_to_name[pcode], 'fuzzy'))
         return pcode
