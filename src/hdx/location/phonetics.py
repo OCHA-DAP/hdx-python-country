@@ -1,5 +1,6 @@
 import pyphonetics
 
+
 class Phonetics(pyphonetics.RefinedSoundex):
     def match(self, possible_names, name, alternative_name=None, transform_possible_names=list(), threshold=2):
         mindistance = None

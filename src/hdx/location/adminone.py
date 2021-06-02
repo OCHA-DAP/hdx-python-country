@@ -34,7 +34,7 @@ class AdminOne(object):
     pcode_to_name = dict()
     pcode_to_iso3 = dict()
 
-    def __init__(self, admin_config, phonetics=None):
+    def __init__(self, admin_config):
         # type: (Dict, object) -> None
         admin_info1 = admin_config['admin1_info']
         self.countries_fuzzy_try = admin_config.get('countries_fuzzy_try')
@@ -53,9 +53,7 @@ class AdminOne(object):
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
         self.init_matches_errors()
-        if phonetics is None:
-            phonetics = get_phonetics()
-        self.phonetics = phonetics
+        self.phonetics = get_phonetics()
 
     def init_matches_errors(self):
         # type: () -> None

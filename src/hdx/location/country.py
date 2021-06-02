@@ -584,10 +584,7 @@ class Country(object):
                 simplified_country, removed_words = cls.simplify_countryname(candidate)
                 if simplified_country in countryname:
                     words = get_words_in_sentence(countryname)
-                    new_match_strength = 0
-                    if simplified_country:
-                        strength_to_add = remove_matching_from_list(words, simplified_country)
-                        new_match_strength += strength_to_add
+                    new_match_strength = remove_matching_from_list(words, simplified_country)
                     for word in removed_words:
                         if word in countryname:
                             remove_matching_from_list(words, word)
