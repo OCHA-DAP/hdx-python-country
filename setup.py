@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 from hdx.utilities.loader import load_file_to_str
 
-requirements = ['hdx-python-utilities>=2.6.5',
+requirements = ['hdx-python-utilities>=2.6.6',
                 'libhxl==4.5.1;python_version<"3"',
                 'libhxl>=4.24.1;python_version>="3"',
                 'pyphonetics']
