@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-import sys
 import logging
 from typing import Dict, Optional, Tuple, List
 
-from hdx.location import clean_name
+from hdx.location import clean_name, get_phonetics
 from hdx.location.country import Country
 from hdx.utilities.text import multiple_replace
 from unidecode import unidecode
-
-from hdx.location.phonetics import Phonetics
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +35,7 @@ class AdminOne(object):
     pcode_to_iso3 = dict()
 
     def __init__(self, admin_config, phonetics=None):
-        # type: (Dict, Phonetics) -> None
+        # type: (Dict, object) -> None
         admin_info1 = admin_config['admin1_info']
         self.countries_fuzzy_try = admin_config.get('countries_fuzzy_try')
         self.admin1_name_mappings = admin_config.get('admin1_name_mappings', dict())
@@ -57,7 +54,7 @@ class AdminOne(object):
             self.pcode_to_iso3[pcode] = countryiso3
         self.init_matches_errors()
         if phonetics is None:
-            phonetics = Phonetics()
+            phonetics = get_phonetics()
         self.phonetics = phonetics
 
     def init_matches_errors(self):
