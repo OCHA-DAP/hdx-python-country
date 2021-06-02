@@ -15,7 +15,7 @@ else:
             transform_possible_names.insert(0, lambda x: x)
 
             def check_name(name, possible_name):
-                nonlocal mindistance, matching_index
+                nonlocal mindistance, matching_index  # noqa: E999
 
                 distance = self.distance(name, possible_name)
                 if mindistance is None or distance < mindistance:
