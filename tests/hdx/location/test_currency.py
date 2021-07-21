@@ -16,6 +16,7 @@ class TestCurrency:
     def test_get_current_value_in_usd(self, fallback_url):
         Currency.setup()
         assert Currency.get_current_value_in_usd(10, 'usd') == 10
+        assert Currency.get_current_value_in_currency(10, 'usd') == 10
         gbprate = Currency.get_current_value_in_usd(10, 'gbp')
         assert gbprate != 10
         assert Currency.get_current_value_in_currency(gbprate, 'GBP') == 10
@@ -32,11 +33,16 @@ class TestCurrency:
             Currency.get_current_value_in_currency(10, 'XYZ')
         with pytest.raises(CurrencyError):
             Currency.setup(current_rates_url='fail')
+        with pytest.raises(CurrencyError):
+            Currency.setup(current_rates_url='fail', fallback_rates_url='fail')
+        Currency._current_rates = None
+        assert Currency.get_current_rate('gbp') != 1
 
     def test_get_historic_value_in_usd(self, fallback_url):
         Currency.setup()
         date = parse_date('2020-02-20')
         assert Currency.get_historic_value_in_usd(10, 'USD', date) == 10
+        assert Currency.get_historic_value_in_currency(10, 'usd', date) == 10
         assert Currency.get_historic_value_in_usd(10, 'gbp', date) == 12.877
         assert Currency.get_historic_value_in_currency(10, 'gbp', date) == 7.765783955890346
         with pytest.raises(CurrencyError):
@@ -52,3 +58,5 @@ class TestCurrency:
         assert Currency.get_historic_value_in_usd(10, 'gbp', date) == 13.844298710126688
         with pytest.raises(CurrencyError):
             Currency.setup(historic_rates_url='fail', fallback_to_current=False)
+        Currency._historic_rates = None
+        assert Currency.get_historic_rate('gbp', date) == 0.7765783955890346
