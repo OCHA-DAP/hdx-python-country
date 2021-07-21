@@ -55,12 +55,12 @@ class Currency(object):
         try:
             current_rates = retriever.retrieve_json(current_rates_url, 'currentrates.json', 'current exchange rates', fallback_current_to_static)
             cls._current_rates = current_rates['rates']
-        except (DownloadError, OSError) as ex:
+        except (DownloadError, IOError) as ex:
             raisefrom(CurrencyError, 'Error getting current rates!', ex)
         try:
             rates_path = retriever.retrieve_file(historic_rates_url, 'rates.csv', 'historic exchange rates', False)
             cls._historic_rates = exchangerates.CurrencyConverter(update=False, source=rates_path)
-        except (DownloadError, OSError) as ex:
+        except (DownloadError, IOError) as ex:
             if fallback_historic_to_current:
                 logger.warning('Falling back to current rates for all historic rates!')
             else:
