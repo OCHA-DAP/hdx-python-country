@@ -7,7 +7,8 @@ from typing import Union, Optional
 import exchangerates
 from hdx.utilities import raisefrom
 from hdx.utilities.downloader import Download, DownloadError
-
+from hdx.utilities.path import get_temp_dir
+from hdx.utilities.retriever import Retrieve
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +26,18 @@ class Currency(object):
     _fallback_to_current = False
 
     @classmethod
-    def setup(cls, current_rates_url=_current_rates_url, fallback_rates_url=None, historic_rates_url=_historic_rates_url, fallback_to_current=False):
-        # type: (str, Optional[str], str, bool) -> None
+    def setup(cls, retriever=None, current_rates_url=_current_rates_url, historic_rates_url=_historic_rates_url,
+              fallback_historic_to_current=False, fallback_current_to_static=False):
+        # type: (Optional[Retrieve], str, str, bool, bool) -> None
         """
         Get the current USD value of the value in local currency
 
         Args:
+            retriever (Optional[Retrieve]): Retrieve object to use for downloading. Defaults to None (generate a new one).
             current_rates_url (str): Current rates url to use. Defaults to https://api.exchangerate.host/latest?base=usd.
-            fallback_current_url (str): Fallback rates url to use for current rates. Defaults to None.
             historic_rates_url (str): Historic rates url to use. Defaults to https://codeforiati.org/exchangerates-scraper/consolidated.csv.
-            fallback_to_current (bool): Whether to try getting current USD value if historic is not available.
+            fallback_historic_to_current (bool): Whether to try getting current USD value if historic is not available.
+            fallback_current_to_static (bool): Whether to use USD value from static file if current is not available.
 
         Returns:
             None
@@ -42,29 +45,29 @@ class Currency(object):
 
         cls._current_rates = None
         cls._historic_rates = None
-        with Download(user_agent='fx') as downloader:
-            try:
-                downloader.download(current_rates_url)
-                cls._current_rates = downloader.get_json()['rates']
-            except DownloadError as ex:
-                if fallback_rates_url:
-                    try:
-                        downloader.download(fallback_rates_url)
-                        cls._current_rates = downloader.get_json()['rates']
-                        logger.warning('Using fallback rates!')
-                    except DownloadError as ex:
-                        raisefrom(CurrencyError, 'Error getting fallback rates from %s!' % fallback_rates_url, ex)
-                else:
-                    raisefrom(CurrencyError, 'Error getting current rates from %s!' % current_rates_url, ex)
-            try:
-                rates_path = downloader.download_file(historic_rates_url)
-                cls._historic_rates = exchangerates.CurrencyConverter(update=False, source=rates_path)
-            except (DownloadError, OSError) as ex:
-                if fallback_to_current:
-                    logger.warning('Falling back to current rates for all historic rates!')
-                else:
-                    raisefrom(CurrencyError, 'Error getting historic rates from %s!' % historic_rates_url, ex)
-        cls._fallback_to_current = fallback_to_current
+        if retriever is None:
+            name = 'hdx-python-country-rates'
+            downloader = Download(user_agent=name)
+            temp_dir = get_temp_dir(name)
+            retriever = Retrieve(downloader, None, temp_dir, temp_dir, save=False, use_saved=False)
+        else:
+            downloader = None
+        try:
+            current_rates = retriever.retrieve_json(current_rates_url, 'currentrates.json', 'current exchange rates', fallback_current_to_static)
+            cls._current_rates = current_rates['rates']
+        except (DownloadError, OSError) as ex:
+            raisefrom(CurrencyError, 'Error getting current rates!', ex)
+        try:
+            rates_path = retriever.retrieve_file(historic_rates_url, 'rates.csv', 'historic exchange rates', False)
+            cls._historic_rates = exchangerates.CurrencyConverter(update=False, source=rates_path)
+        except (DownloadError, OSError) as ex:
+            if fallback_historic_to_current:
+                logger.warning('Falling back to current rates for all historic rates!')
+            else:
+                raisefrom(CurrencyError, 'Error getting historic rates!', ex)
+        cls._fallback_to_current = fallback_historic_to_current
+        if downloader:
+            downloader.close()
 
     @classmethod
     def get_current_rate(cls, currency):
