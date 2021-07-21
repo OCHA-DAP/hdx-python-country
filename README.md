@@ -96,9 +96,11 @@ Examples of usage:
 Currency conversion to USD is simple:
 
     assert Currency.get_current_value_in_usd(10, 'usd') == 10
-    gbprate = Currency.get_current_value_in_usd(1, 'gbp')
-    assert gbprate != 1
+    gbprate = Currency.get_current_value_in_usd(10, 'gbp')
+    assert gbprate != 10
+    assert Currency.get_current_value_in_currency(gbprate, 'GBP') == 10
     date = parse_date('2020-02-20')
     assert Currency.get_historic_value_in_usd(10, 'USD', date) == 10
     assert Currency.get_historic_value_in_usd(10, 'gbp', date) == 12.877
+    assert Currency.get_historic_value_in_currency(10, 'gbp', date) == 7.765783955890346
     
