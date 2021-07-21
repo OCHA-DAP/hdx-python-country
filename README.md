@@ -8,8 +8,10 @@ static files.)
 It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a fuzzy matching for English look up 
 that can handle abbreviations in country names like Dem. for Democratic and Rep. for Republic.
 
-Mapping administration level one names from a source to a base set is also handled including phonetic fuzzy name 
+Mapping administration level one names from a source to a given base set is also handled including phonetic fuzzy name 
 matching if you are running Python 3.  
+
+It also provides currency conversion to USD from local currency.
 
 Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
 (UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
@@ -90,3 +92,13 @@ Examples of usage:
     assert adminone.get_pcode('YEM', 'YEM030', scrapername='test')  # returns ('YE30', True)
     # Fuzzy matching in Python 3 only
     assert adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test')  # returns ('YE30', False)
+
+Currency conversion to USD is simple:
+
+    assert Currency.get_current_value_in_usd(10, 'usd') == 10
+    gbprate = Currency.get_current_value_in_usd(1, 'gbp')
+    assert gbprate != 1
+    date = parse_date('2020-02-20')
+    assert Currency.get_historic_value_in_usd(10, 'USD', date) == 10
+    assert Currency.get_historic_value_in_usd(10, 'gbp', date) == 12.877
+    

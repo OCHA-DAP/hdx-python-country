@@ -56,7 +56,6 @@ class Country(object):
         Returns:
             Dict: Country dictionary
         """
-
         country = hxlcountry.dictionary
         for value in hxlcountry.get_all('#country+name'):
             if value:
