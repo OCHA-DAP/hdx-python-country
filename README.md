@@ -106,8 +106,8 @@ Currency conversion to USD is simple:
     
 It is also possible to pass in a Retrieve object to Currency.setup() to allow the downloaded files to be saved or 
 previously downloaded files to be reused. It is also possible to change the urls used for current and historic rates
-(the defaults are current_rates_url: 'https://api.exchangerate.host/latest?base=usd', 
-historic_rates_url: 'https://codeforiati.org/exchangerates-scraper/consolidated.csv') and to activate fallbacks from 
+(the defaults are current_rates_url: https://api.exchangerate.host/latest?base=usd, 
+historic_rates_url: https://codeforiati.org/exchangerates-scraper/consolidated.csv) and to activate fallbacks from 
 current rates to a static file and/or from historic rates to current rates (for which more currencies exist).
 
     Currency.setup(retriever, current_rates_url=my_current_rates_url, historic_rates_url=my_historic_rates_url,
