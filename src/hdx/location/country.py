@@ -250,7 +250,7 @@ class Country(object):
         return None
 
     @classmethod
-    def get_country_name_from_iso3(cls, iso3, use_live=True, exception=None):
+    def get_country_name_from_iso3(cls, iso3, use_live=True, exception=None, shortname=False):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
         """Get country name from ISO3 code
 
@@ -258,6 +258,7 @@ class Country(object):
             iso3 (str): ISO3 code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+            shortname (bool): Return preferred name if False, short name if True. Defaults to False.
 
         Returns:
             Optional[str]: Country name
@@ -267,7 +268,10 @@ class Country(object):
             countryname = countryinfo.get('#country+name+override')
             if countryname is not None:
                 return countryname
-            return countryinfo.get('#country+name+preferred')
+            if shortname:
+                return countryinfo.get('#country+alt+i_en+name+v_unterm')
+            else:
+                return countryinfo.get('#country+name+preferred')
         return None
 
     @classmethod
@@ -333,7 +337,7 @@ class Country(object):
         return None
 
     @classmethod
-    def get_country_name_from_iso2(cls, iso2, use_live=True, exception=None):
+    def get_country_name_from_iso2(cls, iso2, use_live=True, exception=None, shortname=False):
         # type: (str, bool, Optional[ExceptionUpperBound]) -> Optional[str]
         """Get country name from ISO2 code
 
@@ -341,13 +345,14 @@ class Country(object):
             iso2 (str): ISO2 code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+            shortname (bool): Return preferred name if False, short name if True. Defaults to False.
 
         Returns:
             Optional[str]: Country name
         """
         iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
         if iso3 is not None:
-            return cls.get_country_name_from_iso3(iso3, exception=exception)
+            return cls.get_country_name_from_iso3(iso3, exception=exception, shortname=shortname)
         return None
 
     @classmethod
@@ -413,7 +418,7 @@ class Country(object):
         return None
 
     @classmethod
-    def get_country_name_from_m49(cls, m49, use_live=True, exception=None):
+    def get_country_name_from_m49(cls, m49, use_live=True, exception=None, shortname=False):
         # type: (int, bool, Optional[ExceptionUpperBound]) -> Optional[str]
         """Get country name from M49 code
 
@@ -421,13 +426,14 @@ class Country(object):
             m49 (int): M49 numeric code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+            shortname (bool): Return preferred name if False, short name if True. Defaults to False.
 
         Returns:
             Optional[str]: Country name
         """
         iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
         if iso3 is not None:
-            return cls.get_country_name_from_iso3(iso3, exception=exception)
+            return cls.get_country_name_from_iso3(iso3, exception=exception, shortname=shortname)
         return None
 
     @classmethod

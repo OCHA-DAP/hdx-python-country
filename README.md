@@ -39,6 +39,7 @@ The usage of the country mappings functionality is best illustrated by some exam
     # Set up using non live data from repo rather and override default country name
     # (Leaving out this step will use live data and no overrides)
     Country.get_country_name_from_iso3('jpn', use_live=False)  # returns 'Japan'
+    Country.get_country_name_from_iso3('vEn', shortname=True)  # returns 'Venezuela'
     # uselive=False forces the use of internal files instead of accessing the live feeds.
     # It only needs to be supplied to the first call as the data once loaded is held
     # in internal dictionaries for future use.
@@ -89,20 +90,20 @@ Various other keys are optional:
 Examples of usage:
 
     adminone = AdminOne(config)
-    assert adminone.get_pcode('YEM', 'YEM030', scrapername='test')  # returns ('YE30', True)
+    adminone.get_pcode('YEM', 'YEM030', scrapername='test')  # returns ('YE30', True)
     # Fuzzy matching in Python 3 only
-    assert adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test')  # returns ('YE30', False)
+    adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test')  # returns ('YE30', False)
 
 Currency conversion to USD is simple:
 
-    assert Currency.get_current_value_in_usd(10, 'usd') == 10
+    Currency.get_current_value_in_usd(10, 'usd')  # returns 10
     gbprate = Currency.get_current_value_in_usd(10, 'gbp')
     assert gbprate != 10
-    assert Currency.get_current_value_in_currency(gbprate, 'GBP') == 10
+    Currency.get_current_value_in_currency(gbprate, 'GBP')  # returns 10
     date = parse_date('2020-02-20')
-    assert Currency.get_historic_value_in_usd(10, 'USD', date) == 10
-    assert Currency.get_historic_value_in_usd(10, 'gbp', date) == 12.877
-    assert Currency.get_historic_value_in_currency(10, 'gbp', date) == 7.765783955890346
+    Currency.get_historic_value_in_usd(10, 'USD', date)  # returns 10
+    Currency.get_historic_value_in_usd(10, 'gbp', date)  # returns 12.877
+    Currency.get_historic_value_in_currency(10, 'gbp', date)  # returns 7.765783955890346
     
 It is also possible to pass in a Retrieve object to Currency.setup() to allow the downloaded files to be saved or 
 previously downloaded files to be reused. It is also possible to change the urls used for current and historic rates
