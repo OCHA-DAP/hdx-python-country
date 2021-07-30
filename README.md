@@ -96,7 +96,8 @@ Examples of usage:
 
 Currency conversion to USD is simple:
 
-    Currency.get_current_value_in_usd(10, 'usd')  # returns 10
+    currency = Country.get_currency_from_iso3('usa')  # returns 'USD'
+    Currency.get_current_value_in_usd(10, currency)  # returns 10
     gbprate = Currency.get_current_value_in_usd(10, 'gbp')
     assert gbprate != 10
     Currency.get_current_value_in_currency(gbprate, 'GBP')  # returns 10

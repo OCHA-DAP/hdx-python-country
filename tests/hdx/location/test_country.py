@@ -64,6 +64,7 @@ class TestCountry:
             '#country+name+preferred': 'Bosnia and Herzegovina',
             '#country+name+short+v_reliefweb': '',
             '#country+regex': 'herzegovina|bosnia',
+            '#currency+code': 'BAM',
             '#geo+admin_level': '0',
             '#geo+lat': '44.16506495',
             '#geo+lon': '17.79105724',
@@ -106,7 +107,14 @@ class TestCountry:
             '#region+code+intermediate': '',
             '#region+intermediate+name+preferred': '',
             '#country+regex': 'palestin|\\bgaza|west.?bank',
+            '#currency+code': 'ILS',
             '#country+name+override': 'oPt'}
+
+    def test_get_currency_from_iso3(self):
+        assert Country.get_currency_from_iso3('jpn') == 'JPY'
+        assert Country.get_currency_from_iso3('abc') is None
+        with pytest.raises(LocationError):
+            Country.get_currency_from_iso3('abc', exception=LocationError)
 
     def test_get_country_info_from_iso2(self):
         assert Country.get_country_info_from_iso2('jp') == {
@@ -131,6 +139,7 @@ class TestCountry:
             '#country+name+preferred': 'Japan',
             '#country+name+short+v_reliefweb': '',
             '#country+regex': 'japan',
+            '#currency+code': 'JPY',
             '#geo+admin_level': '0',
             '#geo+lat': '37.63209801',
             '#geo+lon': '138.0812256',
@@ -164,6 +173,7 @@ class TestCountry:
             '#country+name+preferred': 'Taiwan (Province of China)',
             '#country+name+short+v_reliefweb': '',
             '#country+regex': '.*taiwan|.*taipei|.*formosa|^(?!.*\\bdem)(?!.*\\bpe)(?!.*\\bdr)(^rep.*).*\\bchina.*(?!.*\\bdem.*)(?!\\bpe.*)(?!.*\\bdr.*).*|^ROC$|^taiwan r\.?o\.?c\.?$',
+            '#currency+code': 'TWD',
             '#geo+admin_level': '0',
             '#geo+lat': '23.74652012',
             '#geo+lon': '120.9621301',
@@ -207,6 +217,7 @@ class TestCountry:
             '#region+code+intermediate': '',
             '#region+intermediate+name+preferred': '',
             '#country+regex': 'palestin|\\bgaza|west.?bank',
+            '#currency+code': 'ILS',
             '#country+name+override': 'oPt'}
         with pytest.raises(LocationError):
             Country.get_country_info_from_iso2('ab', exception=LocationError)
@@ -223,6 +234,12 @@ class TestCountry:
         assert Country.get_country_name_from_iso2('VE', shortname=True) == 'Venezuela'
         assert Country.get_country_name_from_iso2('TW') == 'Taiwan (Province of China)'
         assert Country.get_country_name_from_iso2('PS') == 'oPt'
+
+    def test_get_currency_from_iso2(self):
+        assert Country.get_currency_from_iso2('jp') == 'JPY'
+        assert Country.get_currency_from_iso2('ab') is None
+        with pytest.raises(LocationError):
+            Country.get_currency_from_iso2('ab', exception=LocationError)
 
     def test_get_m49_from_iso3(self):
         assert Country.get_m49_from_iso3('AFG') == 4
@@ -262,6 +279,7 @@ class TestCountry:
             '#country+name+preferred': 'Afghanistan',
             '#country+name+short+v_reliefweb': '',
             '#country+regex': 'afghan',
+            '#currency+code': 'AFN',
             '#geo+admin_level': '0',
             '#geo+lat': '33.83147477',
             '#geo+lon': '66.02621828',
@@ -294,6 +312,7 @@ class TestCountry:
             '#country+name+preferred': 'Samoa',
             '#country+name+short+v_reliefweb': '',
             '#country+regex': '^(?!.*amer.*)samoa|(\\bindep.*samoa)|^west.*samoa',
+            '#currency+code': 'WST',
             '#geo+admin_level': '0',
             '#geo+lat': '-13.16992041',
             '#geo+lon': '-173.5139768',
@@ -336,6 +355,7 @@ class TestCountry:
             '#region+code+intermediate': '',
             '#region+intermediate+name+preferred': '',
             '#country+regex': 'palestin|\\bgaza|west.?bank',
+            '#currency+code': 'ILS',
             '#country+name+override': 'oPt'}
 
         assert Country.get_country_info_from_m49(9999) is None
@@ -350,6 +370,13 @@ class TestCountry:
         assert Country.get_country_name_from_m49(275) == 'oPt'
         with pytest.raises(LocationError):
             Country.get_country_name_from_m49(9999, exception=LocationError)
+
+    def test_get_currency_from_m49(self):
+        assert Country.get_currency_from_m49(4) == 'AFN'
+        assert Country.get_currency_from_m49(882) == 'WST'
+        assert Country.get_currency_from_m49(9999) is None
+        with pytest.raises(LocationError):
+            Country.get_currency_from_m49(9999, exception=LocationError)
 
     def test_expand_countryname_abbrevs(self):
         assert Country.expand_countryname_abbrevs('jpn') == ['JPN']
