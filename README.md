@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/OCHA-DAP/hdx-python-country/workflows/build/badge.svg)](https://github.com/OCHA-DAP/hdx-python-country/actions?query=workflow%3Abuild) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-python-country/badge.svg?branch=master&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-python-country?branch=master)
+[![Build Status](https://github.com/OCHA-DAP/hdx-python-country/workflows/build/badge.svg)](https://github.com/OCHA-DAP/hdx-python-country/actions?query=workflow%3Abuild) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-python-country/badge.svg?branch=main&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-python-country?branch=main)
 
 The HDX Python Country Library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
 using live official data from the [UN OCHA](https://vocabulary.unocha.org/) feed with fallbacks to an internal static 
