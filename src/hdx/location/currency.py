@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 """Currency conversion"""
 import logging
 from datetime import datetime
-from typing import Union, Optional
+from typing import Optional, Union
 
 import exchangerates
 from hdx.utilities import raisefrom
@@ -17,18 +16,26 @@ class CurrencyError(Exception):
     pass
 
 
-class Currency(object):
+class Currency:
     """Currency class for performing currency conversion"""
-    _current_rates_url = 'https://api.exchangerate.host/latest?base=usd'
-    _historic_rates_url = 'https://codeforiati.org/exchangerates-scraper/consolidated.csv'
+
+    _current_rates_url = "https://api.exchangerate.host/latest?base=usd"
+    _historic_rates_url = (
+        "https://codeforiati.org/exchangerates-scraper/consolidated.csv"
+    )
     _current_rates = None
     _historic_rates = None
     _fallback_to_current = False
 
     @classmethod
-    def setup(cls, retriever=None, current_rates_url=_current_rates_url, historic_rates_url=_historic_rates_url,
-              fallback_historic_to_current=False, fallback_current_to_static=False):
-        # type: (Optional[Retrieve], str, str, bool, bool) -> None
+    def setup(
+        cls,
+        retriever: Optional[Retrieve] = None,
+        current_rates_url: str = _current_rates_url,
+        historic_rates_url: str = _historic_rates_url,
+        fallback_historic_to_current: bool = False,
+        fallback_current_to_static: bool = False,
+    ) -> None:
         """
         Get the current USD value of the value in local currency
 
@@ -46,32 +53,42 @@ class Currency(object):
         cls._current_rates = None
         cls._historic_rates = None
         if retriever is None:
-            name = 'hdx-python-country-rates'
+            name = "hdx-python-country-rates"
             downloader = Download(user_agent=name)
             temp_dir = get_temp_dir(name)
-            retriever = Retrieve(downloader, None, temp_dir, temp_dir, save=False, use_saved=False)
+            retriever = Retrieve(
+                downloader, None, temp_dir, temp_dir, save=False, use_saved=False
+            )
         else:
             downloader = None
         try:
-            current_rates = retriever.retrieve_json(current_rates_url, 'currentrates.json', 'current exchange rates', fallback_current_to_static)
-            cls._current_rates = current_rates['rates']
-        except (DownloadError, IOError) as ex:
-            raisefrom(CurrencyError, 'Error getting current rates!', ex)
+            current_rates = retriever.retrieve_json(
+                current_rates_url,
+                "currentrates.json",
+                "current exchange rates",
+                fallback_current_to_static,
+            )
+            cls._current_rates = current_rates["rates"]
+        except (DownloadError, OSError) as ex:
+            raisefrom(CurrencyError, "Error getting current rates!", ex)
         try:
-            rates_path = retriever.retrieve_file(historic_rates_url, 'rates.csv', 'historic exchange rates', False)
-            cls._historic_rates = exchangerates.CurrencyConverter(update=False, source=rates_path)
-        except (DownloadError, IOError) as ex:
+            rates_path = retriever.retrieve_file(
+                historic_rates_url, "rates.csv", "historic exchange rates", False
+            )
+            cls._historic_rates = exchangerates.CurrencyConverter(
+                update=False, source=rates_path
+            )
+        except (DownloadError, OSError) as ex:
             if fallback_historic_to_current:
-                logger.warning('Falling back to current rates for all historic rates!')
+                logger.warning("Falling back to current rates for all historic rates!")
             else:
-                raisefrom(CurrencyError, 'Error getting historic rates!', ex)
+                raisefrom(CurrencyError, "Error getting historic rates!", ex)
         cls._fallback_to_current = fallback_historic_to_current
         if downloader:
             downloader.close()
 
     @classmethod
-    def get_current_rate(cls, currency):
-        # type: (str) -> float
+    def get_current_rate(cls, currency: str) -> float:
         """
         Get the current fx rate for currency
 
@@ -86,12 +103,11 @@ class Currency(object):
         currency = currency.upper()
         fx_rate = cls._current_rates.get(currency)
         if fx_rate is None:
-            raise CurrencyError('Currency %s is invalid!' % currency)
+            raise CurrencyError(f"Currency {currency} is invalid!")
         return fx_rate
 
     @classmethod
-    def get_current_value_in_usd(cls, value, currency):
-        # type: (Union[int, float], str) -> float
+    def get_current_value_in_usd(cls, value: Union[int, float], currency: str) -> float:
         """
         Get the current USD value of the value in local currency
 
@@ -103,14 +119,15 @@ class Currency(object):
             float: Value in USD
         """
         currency = currency.upper()
-        if currency == 'USD':
+        if currency == "USD":
             return value
         fx_rate = cls.get_current_rate(currency)
         return value / fx_rate
 
     @classmethod
-    def get_current_value_in_currency(cls, usdvalue, currency):
-        # type: (Union[int, float], str) -> float
+    def get_current_value_in_currency(
+        cls, usdvalue: Union[int, float], currency: str
+    ) -> float:
         """
         Get the current value in local currency of the value in USD
 
@@ -122,7 +139,7 @@ class Currency(object):
             float: Value in local currency
         """
         currency = currency.upper()
-        if currency == 'USD':
+        if currency == "USD":
             return usdvalue
         fx_rate = cls.get_current_rate(currency)
         return usdvalue * fx_rate
@@ -141,11 +158,14 @@ class Currency(object):
         if cls._historic_rates is None:
             Currency.setup()
         currency = currency.upper()
-        return cls._historic_rates.closest_rate(currency, date.date())['conversion_rate']
+        return cls._historic_rates.closest_rate(currency, date.date())[
+            "conversion_rate"
+        ]
 
     @classmethod
-    def get_historic_value_in_usd(cls, value, currency, date):
-        # type: (Union[int, float], str, datetime) -> float
+    def get_historic_value_in_usd(
+        cls, value: Union[int, float], currency: str, date: datetime
+    ) -> float:
         """
         Get the USD value of the value in local currency on a particular date
 
@@ -158,7 +178,7 @@ class Currency(object):
             float: Value in USD
         """
         currency = currency.upper()
-        if currency == 'USD':
+        if currency == "USD":
             return value
         if cls._historic_rates:
             try:
@@ -168,11 +188,12 @@ class Currency(object):
                 pass
         if cls._fallback_to_current:
             return cls.get_current_value_in_usd(value, currency)
-        raise CurrencyError('Currency %s is invalid!' % currency)
+        raise CurrencyError(f"Currency {currency} is invalid!")
 
     @classmethod
-    def get_historic_value_in_currency(cls, usdvalue, currency, date):
-        # type: (Union[int, float], str, datetime) -> float
+    def get_historic_value_in_currency(
+        cls, usdvalue: Union[int, float], currency: str, date: datetime
+    ) -> float:
         """
         Get the current value in local currency of the value in USD on a particular date
 
@@ -185,7 +206,7 @@ class Currency(object):
             float: Value in local currency
         """
         currency = currency.upper()
-        if currency == 'USD':
+        if currency == "USD":
             return usdvalue
         if cls._historic_rates:
             try:
@@ -195,4 +216,4 @@ class Currency(object):
                 pass
         if cls._fallback_to_current:
             return cls.get_current_value_in_currency(usdvalue, currency)
-        raise CurrencyError('Currency %s is invalid!' % currency)
+        raise CurrencyError(f"Currency {currency} is invalid!")
