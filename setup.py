@@ -6,9 +6,8 @@ from setuptools import setup, find_packages
 
 from hdx.utilities.loader import load_file_to_str
 
-requirements = ['hdx-python-utilities>=2.7.3',
-                'libhxl==4.5.1;python_version<"3"',
-                'libhxl>=4.24.1;python_version>="3"',
+requirements = ['hdx-python-utilities>=3.0.0',
+                'libhxl>=4.24.1',
                 'pyphonetics',
                 'exchangerates']
 
@@ -19,7 +18,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]

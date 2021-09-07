@@ -13,21 +13,26 @@ matching if you are running Python 3.
 
 It also provides currency conversion to USD from local currency.
 
-Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
-(UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
-return full country information do so in a different format to 1.x.x. The format they use is a dictionary using
-[Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags as keys.
-
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) (HDX) project. If you have 
 humanitarian related data, please upload your datasets to HDX.
 
   - [Usage](#usage)
+  - [Breaking Changes](#breaking-changes)
   - [Examples](#examples)
 
 ## Usage
 
 The library has detailed API documentation which can be found here: <http://ocha-dap.github.io/hdx-python-country/>. 
 The code for the library is here: <https://github.com/ocha-dap/hdx-python-country>.
+
+## Breaking Changes
+
+From 3.0.0, only supports Python >= 3.6
+
+Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
+(UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
+return full country information do so in a different format to 1.x.x. The format they use is a dictionary using
+[Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags as keys.
 
 ### Examples
 
