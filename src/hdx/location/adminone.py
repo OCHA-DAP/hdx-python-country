@@ -4,8 +4,9 @@ from typing import Dict, List, Optional, Tuple
 from hdx.utilities.text import multiple_replace
 from unidecode import unidecode
 
-from hdx.location import clean_name, get_phonetics
+from hdx.location import clean_name
 from hdx.location.country import Country
+from hdx.location.phonetics import Phonetics
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ class AdminOne:
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
         self.init_matches_errors()
-        self.phonetics = get_phonetics()
+        self.phonetics = Phonetics()
 
     def init_matches_errors(self) -> None:
         """Initialise storage of fuzzy matches, ignored and errors for logging purposes

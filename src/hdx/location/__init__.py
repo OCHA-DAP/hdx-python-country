@@ -15,9 +15,3 @@ def clean_name(name):
     clean_name = re.sub(non_ascii, " ", clean_name)
     clean_name = unidecode(clean_name)
     return clean_name.strip().lower()
-
-
-def get_phonetics():
-    from hdx.location.phonetics import Phonetics
-
-    return Phonetics()
