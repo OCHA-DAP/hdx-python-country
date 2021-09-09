@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Optional, Union
 
 import exchangerates
-from hdx.utilities import raisefrom
 from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.path import get_temp_dir
 from hdx.utilities.retriever import Retrieve
@@ -70,7 +69,7 @@ class Currency:
             )
             cls._current_rates = current_rates["rates"]
         except (DownloadError, OSError) as ex:
-            raisefrom(CurrencyError, "Error getting current rates!", ex)
+            raise CurrencyError("Error getting current rates!") from ex
         try:
             rates_path = retriever.retrieve_file(
                 historic_rates_url, "rates.csv", "historic exchange rates", False
@@ -82,7 +81,7 @@ class Currency:
             if fallback_historic_to_current:
                 logger.warning("Falling back to current rates for all historic rates!")
             else:
-                raisefrom(CurrencyError, "Error getting historic rates!", ex)
+                raise CurrencyError("Error getting historic rates!") from ex
         cls._fallback_to_current = fallback_historic_to_current
         if downloader:
             downloader.close()
