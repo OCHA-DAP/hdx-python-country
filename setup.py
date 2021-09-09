@@ -5,7 +5,7 @@ from hdx.utilities.loader import load_file_to_str
 from setuptools import find_namespace_packages, setup
 
 requirements = [
-    "hdx-python-utilities>=3.0.0",
+    "hdx-python-utilities>=3.0.2",
     "libhxl>=4.24.1",
     "pyphonetics",
     "exchangerates",
