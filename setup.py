@@ -13,6 +13,6 @@ setup(
     cmdclass={
         "clean": CleanCommand,
         "package": PackageCommand,
-        "publish": PublishCommand,
+        "publish": PublishCommand
     }
 )
