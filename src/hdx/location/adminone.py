@@ -4,8 +4,8 @@ from typing import Dict, List, Optional, Tuple
 from hdx.utilities.text import multiple_replace
 from unidecode import unidecode
 
-from hdx.location import clean_name
 from hdx.location.country import Country
+from hdx.location.names import clean_name
 from hdx.location.phonetics import Phonetics
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,9 @@ class AdminOne:
     def __init__(self, admin_config: Dict) -> None:
         admin_info1 = admin_config["admin1_info"]
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
-        self.admin1_name_mappings = admin_config.get("admin1_name_mappings", dict())
+        self.admin1_name_mappings = admin_config.get(
+            "admin1_name_mappings", dict()
+        )
         self.admin1_name_replacements = admin_config.get(
             "admin1_name_replacements", dict()
         )
@@ -86,7 +88,11 @@ class AdminOne:
         country_pcodelength = self.pcode_lengths.get(countryiso3)
         if not country_pcodelength:
             return None
-        if pcode_length == country_pcodelength or pcode_length < 4 or pcode_length > 6:
+        if (
+            pcode_length == country_pcodelength
+            or pcode_length < 4
+            or pcode_length > 6
+        ):
             return None
         if country_pcodelength == 4:
             pcode = f"{Country.get_iso2_from_iso3(pcode[:3])}{pcode[-2:]}"
@@ -206,7 +212,13 @@ class AdminOne:
             map_name = map_names[matching_index]
             pcode = name_to_pcode[map_name]
             self.matches.add(
-                (scrapername, countryiso3, name, self.pcode_to_name[pcode], "fuzzy")
+                (
+                    scrapername,
+                    countryiso3,
+                    name,
+                    self.pcode_to_name[pcode],
+                    "fuzzy",
+                )
             )
         return pcode
 
@@ -280,9 +292,7 @@ class AdminOne:
             if len(error) == 2:
                 line = f"{error[0]} - Could not find {error[1]} in map names!"
             else:
-                line = (
-                    f"{error[0]} - {error[1]}: Could not find {error[2]} in map names!"
-                )
+                line = f"{error[0]} - {error[1]}: Could not find {error[2]} in map names!"
             logger.error(line)
             output.append(line)
         return output

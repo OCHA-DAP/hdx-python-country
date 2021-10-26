@@ -25,7 +25,9 @@ class Phonetics(pyphonetics.RefinedSoundex):
 
         for i, possible_name in enumerate(possible_names):
             for transform_possible_name in transform_possible_names:
-                transformed_possible_name = transform_possible_name(possible_name)
+                transformed_possible_name = transform_possible_name(
+                    possible_name
+                )
                 if not transformed_possible_name:
                     continue
                 check_name(name, transformed_possible_name)

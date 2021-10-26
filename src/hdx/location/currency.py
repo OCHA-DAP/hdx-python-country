@@ -56,7 +56,12 @@ class Currency:
             downloader = Download(user_agent=name)
             temp_dir = get_temp_dir(name)
             retriever = Retrieve(
-                downloader, None, temp_dir, temp_dir, save=False, use_saved=False
+                downloader,
+                None,
+                temp_dir,
+                temp_dir,
+                save=False,
+                use_saved=False,
             )
         else:
             downloader = None
@@ -72,14 +77,19 @@ class Currency:
             raise CurrencyError("Error getting current rates!") from ex
         try:
             rates_path = retriever.retrieve_file(
-                historic_rates_url, "rates.csv", "historic exchange rates", False
+                historic_rates_url,
+                "rates.csv",
+                "historic exchange rates",
+                False,
             )
             cls._historic_rates = exchangerates.CurrencyConverter(
                 update=False, source=rates_path
             )
         except (DownloadError, OSError) as ex:
             if fallback_historic_to_current:
-                logger.warning("Falling back to current rates for all historic rates!")
+                logger.warning(
+                    "Falling back to current rates for all historic rates!"
+                )
             else:
                 raise CurrencyError("Error getting historic rates!") from ex
         cls._fallback_to_current = fallback_historic_to_current
@@ -106,7 +116,9 @@ class Currency:
         return fx_rate
 
     @classmethod
-    def get_current_value_in_usd(cls, value: Union[int, float], currency: str) -> float:
+    def get_current_value_in_usd(
+        cls, value: Union[int, float], currency: str
+    ) -> float:
         """
         Get the current USD value of the value in local currency
 
