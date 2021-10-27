@@ -79,9 +79,16 @@ output_directory = "docs/build"
     title = "API Documentation"
 
         [[tool.pydoc-markdown.renderer.pages.children]]
-        title = "Country"
+        title = "Countries"
         contents = ["hdx.location.country.*"]
 
+        [[tool.pydoc-markdown.renderer.pages.children]]
+        title = "Countries"
+        contents = ["hdx.location.adminone.*"]
+
+        [[tool.pydoc-markdown.renderer.pages.children]]
+        title = "Countries"
+        contents = ["hdx.location.currency.*"]
 
 [tool.tox]
 legacy_tox_ini = """
