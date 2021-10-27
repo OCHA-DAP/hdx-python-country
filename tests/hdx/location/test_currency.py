@@ -20,10 +20,20 @@ class TestCurrency:
         fallback_dir = join("tests", "fixtures")
         temp_dir = get_temp_dir(name)
         retriever = Retrieve(
-            downloader, fallback_dir, temp_dir, temp_dir, save=False, use_saved=False
+            downloader,
+            fallback_dir,
+            temp_dir,
+            temp_dir,
+            save=False,
+            use_saved=False,
         )
         retriever_broken = Retrieve(
-            downloader, "tests", temp_dir, temp_dir, save=False, use_saved=False
+            downloader,
+            "tests",
+            temp_dir,
+            temp_dir,
+            save=False,
+            use_saved=False,
         )
         yield retriever, retriever_broken
         UserAgent.clear_global()
@@ -45,8 +55,13 @@ class TestCurrency:
             current_rates_url="fail",
             fallback_current_to_static=True,
         )
-        assert Currency.get_current_value_in_usd(10, "gbp") == 13.844298710126688
-        assert Currency.get_current_value_in_currency(10, "gbp") == 7.223190000000001
+        assert (
+            Currency.get_current_value_in_usd(10, "gbp") == 13.844298710126688
+        )
+        assert (
+            Currency.get_current_value_in_currency(10, "gbp")
+            == 7.223190000000001
+        )
         with pytest.raises(CurrencyError):
             Currency.get_current_value_in_usd(10, "XYZ")
         with pytest.raises(CurrencyError):
@@ -80,7 +95,9 @@ class TestCurrency:
             Currency.get_historic_value_in_usd(10, "XYZ", date)
         with pytest.raises(CurrencyError):
             Currency.get_historic_value_in_currency(10, "XYZ", date)
-        Currency.setup(historic_rates_url="fail", fallback_historic_to_current=True)
+        Currency.setup(
+            historic_rates_url="fail", fallback_historic_to_current=True
+        )
         gbprate = Currency.get_historic_value_in_usd(1, "gbp", date)
         assert gbprate == Currency.get_current_value_in_usd(1, "gbp")
         gbprate = Currency.get_historic_value_in_currency(1, "gbp", date)
@@ -93,7 +110,10 @@ class TestCurrency:
             fallback_historic_to_current=True,
             fallback_current_to_static=True,
         )
-        assert Currency.get_historic_value_in_usd(10, "gbp", date) == 13.844298710126688
+        assert (
+            Currency.get_historic_value_in_usd(10, "gbp", date)
+            == 13.844298710126688
+        )
         with pytest.raises(CurrencyError):
             Currency.setup(
                 retriever=retriever,

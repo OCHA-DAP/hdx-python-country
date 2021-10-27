@@ -1,8 +1,6 @@
 include *.txt
-include .coveragerc
-include Dockerfile
+include pyproject.toml
 include LICENSE
-include pytest.ini
 recursive-include documentation *.py
 recursive-include documentation *.rst
 recursive-include documentation *.sh

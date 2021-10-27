@@ -40,7 +40,14 @@ class Country:
         "W.": "WEST",
         "K.": "KINGDOM",
     }
-    major_differentiators = ["DEMOCRATIC", "NORTH", "SOUTH", "EAST", "WEST", "STATES"]
+    major_differentiators = [
+        "DEMOCRATIC",
+        "NORTH",
+        "SOUTH",
+        "EAST",
+        "WEST",
+        "STATES",
+    ]
     multiple_abbreviations = {
         "FED.": ["FEDERATION", "FEDERAL", "FEDERATED"],
         "ISL.": ["ISLAND", "ISLANDS"],
@@ -103,7 +110,9 @@ class Country:
         )
         regionname = hxlcountry.get("#region+main+name+preferred")
         sub_regionname = hxlcountry.get("#region+name+preferred+sub")
-        intermediate_regionname = hxlcountry.get("#region+intermediate+name+preferred")
+        intermediate_regionname = hxlcountry.get(
+            "#region+intermediate+name+preferred"
+        )
         regionid = hxlcountry.get("#region+code+main")
         if regionid:
             regionid = int(regionid)
@@ -125,15 +134,21 @@ class Country:
         if regionname:
             add_country_to_set("regioncodes2countries", regionid, iso3)
             cls._countriesdata["regioncodes2names"][regionid] = regionname
-            cls._countriesdata["regionnames2codes"][regionname.upper()] = regionid
+            cls._countriesdata["regionnames2codes"][
+                regionname.upper()
+            ] = regionid
         if sub_regionname:
             add_country_to_set("regioncodes2countries", sub_regionid, iso3)
-            cls._countriesdata["regioncodes2names"][sub_regionid] = sub_regionname
+            cls._countriesdata["regioncodes2names"][
+                sub_regionid
+            ] = sub_regionname
             cls._countriesdata["regionnames2codes"][
                 sub_regionname.upper()
             ] = sub_regionid
         if intermediate_regionname:
-            add_country_to_set("regioncodes2countries", intermediate_regionid, iso3)
+            add_country_to_set(
+                "regioncodes2countries", intermediate_regionid, iso3
+            )
             cls._countriesdata["regioncodes2names"][
                 intermediate_regionid
             ] = intermediate_regionname
@@ -167,7 +182,9 @@ class Country:
         cls._countriesdata["currencies"] = dict()
 
         for key, value in cls._country_name_mappings.items():
-            cls._countriesdata["countrynames2iso3"][key.upper()] = value.upper()
+            cls._countriesdata["countrynames2iso3"][
+                key.upper()
+            ] = value.upper()
 
         for country in countries:
             iso3 = country.get("#country+code+v_iso3")
@@ -191,7 +208,7 @@ class Country:
         use_live: bool = True,
         country_name_overrides: Dict = None,
         country_name_mappings: Dict = None,
-    ) -> List[Dict[str,Dict]]:
+    ) -> List[Dict[str, Dict]]:
         """
         Read countries data from OCHA countries feed (falling back to file)
 
@@ -274,7 +291,7 @@ class Country:
         iso3: str,
         use_live: bool = True,
         exception: Optional[ExceptionUpperBound] = None,
-    ) -> Optional[Dict[str,str]]:
+    ) -> Optional[Dict[str, str]]:
         """Get country information from ISO3 code
 
         Args:
@@ -410,7 +427,7 @@ class Country:
         iso2: str,
         use_live: bool = True,
         exception: Optional[ExceptionUpperBound] = None,
-    ) -> Optional[Dict[str,str]]:
+    ) -> Optional[Dict[str, str]]:
         """Get country name from ISO2 code
 
         Args:
@@ -421,7 +438,9 @@ class Country:
         Returns:
             Optional[Dict[str,str]]: Country information
         """
-        iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_iso2(
+            iso2, use_live=use_live, exception=exception
+        )
         if iso3 is not None:
             return cls.get_country_info_from_iso3(
                 iso3, use_live=use_live, exception=exception
@@ -447,7 +466,9 @@ class Country:
         Returns:
             Optional[str]: Country name
         """
-        iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_iso2(
+            iso2, use_live=use_live, exception=exception
+        )
         if iso3 is not None:
             return cls.get_country_name_from_iso3(
                 iso3, exception=exception, shortname=shortname
@@ -471,7 +492,9 @@ class Country:
         Returns:
             Optional[str]: Currency
         """
-        iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_iso2(
+            iso2, use_live=use_live, exception=exception
+        )
         if iso3 is not None:
             return cls.get_currency_from_iso3(
                 iso3, use_live=use_live, exception=exception
@@ -536,7 +559,7 @@ class Country:
         m49: int,
         use_live: bool = True,
         exception: Optional[ExceptionUpperBound] = None,
-    ) -> Optional[Dict[str,str]]:
+    ) -> Optional[Dict[str, str]]:
         """Get country name from M49 code
 
         Args:
@@ -547,7 +570,9 @@ class Country:
         Returns:
             Optional[Dict[str,str]]: Country information
         """
-        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_m49(
+            m49, use_live=use_live, exception=exception
+        )
         if iso3 is not None:
             return cls.get_country_info_from_iso3(iso3, exception=exception)
         return None
@@ -571,7 +596,9 @@ class Country:
         Returns:
             Optional[str]: Country name
         """
-        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_m49(
+            m49, use_live=use_live, exception=exception
+        )
         if iso3 is not None:
             return cls.get_country_name_from_iso3(
                 iso3, exception=exception, shortname=shortname
@@ -595,7 +622,9 @@ class Country:
         Returns:
             Optional[str]: Currency
         """
-        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_m49(
+            m49, use_live=use_live, exception=exception
+        )
         if iso3 is not None:
             return cls.get_currency_from_iso3(
                 iso3, use_live=use_live, exception=exception
@@ -614,7 +643,11 @@ class Country:
         """
 
         def replace_ensure_space(word, replace, replacement):
-            return word.replace(replace, f"{replacement} ").replace("  ", " ").strip()
+            return (
+                word.replace(replace, f"{replacement} ")
+                .replace("  ", " ")
+                .strip()
+            )
 
         countryupper = country.upper()
         for abbreviation in cls.abbreviations:
@@ -626,7 +659,9 @@ class Country:
             if abbreviation in countryupper:
                 for expanded in cls.multiple_abbreviations[abbreviation]:
                     candidates.append(
-                        replace_ensure_space(countryupper, abbreviation, expanded)
+                        replace_ensure_space(
+                            countryupper, abbreviation, expanded
+                        )
                     )
         return candidates
 
@@ -654,7 +689,10 @@ class Country:
         for simplification1, simplification2 in cls.abbreviations.items():
             countryupper = countryupper.replace(simplification1, "")
             remove.append(simplification2)
-        for simplification1, simplifications in cls.multiple_abbreviations.items():
+        for (
+            simplification1,
+            simplifications,
+        ) in cls.multiple_abbreviations.items():
             countryupper = countryupper.replace(simplification1, "")
             for simplification2 in simplifications:
                 remove.append(simplification2)
@@ -765,7 +803,9 @@ class Country:
         matches = set()
         for countryname in sorted(countriesdata["countrynames2iso3"]):
             for candidate in expanded_country_candidates:
-                simplified_country, removed_words = cls.simplify_countryname(candidate)
+                simplified_country, removed_words = cls.simplify_countryname(
+                    candidate
+                )
                 if simplified_country in countryname:
                     words = get_words_in_sentence(countryname)
                     new_match_strength = remove_matching_from_list(

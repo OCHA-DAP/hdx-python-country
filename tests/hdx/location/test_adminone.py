@@ -15,11 +15,26 @@ class TestAdminOne:
 
     def test_adminone(self, config):
         adminone = AdminOne(config)
-        assert adminone.get_pcode("YEM", "YE30", scrapername="test") == ("YE30", True)
-        assert adminone.get_pcode("YEM", "YEM30", scrapername="test") == ("YE30", True)
-        assert adminone.get_pcode("YEM", "YEM030", scrapername="test") == ("YE30", True)
-        assert adminone.get_pcode("NGA", "NG015", scrapername="test") == ("NG015", True)
-        assert adminone.get_pcode("NGA", "NG15", scrapername="test") == ("NG015", True)
+        assert adminone.get_pcode("YEM", "YE30", scrapername="test") == (
+            "YE30",
+            True,
+        )
+        assert adminone.get_pcode("YEM", "YEM30", scrapername="test") == (
+            "YE30",
+            True,
+        )
+        assert adminone.get_pcode("YEM", "YEM030", scrapername="test") == (
+            "YE30",
+            True,
+        )
+        assert adminone.get_pcode("NGA", "NG015", scrapername="test") == (
+            "NG015",
+            True,
+        )
+        assert adminone.get_pcode("NGA", "NG15", scrapername="test") == (
+            "NG015",
+            True,
+        )
         assert adminone.get_pcode("NGA", "NGA015", scrapername="test") == (
             "NG015",
             True,
@@ -28,15 +43,27 @@ class TestAdminOne:
             "NER004",
             True,
         )
-        assert adminone.get_pcode("NER", "NE04", scrapername="test") == ("NER004", True)
+        assert adminone.get_pcode("NER", "NE04", scrapername="test") == (
+            "NER004",
+            True,
+        )
         assert adminone.get_pcode("NER", "NE004", scrapername="test") == (
             "NER004",
             True,
         )
-        assert adminone.get_pcode("ABC", "NE004", scrapername="test") == (None, False)
+        assert adminone.get_pcode("ABC", "NE004", scrapername="test") == (
+            None,
+            False,
+        )
         config["countries_fuzzy_try"].append("ABC")
-        assert adminone.get_pcode("ABC", "NE004", scrapername="test") == (None, False)
-        assert adminone.get_pcode("XYZ", "XYZ123", scrapername="test") == (None, False)
+        assert adminone.get_pcode("ABC", "NE004", scrapername="test") == (
+            None,
+            False,
+        )
+        assert adminone.get_pcode("XYZ", "XYZ123", scrapername="test") == (
+            None,
+            False,
+        )
         assert adminone.get_pcode("NER", "ABCDEFGH", scrapername="test") == (
             None,
             False,
@@ -49,12 +76,19 @@ class TestAdminOne:
             "YE30",
             False,
         )
-        assert adminone.get_pcode("YEM", "nord", scrapername="test") == (None, False)
-        assert adminone.get_pcode("NGA", "FCT (Abuja)", scrapername="test") == (
+        assert adminone.get_pcode("YEM", "nord", scrapername="test") == (
+            None,
+            False,
+        )
+        assert adminone.get_pcode(
+            "NGA", "FCT (Abuja)", scrapername="test"
+        ) == (
             "NG015",
             True,
         )
-        assert adminone.get_pcode("UKR", "Chernihiv Oblast", scrapername="test") == (
+        assert adminone.get_pcode(
+            "UKR", "Chernihiv Oblast", scrapername="test"
+        ) == (
             "UA74",
             False,
         )
@@ -83,14 +117,18 @@ class TestAdminOne:
             "test - NER: Could not find ABCDEFGH in map names!",
         ]
 
-    @pytest.mark.skipif(sys.version_info[0] == 2, reason="Requires Python 3 or higher")
+    @pytest.mark.skipif(
+        sys.version_info[0] == 2, reason="Requires Python 3 or higher"
+    )
     def test_adminone_fuzzy(self, config):
         adminone = AdminOne(config)
         assert adminone.get_pcode("YEM", "Al Dali", scrapername="test") == (
             "YE30",
             False,
         )
-        assert adminone.get_pcode("YEM", "Al Dhale'e / الضالع", scrapername="test") == (
+        assert adminone.get_pcode(
+            "YEM", "Al Dhale'e / الضالع", scrapername="test"
+        ) == (
             "YE30",
             False,
         )
