@@ -16,7 +16,7 @@ matching if you are running Python 3.
 
 It also provides currency conversion to USD from local currency.
 
-For more information, please read the [documentation](https://hdx-python-utilities.readthedocs.io/en/latest/). 
+For more information, please read the [documentation](https://hdx-python-country.readthedocs.io/en/latest/). 
 
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) (HDX) project. If you have 
 humanitarian related data, please upload your datasets to HDX.
