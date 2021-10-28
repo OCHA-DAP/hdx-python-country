@@ -19,12 +19,8 @@ class CountryError(Exception):
 
 
 class Country:
-    """Country class with various methods to help with countries and regions. Uses OCHA countries feed which
-    supplies data in form:
-    ::
-        ID,HRinfo ID,RW ID,m49 numerical code,FTS API ID,Appears in UNTERM list,Appears in DGACM list,ISO 3166-1 Alpha 2-Codes,ISO 3166-1 Alpha 3-Codes,x Alpha2 codes,x Alpha3 codes,Preferred Term,m49 Alt Term,ISO Alt Term,UNTERM Alt Term,FTS Alt Term,HRinfo Alt Term,RW Short Name,RW API Alt Term,English Short,French Short,Spanish Short,Russian Short,Chinese Short,Arabic Short,Admin Level,Latitude,Longitude,Region Code,Region Name,Sub-region Code,Sub-region Name,Intermediate Region Code,Intermediate Region Name,Regex,Concatenation
-        #meta +id,#country +code +v_hrinfo_country,#country +code +v_reliefweb,#country +code +num +v_m49,#country +code +v_fts,,,#country +code +v_iso2,#country +code +v_iso3,,,#country +name +preferred,#country +name +alt +v_m49,#country +name +alt +v_iso,#country +name +alt +v_unterm,#country +name +alt +v_fts,#country +name +alt +v_hrinfo_country,#country +name +short +v_reliefweb,#country +name +alt +v_reliefweb,#country +name +i_en +alt +v_unterm,#country +name +i_fr +alt +v_unterm,#country +name +i_es +alt +v_unterm,#country +name +i_ru +alt +v_unterm,#country +name +i_zh +alt +v_unterm,#country +name +i_ar +alt +v_unterm,#geo +admin_level,#geo +lat,#geo +lon,#region +main +code,#region +main +name +preferred,#region +sub +code,#region +sub +name +preferred,#region +intermediate +code,#region +intermediate +name +preferred,#country +regex,
-        1,181,13,4,1,Y,Y,AF,AFG,,,Afghanistan,,,,,,,,Afghanistan,Afghanistan (l') [masc.],Afganistán (el),Афганистан,阿富汗,أفغانستان,0,33.83147477,66.02621828,142,Asia,34,Southern Asia,,,afghan,
+    """Country class with various methods to help with mapping between country and
+    region names and codes. Uses OCHA's countries and territories feed.
     """
 
     abbreviations = {
