@@ -41,52 +41,52 @@ The usage of the country mappings functionality is best illustrated by some exam
 
     from hdx.location.country import Country
     
-    Country.countriesdata(use_live=False, country_name_overrides={'PSE': 'oPt'})
+    Country.countriesdata(use_live=False, country_name_overrides={"PSE": "oPt"})
     # Set up using non live data from repo rather and override default country name
     # (Leaving out this step will use live data and no overrides)
-    Country.get_country_name_from_iso3('jpn', use_live=False)  # returns 'Japan'
-    Country.get_country_name_from_iso3('vEn', shortname=True)  # returns 'Venezuela'
+    Country.get_country_name_from_iso3("jpn", use_live=False)  # returns "Japan"
+    Country.get_country_name_from_iso3("vEn", shortname=True)  # returns "Venezuela"
     # uselive=False forces the use of internal files instead of accessing the live feeds.
     # It only needs to be supplied to the first call as the data once loaded is held
     # in internal dictionaries for future use.
-    Country.get_country_name_from_iso2('Pl')  # returns 'Poland'
-    Country.get_iso3_country_code('UZBEKISTAN')  # returns 'UZB'
-    Country.get_country_name_from_m49(4)  # returns 'Afghanistan'
+    Country.get_country_name_from_iso2("Pl")  # returns "Poland"
+    Country.get_iso3_country_code("UZBEKISTAN")  # returns "UZB"
+    Country.get_country_name_from_m49(4)  # returns "Afghanistan"
     
-    Country.get_iso3_country_code_fuzzy('Sierra')
-    # performs fuzzy match and returns ('SLE', False). The False indicates a fuzzy rather than exact match.
-    assert Country.get_iso3_country_code_fuzzy('Czech Rep.')
-    # returns ('CZE', False)
+    Country.get_iso3_country_code_fuzzy("Sierra")
+    # performs fuzzy match and returns ("SLE", False). The False indicates a fuzzy rather than exact match.
+    assert Country.get_iso3_country_code_fuzzy("Czech Rep.")
+    # returns ("CZE", False)
     
-    Country.get_country_info_from_iso2('jp')
+    Country.get_country_info_from_iso2("jp")
     # Returns dictionary with HXL hashtags as keys. For more on HXL, see http://hxlstandard.org/
-    # {'#country+alt+i_ar+name+v_unterm': 'اليابان', '#country+alt+i_en+name+v_unterm': 'Japan',
-    # '#country+alt+i_es+name+v_unterm': 'Japón (el)', '#country+alt+i_fr+name+v_unterm': 'Japon (le)',
-    # '#country+alt+i_ru+name+v_unterm': 'Япония', '#country+alt+i_zh+name+v_unterm': '日本',
-    # '#country+alt+name+v_fts': '', '#country+alt+name+v_hrinfo_country': '',
-    # '#country+alt+name+v_iso': '', '#country+alt+name+v_m49': '',
-    # '#country+alt+name+v_reliefweb': '', '#country+alt+name+v_unterm': '',
-    # '#country+code+num+v_m49': '392', '#country+code+v_fts': '112',
-    # '#country+code+v_hrinfo_country': '292', '#country+code+v_iso2': 'JP',
-    # '#country+code+v_iso3': 'JPN', '#country+code+v_reliefweb': '128',
-    # '#country+name+preferred': 'Japan', '#country+name+short+v_reliefweb': '',
-    # '#country+regex': 'japan', '#geo+admin_level': '0', '#geo+lat': '37.63209801',
-    # '#geo+lon': '138.0812256', '#meta+id': '112', '#region+code+intermediate': '',
-    # '#region+code+main': '142', '#region+code+sub': '30', '#region+intermediate+name+preferred': '',
-    # '#region+main+name+preferred': 'Asia', '#region+name+preferred+sub': 'Eastern Asia'}
-    Country.get_countries_in_region('Channel Islands')
-    # ['GGY', 'JEY']
-    len(Country.get_countries_in_region('Africa'))
+    # {"#country+alt+i_ar+name+v_unterm": "اليابان", "#country+alt+i_en+name+v_unterm": "Japan",
+    # "#country+alt+i_es+name+v_unterm": "Japón (el)", "#country+alt+i_fr+name+v_unterm": "Japon (le)",
+    # "#country+alt+i_ru+name+v_unterm": "Япония", "#country+alt+i_zh+name+v_unterm": "日本",
+    # "#country+alt+name+v_fts": "", "#country+alt+name+v_hrinfo_country": "",
+    # "#country+alt+name+v_iso": "", "#country+alt+name+v_m49": "",
+    # "#country+alt+name+v_reliefweb": "", "#country+alt+name+v_unterm": "",
+    # "#country+code+num+v_m49": "392", "#country+code+v_fts": "112",
+    # "#country+code+v_hrinfo_country": "292", "#country+code+v_iso2": "JP",
+    # "#country+code+v_iso3": "JPN", "#country+code+v_reliefweb": "128",
+    # "#country+name+preferred": "Japan", "#country+name+short+v_reliefweb": "",
+    # "#country+regex": "japan", "#geo+admin_level": "0", "#geo+lat": "37.63209801",
+    # "#geo+lon": "138.0812256", "#meta+id": "112", "#region+code+intermediate": "",
+    # "#region+code+main": "142", "#region+code+sub": "30", "#region+intermediate+name+preferred": "",
+    # "#region+main+name+preferred": "Asia", "#region+name+preferred+sub": "Eastern Asia"}
+    Country.get_countries_in_region("Channel Islands")
+    # ["GGY", "JEY"]
+    len(Country.get_countries_in_region("Africa"))
     # 60
     Country.get_countries_in_region(13)
-    # ['BLZ', 'CRI', 'GTM', 'HND', 'MEX', 'NIC', 'PAN', 'SLV']
+    # ["BLZ", "CRI", "GTM", "HND", "MEX", "NIC", "PAN", "SLV"]
 
 ## Administration Level One
 
 The administration level one mappings requires using an input configuration dictionary, admin_config, with key 
 *admin1_info* which is a list with values of the form:
 
-    {'iso3': 'AFG', 'pcode': 'AF01', 'name': 'Kabul'}
+    {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
 
 Various other keys are optional:
 
@@ -98,23 +98,23 @@ Various other keys are optional:
 Examples of usage:
 
     adminone = AdminOne(config)
-    adminone.get_pcode('YEM', 'YEM030', scrapername='test')  # returns ('YE30', True)
+    adminone.get_pcode("YEM", "YEM030", scrapername="test")  # returns ("YE30", True)
     # Fuzzy matching in Python 3 only
-    adminone.get_pcode('YEM', "Al Dhale'e / الضالع", scrapername='test')  # returns ('YE30', False)
+    adminone.get_pcode("YEM", "Al Dhale"e / الضالع", scrapername="test")  # returns ("YE30", False)
 
 ## Currencies
 
 Currency conversion to USD is simple:
 
-    currency = Country.get_currency_from_iso3('usa')  # returns 'USD'
+    currency = Country.get_currency_from_iso3("usa")  # returns "USD"
     Currency.get_current_value_in_usd(10, currency)  # returns 10
-    gbprate = Currency.get_current_value_in_usd(10, 'gbp')
+    gbprate = Currency.get_current_value_in_usd(10, "gbp")
     assert gbprate != 10
-    Currency.get_current_value_in_currency(gbprate, 'GBP')  # returns 10
-    date = parse_date('2020-02-20')
-    Currency.get_historic_value_in_usd(10, 'USD', date)  # returns 10
-    Currency.get_historic_value_in_usd(10, 'gbp', date)  # returns 12.877
-    Currency.get_historic_value_in_currency(10, 'gbp', date)  # returns 7.765783955890346
+    Currency.get_current_value_in_currency(gbprate, "GBP")  # returns 10
+    date = parse_date("2020-02-20")
+    Currency.get_historic_value_in_usd(10, "USD", date)  # returns 10
+    Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 12.877
+    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.765783955890346
     
 It is also possible to pass in a Retrieve object to Currency.setup() to allow the downloaded files to be saved or 
 previously downloaded files to be reused. It is also possible to change the urls used for current and historic rates
