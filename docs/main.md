@@ -13,7 +13,7 @@ matching if you are running Python 3.
 
 It also provides currency conversion to USD from local currency.
 
-1. [Countries](#counties)
+1. [Countries](#countries)
 1. [Administration level one](#administration-level-one)
 1. [Currencies](#currencies)
 

@@ -83,11 +83,11 @@ output_directory = "docs/build"
         contents = ["hdx.location.country.*"]
 
         [[tool.pydoc-markdown.renderer.pages.children]]
-        title = "Countries"
+        title = "Administration level one"
         contents = ["hdx.location.adminone.*"]
 
         [[tool.pydoc-markdown.renderer.pages.children]]
-        title = "Countries"
+        title = "Currencies"
         contents = ["hdx.location.currency.*"]
 
 [tool.tox]
