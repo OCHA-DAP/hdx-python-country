@@ -111,8 +111,8 @@ commands =
 [testenv:lint]
 wheel_build_env = py38
 deps =
-    flakehell
-    flake8==3.9.0
+    git+git://github.com/mcarans/flakehell.git#egg=flakehell
+    flake8
     flake8-isort
     flake8-black
 commands =
