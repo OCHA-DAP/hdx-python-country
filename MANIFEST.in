@@ -1,10 +1,6 @@
 include *.txt
 include pyproject.toml
 include LICENSE
-recursive-include documentation *.py
-recursive-include documentation *.rst
-recursive-include documentation *.sh
-recursive-include documentation Makefile
 recursive-include src *.txt
 recursive-include src *.yml
 recursive-include src *.json
