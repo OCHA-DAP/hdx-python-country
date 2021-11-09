@@ -1,9 +1,9 @@
 include *.txt
 include pyproject.toml
 include LICENSE
-include docs *.yml
-include docs *.txt
-include docs *.md
+include docs/*.yml
+include docs/*.txt
+include docs/*.md
 recursive-include src *.txt
 recursive-include src *.yml
 recursive-include src *.json
