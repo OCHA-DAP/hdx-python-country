@@ -3,7 +3,10 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-The HDX Python Country Library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
+The HDX Python Country Library provides utilities to map between country and region codes 
+and names, to convert between currencies and to match administrative level one names from different sources.  
+
+It provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
 using live official data from the [UN OCHA](https://vocabulary.unocha.org/) feed with fallbacks to an internal static 
 file if there is any problem with retrieving data from the url. (Also it is possible to force the use of the internal 
 static files.)

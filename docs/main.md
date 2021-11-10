@@ -1,6 +1,18 @@
+# Summary
+
+The HDX Python Country Library provides utilities to map between country and region codes 
+and names, to convert between currencies and to match administrative level one names from different sources.  
+
+# Contents
+
+1. [Information](#information)
+2. [Countries](#countries)
+3. [Administration level one](#administration-level-one)
+4. [Currencies](#currencies)
+
 # Information
 
-The HDX Python Country Library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
+The library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
 using live official data from the [UN OCHA](https://vocabulary.unocha.org/) feed with fallbacks to an internal static 
 file if there is any problem with retrieving data from the url. (Also it is possible to force the use of the internal 
 static files.)
@@ -12,10 +24,6 @@ Mapping administration level one names from a source to a given base set is also
 matching if you are running Python 3.  
 
 It also provides currency conversion to USD from local currency.
-
-1. [Countries](#countries)
-1. [Administration level one](#administration-level-one)
-1. [Currencies](#currencies)
 
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) (HDX) project. If you have 
 humanitarian related data, please upload your datasets to HDX.
