@@ -30,7 +30,7 @@ humanitarian related data, please upload your datasets to HDX.
 
 The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-country).
 The library has detailed API documentation which can be found in the menu on the left and starts 
-[here](https://hdx-python-country.readthedocs.io/en/latest/api-documentation/downloading-files/). 
+[here](https://hdx-python-country.readthedocs.io/en/latest/api-documentation/countries/). 
 
 ## Breaking Changes
 
