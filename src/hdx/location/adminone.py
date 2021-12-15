@@ -15,7 +15,7 @@ class AdminOne:
     """AdminOne class which takes in pcodes and then maps names to those pcodes with fuzzy matching if necessary. The
     input configuration dictionary, admin_config, requires key admin1_info which is a list with values of the form:
     ::
-        {'iso3': 'AFG', 'pcode': 'AF01', 'name': 'Kabul'}
+        {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
 
     Various other keys are optional:
     countries_fuzzy_try are countries (iso3 codes) for which to try fuzzy matching. Default is all countries.
