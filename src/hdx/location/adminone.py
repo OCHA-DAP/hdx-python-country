@@ -145,9 +145,6 @@ class AdminOne:
         if not name_to_pcode:
             self.errors.add((scrapername, countryiso3))
             return None
-        if name.lower() in self.admin1_fuzzy_dont:
-            self.ignored.add((scrapername, countryiso3, name))
-            return None
         adm1_name_lookup = clean_name(name)
         adm1_name_lookup2 = multiple_replace(
             adm1_name_lookup, self.admin1_name_replacements
@@ -155,6 +152,9 @@ class AdminOne:
         pcode = name_to_pcode.get(
             adm1_name_lookup, name_to_pcode.get(adm1_name_lookup2)
         )
+        if not pcode and name.lower() in self.admin1_fuzzy_dont:
+            self.ignored.add((scrapername, countryiso3, name))
+            return None
         if not pcode:
             for map_name in name_to_pcode:
                 if adm1_name_lookup in map_name:
