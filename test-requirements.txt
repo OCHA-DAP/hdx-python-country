@@ -1,6 +1,5 @@
-pytest==6.2.5
+pytest==7.0.1
 pytest-cov==3.0.0
-pytest-pythonpath==0.7.3
 pytest-runner==5.3.1
 tox==3.24.5
 tox-wheel==0.7.0
