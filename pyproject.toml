@@ -1,6 +1,11 @@
 [build-system]
-requires = [ "setuptools", "wheel"]
+requires = [ "setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/hdx/location/_version.py"
+local_scheme = "no-local-version"
+version_scheme = "python-simplified-semver"
 
 [tool.black]
 line-length = 79
@@ -28,6 +33,7 @@ show_source = true
 
 [tool.pytest.ini_options]
 pythonpath = "src"
+addopts = "--color=yes"
 log_cli = 1
 
 [tool.coverage.paths]
@@ -133,11 +139,10 @@ commands =
 
 [testenv:publish]
 wheel_build_env = py310
-passenv = SSH_AUTH_SOCK
+passenv = SSH_AUTH_SOCK TWINE_USERNAME TWINE_PASSWORD
 deps =
     twine
 
 commands =
-    python -c \"from hdx.utilities.wheel import git_tag_whl; git_tag_whl('{distdir}')\"
     twine upload {distdir}/*
 """
