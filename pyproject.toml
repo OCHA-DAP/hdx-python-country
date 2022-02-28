@@ -21,6 +21,7 @@ format = "grouped"
 max_line_length = 79
 # show line of source code in output
 show_source = true
+exclude = ["_version.py"]
 
     # list of plugins and rules for them
     [tool.flakeheaven.plugins]
