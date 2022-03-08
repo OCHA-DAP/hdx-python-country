@@ -27,13 +27,6 @@ class AdminOne:
         admin_config (Dict): Configuration dictionary
     """
 
-    _admininfo = None
-    pcodes = list()
-    pcode_lengths = dict()
-    name_to_pcode = dict()
-    pcode_to_name = dict()
-    pcode_to_iso3 = dict()
-
     def __init__(self, admin_config: Dict) -> None:
         admin_info1 = admin_config["admin1_info"]
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
@@ -44,6 +37,12 @@ class AdminOne:
             "admin1_name_replacements", dict()
         )
         self.admin1_fuzzy_dont = admin_config.get("admin1_fuzzy_dont", list())
+        self.pcodes = list()
+        self.pcode_lengths = dict()
+        self.name_to_pcode = dict()
+        self.pcode_to_name = dict()
+        self.pcode_to_iso3 = dict()
+
         for row in admin_info1:
             countryiso3 = row["iso3"]
             pcode = row.get("pcode")
