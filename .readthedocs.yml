@@ -3,7 +3,6 @@ mkdocs: {}  # tell readthedocs to use mkdocs
 build:
   os: ubuntu-20.04
   jobs:
-    pre_create_environment:
+    post_install:
       - pip install pydoc-markdown==4.5.1
-    pre_build:
       - pydoc-markdown --build --site-dir "$PWD/_build/html"
