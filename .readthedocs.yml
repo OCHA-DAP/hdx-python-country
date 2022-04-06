@@ -12,4 +12,4 @@ build:
     post_install:
       - pip install pydoc-markdown==4.5.1
       - pip install jinja2==3.0.3
-      - pydoc-markdown --build --site-dir "$PWD/_build/html"
+      - pydoc-markdown --build --site-dir "$PWD/docs/_build/html"
