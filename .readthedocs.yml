@@ -11,4 +11,5 @@ build:
   jobs:
     pre_build:
       - pip install pydoc-markdown==4.5.1
+      - pip install mkdocs==1.2.4
       - pydoc-markdown
