@@ -67,7 +67,7 @@ packages = ["hdx.location"]
 
 [tool.pydoc-markdown.renderer]
 type = "mkdocs"
-output_directory = "docs/build"
+output_directory = "docs"
 
     [tool.pydoc-markdown.renderer.mkdocs_config]
     site_name = "HDX Python Country"
@@ -81,7 +81,7 @@ output_directory = "docs/build"
     [[tool.pydoc-markdown.renderer.pages]]
     title = "Home"
     name = "index"
-    source ="docs/main.md"
+    source ="pydoc/main.md"
 
     [[tool.pydoc-markdown.renderer.pages]]
     title = "API Documentation"
