@@ -7,7 +7,7 @@ mkdocs:
 build:
   os: ubuntu-20.04
   tools:
-    python: "3.8"
+    python: "3.9"
   jobs:
     post_install:
       - pip install pydoc-markdown==4.5.1
