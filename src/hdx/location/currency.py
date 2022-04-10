@@ -66,7 +66,7 @@ class Currency:
         else:
             downloader = None
         try:
-            current_rates = retriever.retrieve_json(
+            current_rates = retriever.download_json(
                 current_rates_url,
                 "currentrates.json",
                 "current exchange rates",
@@ -76,7 +76,7 @@ class Currency:
         except (DownloadError, OSError) as ex:
             raise CurrencyError("Error getting current rates!") from ex
         try:
-            rates_path = retriever.retrieve_file(
+            rates_path = retriever.download_file(
                 historic_rates_url,
                 "rates.csv",
                 "historic exchange rates",
