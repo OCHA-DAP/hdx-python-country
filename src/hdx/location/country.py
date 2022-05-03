@@ -2,6 +2,7 @@
 import copy
 import logging
 import re
+from string import punctuation
 from typing import Dict, List, Optional, Tuple, TypeVar, Union
 
 import hxl
@@ -700,6 +701,7 @@ class Country:
         if len(countryupper_words) > 1:
             countryupper = countryupper_words[0]
         if countryupper:
+            countryupper = countryupper.strip(punctuation)
             words.remove(countryupper)
         return countryupper, words
 
