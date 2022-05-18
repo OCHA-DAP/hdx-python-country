@@ -12,24 +12,30 @@ and names, to convert between currencies and to match administrative level one n
 
 # Information
 
-The library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) and regions 
-using live official data from the [UN OCHA](https://vocabulary.unocha.org/) feed with fallbacks to an internal static 
-file if there is any problem with retrieving data from the url. (Also it is possible to force the use of the internal 
-static files.)
+The library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) 
+and regions using live official data from the [UN OCHA](https://vocabulary.unocha.org/) 
+feed with fallbacks to an internal static file if there is any problem with retrieving 
+data from the url. (Also it is possible to force the use of the internal static files.)
+The UN OCHA feed has regex taken from
+[here](https://github.com/konstantinstadler/country_converter/blob/master/country_converter/country_data.tsv).
 
-It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a fuzzy matching for English look up 
-that can handle abbreviations in country names like Dem. for Democratic and Rep. for Republic.
 
-Mapping administration level one names from a source to a given base set is also handled including phonetic fuzzy name 
-matching if you are running Python 3.  
+It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a 
+fuzzy matching for English look up that can handle abbreviations in country names like 
+Dem. for Democratic and Rep. for Republic.
+
+Mapping administration level one names from a source to a given base set is also handled 
+including phonetic fuzzy name matching if you are running Python 3.  
 
 It also provides currency conversion to USD from local currency.
 
-This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) (HDX) project. If you have 
-humanitarian related data, please upload your datasets to HDX.
+This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) 
+(HDX) project. If you have humanitarian related data, please upload your datasets to 
+HDX.
 
 The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-country).
-The library has detailed API documentation which can be found in the menu on the left and starts 
+The library has detailed API documentation which can be found in the menu on the left 
+and starts 
 [here](https://hdx-python-country.readthedocs.io/en/latest/api-documentation/countries/). 
 
 ## Breaking Changes
