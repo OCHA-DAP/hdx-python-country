@@ -1,4 +1,4 @@
-hdx-python-utilities==3.3.2
+hdx-python-utilities==3.3.3
 libhxl==4.25
 pyphonetics==0.5.3
 exchangerates==0.3.4
