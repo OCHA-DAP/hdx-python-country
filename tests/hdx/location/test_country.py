@@ -2,6 +2,7 @@
 import hxl
 import pytest
 from hdx.utilities.path import script_dir_plus_file
+from hxl import InputOptions
 
 from hdx.location.country import Country
 
@@ -633,7 +634,7 @@ class TestCountry:
     def test_ocha_feed_file_working(self):
         countries = hxl.data(
             script_dir_plus_file("Countries_UZB_Deleted.csv", TestCountry),
-            allow_local=True,
+            InputOptions(allow_local=True),
         )
         Country.set_countriesdata(countries)
         assert Country.get_iso3_country_code("UZBEKISTAN") is None

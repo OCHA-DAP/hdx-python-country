@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Tuple, TypeVar, Union
 import hxl
 from hdx.utilities.path import script_dir_plus_file
 from hdx.utilities.text import get_words_in_sentence
+from hxl import InputOptions
 
 ExceptionUpperBound = TypeVar("T", bound="Exception")
 
@@ -236,7 +237,7 @@ class Country:
                         "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
                         Country,
                     ),
-                    allow_local=True,
+                    InputOptions(allow_local=True),
                 )
             cls.set_countriesdata(countries)
         return cls._countriesdata
