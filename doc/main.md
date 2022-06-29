@@ -34,9 +34,7 @@ This library is part of the [Humanitarian Data Exchange](https://data.humdata.or
 HDX.
 
 The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-country).
-The library has detailed API documentation which can be found in the menu on the left 
-and starts 
-[here](https://hdx-python-country.readthedocs.io/en/latest/api-documentation/countries/). 
+The library has detailed API documentation which can be found in the menu at the top. 
 
 ## Breaking Changes
 
