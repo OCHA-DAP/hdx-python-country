@@ -779,6 +779,12 @@ class Country:
         if iso3 is not None:
             return iso3, True
 
+        # regex lookup
+        for iso3, regex in countriesdata["aliases"].items():
+            index = re.search(regex, country.upper())
+            if index is not None:
+                return iso3, False
+
         if len(country) < min_chars:
             return None, False
 
@@ -789,12 +795,6 @@ class Country:
                     if word_or_part == word:
                         return 35
                     return 17
-
-        # regex lookup
-        for iso3, regex in countriesdata["aliases"].items():
-            index = re.search(regex, country.upper())
-            if index is not None:
-                return iso3, False
 
         # fuzzy matching
         expanded_country_candidates = cls.expand_countryname_abbrevs(country)

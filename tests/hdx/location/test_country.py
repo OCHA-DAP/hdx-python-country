@@ -107,9 +107,9 @@ class TestCountry:
             "#country+alt+name+v_hrinfo_country": "occupied Palestinian territory",
             "#country+name+short+v_reliefweb": "oPt",
             "#country+alt+name+v_reliefweb": "occupied Palestinian territory",
-            "#country+alt+i_en+name+v_unterm": "Palestine",
-            "#country+alt+i_fr+name+v_unterm": "État de Palestine",
-            "#country+alt+i_es+name+v_unterm": "Estado de Palestina",
+            "#country+alt+i_en+name+v_unterm": "State of Palestine",
+            "#country+alt+i_fr+name+v_unterm": "État de Palestine (l')",
+            "#country+alt+i_es+name+v_unterm": "Estado de Palestina (el)",
             "#country+alt+i_ru+name+v_unterm": "Государство Палестина",
             "#country+alt+i_zh+name+v_unterm": "巴勒斯坦国",
             "#country+alt+i_ar+name+v_unterm": "دولة فلسطين",
@@ -220,9 +220,9 @@ class TestCountry:
             "#country+alt+name+v_hrinfo_country": "occupied Palestinian territory",
             "#country+name+short+v_reliefweb": "oPt",
             "#country+alt+name+v_reliefweb": "occupied Palestinian territory",
-            "#country+alt+i_en+name+v_unterm": "Palestine",
-            "#country+alt+i_fr+name+v_unterm": "État de Palestine",
-            "#country+alt+i_es+name+v_unterm": "Estado de Palestina",
+            "#country+alt+i_en+name+v_unterm": "State of Palestine",
+            "#country+alt+i_fr+name+v_unterm": "État de Palestine (l')",
+            "#country+alt+i_es+name+v_unterm": "Estado de Palestina (el)",
             "#country+alt+i_ru+name+v_unterm": "Государство Палестина",
             "#country+alt+i_zh+name+v_unterm": "巴勒斯坦国",
             "#country+alt+i_ar+name+v_unterm": "دولة فلسطين",
@@ -370,9 +370,9 @@ class TestCountry:
             "#country+alt+name+v_hrinfo_country": "occupied Palestinian territory",
             "#country+name+short+v_reliefweb": "oPt",
             "#country+alt+name+v_reliefweb": "occupied Palestinian territory",
-            "#country+alt+i_en+name+v_unterm": "Palestine",
-            "#country+alt+i_fr+name+v_unterm": "État de Palestine",
-            "#country+alt+i_es+name+v_unterm": "Estado de Palestina",
+            "#country+alt+i_en+name+v_unterm": "State of Palestine",
+            "#country+alt+i_fr+name+v_unterm": "État de Palestine (l')",
+            "#country+alt+i_es+name+v_unterm": "Estado de Palestina (el)",
             "#country+alt+i_ru+name+v_unterm": "Государство Палестина",
             "#country+alt+i_zh+name+v_unterm": "巴勒斯坦国",
             "#country+alt+i_ar+name+v_unterm": "دولة فلسطين",
@@ -476,12 +476,15 @@ class TestCountry:
         )
         assert Country.get_iso3_country_code("Congo DR") == "COD"
         assert Country.get_iso3_country_code("oPt") == "PSE"
-        assert Country.get_iso3_country_code("Laos") == "LAO"
+        assert (
+            Country.get_iso3_country_code("Lao People's Democratic Republic")
+            == "LAO"
+        )
         assert Country.get_iso3_country_code_fuzzy("jpn") == ("JPN", True)
         assert Country.get_iso3_country_code_fuzzy("ZWE") == ("ZWE", True)
         assert Country.get_iso3_country_code_fuzzy("Vut") == ("VUT", True)
         assert Country.get_iso3_country_code_fuzzy("Congo DR") == ("COD", True)
-        assert Country.get_iso3_country_code_fuzzy("laos") == ("LAO", True)
+        assert Country.get_iso3_country_code_fuzzy("laos") == ("LAO", False)
         assert Country.get_iso3_country_code("abc") is None
         assert Country.get_iso3_country_code("-") is None
         with pytest.raises(LocationError):
@@ -565,7 +568,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy("Vietnam") == ("VNM", False)
         assert Country.get_iso3_country_code_fuzzy("South Korea") == (
             "KOR",
-            True,
+            False,
         )
         assert Country.get_iso3_country_code_fuzzy("Korea Republic") == (
             "KOR",
@@ -577,7 +580,7 @@ class TestCountry:
         )
         assert Country.get_iso3_country_code_fuzzy("North Korea") == (
             "PRK",
-            True,
+            False,
         )
         assert Country.get_iso3_country_code_fuzzy(
             "Serbia and Kosovo: S/RES/1244 (1999)"
@@ -644,6 +647,7 @@ class TestCountry:
         assert (
             Country.get_iso3_country_code("UZBEKISTAN", use_live=True) == "UZB"
         )
+        assert Country.get_iso3_country_code_fuzzy("Laos") == ("LAO", False)
         Country.set_ocha_url("NOTEXIST")
         Country._countriesdata = None
         assert Country.get_iso3_from_iso2("AF") == "AFG"
