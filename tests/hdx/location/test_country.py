@@ -637,7 +637,7 @@ class TestCountry:
     def test_ocha_feed_file_working(self):
         countries = hxl.data(
             script_dir_plus_file("Countries_UZB_Deleted.csv", TestCountry),
-            InputOptions(allow_local=True),
+            InputOptions(allow_local=True, encoding="utf-8"),
         )
         Country.set_countriesdata(countries)
         assert Country.get_iso3_country_code("UZBEKISTAN") is None
