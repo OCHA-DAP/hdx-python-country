@@ -226,7 +226,9 @@ class Country:
                 cls.set_country_name_mappings(country_name_mappings)
             if use_live:
                 try:
-                    countries = hxl.data(cls._ochaurl)
+                    countries = hxl.data(
+                        cls._ochaurl, InputOptions(encoding="utf-8")
+                    )
                 except OSError:
                     logger.exception(
                         "Download from OCHA feed failed! Falling back to stored file."
@@ -237,7 +239,7 @@ class Country:
                         "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
                         Country,
                     ),
-                    InputOptions(allow_local=True),
+                    InputOptions(allow_local=True, encoding="utf-8"),
                 )
             cls.set_countriesdata(countries)
         return cls._countriesdata
