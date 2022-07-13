@@ -2,7 +2,7 @@
 [![Coverage Status](https://codecov.io/gh/OCHA-DAP/hdx-python-country/branch/main/graph/badge.svg?token=JpWZc5js4y)](https://codecov.io/gh/OCHA-DAP/hdx-python-country)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
-[![Downloads](https://pepy.tech/badge/hdx-python-country)](https://pepy.tech/project/hdx-python-country)
+[![Downloads](https://img.shields.io/pypi/dm/hdx-python-country.svg)](https://pypistats.org/packages/hdx-python-country)
 
 The HDX Python Country Library provides utilities to map between country and region codes 
 and names, to convert between currencies and to match administrative level one names from different sources.  
