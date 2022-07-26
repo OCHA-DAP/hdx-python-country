@@ -597,6 +597,10 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy("Taiwan*") == ("TWN", False)
         assert Country.get_iso3_country_code_fuzzy("Kosovo") == (None, False)
         assert Country.get_iso3_country_code_fuzzy("Kosovo*") == (None, False)
+        assert Country.get_iso3_country_code_fuzzy("India") == ("IND", True)
+        assert Country.get_iso3_country_code_fuzzy("India*") == ("IND", False)
+        assert Country.get_iso3_country_code_fuzzy("*India") == ("IND", False)
+        assert Country.get_iso3_country_code_fuzzy("Bassas Da India") == (None, False)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code("abc", exception=ValueError)
         with pytest.raises(ValueError):
