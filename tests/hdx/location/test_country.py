@@ -600,6 +600,10 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy("India") == ("IND", True)
         assert Country.get_iso3_country_code_fuzzy("India*") == ("IND", False)
         assert Country.get_iso3_country_code_fuzzy("*India") == ("IND", False)
+        assert Country.get_iso3_country_code_fuzzy("Republic of India") == (
+            "IND",
+            False,
+        )
         assert Country.get_iso3_country_code_fuzzy("Bassas Da India") == (
             None,
             False,
