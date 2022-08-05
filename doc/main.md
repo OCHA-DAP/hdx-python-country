@@ -1,7 +1,9 @@
 # Summary
 
-The HDX Python Country Library provides utilities to map between country and region codes 
-and names, to convert between currencies and to match administrative level one names from different sources.  
+The HDX Python Country Library provides utilities to map between country and region 
+codes and names and to match administrative level one names from different sources.
+It also provides utilities for foreign exchange enabling obtaining current and historic 
+FX rates for different currencies.
 
 # Contents
 
@@ -116,23 +118,27 @@ Examples of usage:
 
 ## Currencies
 
-Currency conversion to USD is simple:
+Various functions support the conversion of monetary amounts to USD. Note that the 
+returned values are cached to reduce network usage which means that the library is 
+unsuited for use where rates are expected to update while the program is running:
 
     currency = Country.get_currency_from_iso3("usa")  # returns "USD"
+    assert Currency.get_current_rate("usd")  # returns 1
     Currency.get_current_value_in_usd(10, currency)  # returns 10
     gbprate = Currency.get_current_value_in_usd(10, "gbp")
     assert gbprate != 10
     Currency.get_current_value_in_currency(gbprate, "GBP")  # returns 10
     date = parse_date("2020-02-20")
+    Currency.get_historic_rate("gbp", date)  # returns 0.76910001039505
     Currency.get_historic_value_in_usd(10, "USD", date)  # returns 10
-    Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 12.877
-    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.765783955890346
+    Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 13.002210200027791
+    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.6910001039505005
     
-It is also possible to pass in a Retrieve object to Currency.setup() to allow the downloaded files to be saved or 
-previously downloaded files to be reused. It is also possible to change the urls used for current and historic rates
-(the defaults are current_rates_url: https://api.exchangerate.host/latest?base=usd, 
-historic_rates_url: https://codeforiati.org/exchangerates-scraper/consolidated.csv) and to activate fallbacks from 
-current rates to a static file and/or from historic rates to current rates (for which more currencies exist).
+The conversion relies on Yahoo Finance, falling back on exchangerate.host for current 
+rates, and Yahoo Finance falling back on IMF data via IATI for historic rates. Historic 
+rates can also fall back to current rates if desired (this is not the default).
+It is possible to pass in a Retrieve object to Currency.setup() to allow the downloaded 
+files from the secondary sources to be saved or previously downloaded files to be 
+reused and to allow fallbacks from current rates to a static file eg. 
 
-    Currency.setup(retriever, current_rates_url=my_current_rates_url, historic_rates_url=my_historic_rates_url,
-                   fallback_historic_to_current=True, fallback_current_to_static=True)
+    Currency.setup(retriever, ..., fallback_historic_to_current=True, fallback_current_to_static=True)
