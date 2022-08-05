@@ -39,7 +39,7 @@ class Currency:
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
-        return int(round(date.timestamp()))
+        return int(round(get_timestamp_from_datetime(date)))
 
     @classmethod
     def setup(
@@ -269,7 +269,7 @@ class Currency:
         data = cls._get_primary_rates_data(currency, timestamp)
         if not data:
             return None
-        return data["indicators"]["adjclose"][0]["adjclose"][0]
+        return data["indicators"]["adjclose"][-1]["adjclose"][-1]
 
     @classmethod
     def _get_interpolated_rate(
