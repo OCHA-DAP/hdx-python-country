@@ -39,7 +39,7 @@ class Currency:
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
-        return int(round(get_timestamp_from_datetime(date)))
+        return int(round(date.timestamp()))
 
     @classmethod
     def setup(

@@ -115,7 +115,7 @@ class TestCurrency:
     ):
         Currency._no_historic = False
         Currency.setup(secondary_historic_url=secondary_historic_url)
-        date = parse_date("2020-02-20").replace(tzinfo=None)
+        date = parse_date("2020-02-20")
         assert Currency.get_historic_rate("usd", date) == 1
         assert Currency.get_historic_value_in_usd(10, "USD", date) == 10
         assert Currency.get_historic_value_in_currency(10, "usd", date) == 10
