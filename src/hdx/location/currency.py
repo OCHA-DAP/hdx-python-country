@@ -269,7 +269,8 @@ class Currency:
         data = cls._get_primary_rates_data(currency, timestamp)
         if not data:
             return None
-        return data["indicators"]["adjclose"][-1]["adjclose"][-1]
+        logger.info(data)
+        return data["indicators"]["adjclose"][0]["adjclose"][0]
 
     @classmethod
     def _get_interpolated_rate(
