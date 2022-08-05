@@ -1,6 +1,6 @@
 """Currency conversion"""
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
 from hdx.utilities.dateparse import get_timestamp_from_datetime, parse_date
@@ -8,7 +8,6 @@ from hdx.utilities.dictandlist import dict_of_dicts_add
 from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.path import get_temp_dir
 from hdx.utilities.retriever import Retrieve
-from pytz import utc
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +39,11 @@ class Currency:
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
-        return int(round(get_timestamp_from_datetime(utc.localize(date))))
+        return int(
+            round(
+                get_timestamp_from_datetime(date.replace(tzinfo=timezone.utc))
+            )
+        )
 
     @classmethod
     def setup(
