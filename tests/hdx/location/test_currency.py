@@ -119,14 +119,14 @@ class TestCurrency:
         assert Currency.get_historic_rate("usd", date) == 1
         assert Currency.get_historic_value_in_usd(10, "USD", date) == 10
         assert Currency.get_historic_value_in_currency(10, "usd", date) == 10
-        assert Currency.get_historic_rate("gbp", date) == 0.76910001039505
+        assert Currency.get_historic_rate("gbp", date) == 0.7735000252723694
         assert (
             Currency.get_historic_value_in_usd(10, "gbp", date)
-            == 13.002210200027791
+            == 12.928247799964508
         )
         assert (
             Currency.get_historic_value_in_currency(10, "gbp", date)
-            == 7.6910001039505005
+            == 7.735000252723694
         )
         with pytest.raises(CurrencyError):
             Currency.get_historic_value_in_usd(10, "XYZ", date)

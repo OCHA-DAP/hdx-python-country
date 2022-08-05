@@ -8,6 +8,7 @@ from hdx.utilities.dictandlist import dict_of_dicts_add
 from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.path import get_temp_dir
 from hdx.utilities.retriever import Retrieve
+from pytz import utc
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class Currency:
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
-        return int(round(get_timestamp_from_datetime(date)))
+        return int(round(get_timestamp_from_datetime(utc.localize(date))))
 
     @classmethod
     def setup(
