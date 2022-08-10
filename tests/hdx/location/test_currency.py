@@ -53,6 +53,9 @@ class TestCurrency:
         gbprate = Currency.get_current_value_in_usd(10, "gbp")
         assert gbprate != 10
         assert Currency.get_current_value_in_currency(gbprate, "GBP") == 10
+        xdrrate = Currency.get_current_value_in_usd(10, "xdr")
+        assert xdrrate != 10
+        assert Currency.get_current_value_in_currency(xdrrate, "xdr") == 10
         with pytest.raises(CurrencyError):
             Currency.get_current_value_in_usd(10, "XYZ")
         with pytest.raises(CurrencyError):
@@ -96,8 +99,10 @@ class TestCurrency:
             Currency.get_current_value_in_currency(10, "gbp")
         Currency._rates_api = None
         assert Currency.get_current_rate("usd") == 1
-        rate1 = Currency.get_current_rate("gbp")
-        assert rate1 != 1
+        rate1gbp = Currency.get_current_rate("gbp")
+        assert rate1gbp != 1
+        rate1xdr = Currency.get_current_rate("xdr")
+        assert rate1xdr != 1
         Currency.setup(
             retriever=retrievers[1],
             primary_rates_url="fail",
@@ -106,9 +111,12 @@ class TestCurrency:
             no_historic=True,
         )
         Currency._secondary_rates = None
-        rate2 = Currency.get_current_rate("gbp")
-        assert rate2 != 1
-        assert (rate1 - rate2) / rate1 < 0.002
+        rate2gbp = Currency.get_current_rate("gbp")
+        assert rate2gbp != 1
+        assert (rate1gbp - rate2gbp) / rate1gbp < 0.002
+        rate2xdr = Currency.get_current_rate("xdr")
+        assert rate2xdr != 1
+        assert (rate1xdr - rate2xdr) / rate1xdr < 0.002
 
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
@@ -120,6 +128,22 @@ class TestCurrency:
         assert Currency.get_historic_value_in_usd(10, "USD", date) == 10
         assert Currency.get_historic_value_in_currency(10, "usd", date) == 10
         assert Currency.get_historic_rate("gbp", date) == 0.7735000252723694
+        assert Currency.get_historic_rate("xdr", date) == 0.7275806206896552
+        assert (
+            Currency.get_historic_rate(
+                "gbp",
+                parse_date("2020-02-20 00:00:00 NZST"),
+                ignore_timeinfo=False,
+            )
+            == 0.76910001039505
+        )
+        assert (
+            Currency.get_historic_rate(
+                "gbp",
+                parse_date("2020-02-19"),
+            )
+            == 0.76910001039505
+        )
         assert (
             Currency.get_historic_value_in_usd(10, "gbp", date)
             == 12.928247799964508

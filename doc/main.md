@@ -129,10 +129,12 @@ unsuited for use where rates are expected to update while the program is running
     assert gbprate != 10
     Currency.get_current_value_in_currency(gbprate, "GBP")  # returns 10
     date = parse_date("2020-02-20")
-    Currency.get_historic_rate("gbp", date)  # returns 0.76910001039505
+    Currency.get_historic_rate("gbp", date)  # returns 0.7735000252723694
+    Currency.get_historic_rate("gbp", parse_date("2020-02-20 00:00:00 NZST"),
+                               ignore_timeinfo=False)  # returns 0.76910001039505
     Currency.get_historic_value_in_usd(10, "USD", date)  # returns 10
     Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 13.002210200027791
-    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.6910001039505005
+    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.735000252723694
     
 The conversion relies on Yahoo Finance, falling back on exchangerate.host for current 
 rates, and Yahoo Finance falling back on IMF data via IATI for historic rates. Historic 

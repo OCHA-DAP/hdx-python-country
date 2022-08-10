@@ -39,11 +39,16 @@ class Currency:
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
-        return int(
-            round(
-                get_timestamp_from_datetime(date.replace(tzinfo=timezone.utc))
-            )
-        )
+        """
+        Get integer timestamp from datetime object
+
+        Args:
+            date (datetime): datetime object
+
+        Returns:
+            int: Integer timestamp
+        """
+        return int(round(get_timestamp_from_datetime(date)))
 
     @classmethod
     def setup(
@@ -116,7 +121,9 @@ class Currency:
             cls._secondary_historic = dict()
             for row in iterator:
                 currency = row["Currency"]
-                date = cls._get_int_timestamp(parse_date(row["Date"]))
+                date = cls._get_int_timestamp(
+                    parse_date(row["Date"], force_utc=True)
+                )
                 rate = float(row["Rate"])
                 dict_of_dicts_add(
                     cls._secondary_historic, currency, date, rate
@@ -165,7 +172,7 @@ class Currency:
             Optional[float]: fx rate or None
         """
         data = cls._get_primary_rates_data(
-            currency, cls._get_int_timestamp(datetime.now())
+            currency, cls._get_int_timestamp(datetime.utcnow())
         )
         if not data:
             return None
@@ -274,13 +281,35 @@ class Currency:
         if not data:
             return None
         logger.info(data)
-        return data["indicators"]["adjclose"][0]["adjclose"][0]
+        adjclose = data["indicators"]["adjclose"][0].get("adjclose")
+        if adjclose is None:
+            return None
+        return adjclose[0]
 
     @classmethod
     def _get_interpolated_rate(
-        cls, timestamp1, rate1, timestamp2, rate2, desired_date
-    ):
-        return rate1 + (desired_date - timestamp1) * (
+        cls,
+        timestamp1: int,
+        rate1: float,
+        timestamp2: int,
+        rate2: float,
+        desired_timestamp: int,
+    ) -> float:
+        """
+        Return a rate for a desired timestamp based on linearly interpolating between
+        two timestamp/rate pairs.
+
+        Args:
+            timestamp1 (int): First timestamp to use for fx conversion
+            rate1 (float): Rate at first timestamp
+            timestamp2 (int): Second timestamp to use for fx conversion
+            rate2 (float): Rate at second timestamp
+            desired_timestamp (int): Timestamp at which rate is desired
+
+        Returns:
+            float: Rate at desired timestamp
+        """
+        return rate1 + (desired_timestamp - timestamp1) * (
             (rate2 - rate1) / (timestamp2 - timestamp1)
         )
 
@@ -331,13 +360,19 @@ class Currency:
         )
 
     @classmethod
-    def get_historic_rate(cls, currency: str, date: datetime) -> float:
+    def get_historic_rate(
+        cls, currency: str, date: datetime, ignore_timeinfo: bool=True
+    ) -> float:
         """
-        Get the fx rate for currency on a particular date
+        Get the fx rate for currency on a particular date. Any time and time zone
+        information will be ignored by default (meaning that the time is set to 00:00:00
+        and the time zone set to UTC). To have the time and time zone accounted for,
+        set ignore_timeinfo to False. This may affect which day's closing value is used.
 
         Args:
             currency (str): Currency
             date (datetime): Date to use for fx conversion
+            ignore_timeinfo (bool): Ignore time and time zone of date. Defaults to True.
 
         Returns:
             float: fx rate
@@ -348,6 +383,12 @@ class Currency:
         if cls._cached_historic_rates is None:
             Currency.setup()
         currency_data = cls._cached_historic_rates.get(currency)
+        if ignore_timeinfo:
+            date = date.replace(
+                hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
+            )
+        else:
+            date = date.astimezone(timezone.utc)
         timestamp = cls._get_int_timestamp(date)
         if currency_data is not None:
             fx_rate = currency_data.get(timestamp)
@@ -369,24 +410,33 @@ class Currency:
             fx_rate = cls.get_current_rate(currency)
             if fx_rate:
                 logger.warning(
-                    "Falling back to current rate for currency {currency} on date {date}!"
+                    f"Falling back to current rate for currency {currency} on date {date.isoformat()}!"
                 )
             return fx_rate
         raise CurrencyError(
-            f"Failed to get rate for currency {currency} on date {date}!"
+            f"Failed to get rate for currency {currency} on date {date.isoformat()}!"
         )
 
     @classmethod
     def get_historic_value_in_usd(
-        cls, value: Union[int, float], currency: str, date: datetime
+        cls,
+        value: Union[int, float],
+        currency: str,
+        date: datetime,
+        ignore_timeinfo: bool=True,
     ) -> float:
         """
-        Get the USD value of the value in local currency on a particular date
+        Get the USD value of the value in local currency on a particular date. Any time
+        and time zone information will be ignored by default (meaning that the time is
+        set to 00:00:00 and the time zone set to UTC). To have the time and time zone
+        accounted for, set ignore_timeinfo to False. This may affect which day's closing
+        value is used.
 
         Args:
             value (Union[int, float]): Value in local currency
             currency (str): Currency
             date (datetime): Date to use for fx conversion
+            ignore_timeinfo (bool): Ignore time and time zone of date. Defaults to True.
 
         Returns:
             float: Value in USD
@@ -394,20 +444,31 @@ class Currency:
         currency = currency.upper()
         if currency == "USD":
             return value
-        fx_rate = cls.get_historic_rate(currency, date)
+        fx_rate = cls.get_historic_rate(
+            currency, date, ignore_timeinfo=ignore_timeinfo
+        )
         return value / fx_rate
 
     @classmethod
     def get_historic_value_in_currency(
-        cls, usdvalue: Union[int, float], currency: str, date: datetime
+        cls,
+        usdvalue: Union[int, float],
+        currency: str,
+        date: datetime,
+        ignore_timeinfo: bool=True,
     ) -> float:
         """
-        Get the current value in local currency of the value in USD on a particular date
+        Get the current value in local currency of the value in USD on a particular
+        date. Any time and time zone information will be ignored by default (meaning
+        that the time is set to 00:00:00 and the time zone set to UTC). To have the time
+        and time zone accounted for, set ignore_timeinfo to False. This may affect which
+        day's closing value is used.
 
         Args:
             value (Union[int, float]): Value in USD
             currency (str): Currency
             date (datetime): Date to use for fx conversion
+            ignore_timeinfo (bool): Ignore time and time zone of date. Defaults to True.
 
         Returns:
             float: Value in local currency
@@ -415,5 +476,7 @@ class Currency:
         currency = currency.upper()
         if currency == "USD":
             return usdvalue
-        fx_rate = cls.get_historic_rate(currency, date)
+        fx_rate = cls.get_historic_rate(
+            currency, date, ignore_timeinfo=ignore_timeinfo
+        )
         return usdvalue * fx_rate
