@@ -1,7 +1,9 @@
 # Summary
 
-The HDX Python Country Library provides utilities to map between country and region codes 
-and names, to convert between currencies and to match administrative level one names from different sources.  
+The HDX Python Country Library provides utilities to map between country and region 
+codes and names and to match administrative level one names from different sources.
+It also provides utilities for foreign exchange enabling obtaining current and historic 
+FX rates for different currencies.
 
 # Contents
 
@@ -18,16 +20,16 @@ feed with fallbacks to an internal static file if there is any problem with retr
 data from the url. (Also it is possible to force the use of the internal static files.)
 The UN OCHA feed has regex taken from
 [here](https://github.com/konstantinstadler/country_converter/blob/master/country_converter/country_data.tsv).
-
+with improvements contributed back.
 
 It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a 
 fuzzy matching for English look up that can handle abbreviations in country names like 
 Dem. for Democratic and Rep. for Republic.
 
 Mapping administration level one names from a source to a given base set is also handled 
-including phonetic fuzzy name matching if you are running Python 3.  
+including phonetic fuzzy name matching.  
 
-It also provides currency conversion to USD from local currency.
+It also provides currency conversion to and from USD from local currency.
 
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) 
 (HDX) project. If you have humanitarian related data, please upload your datasets to 
@@ -38,12 +40,15 @@ The library has detailed API documentation which can be found in the menu at the
 
 ## Breaking Changes
 
+From 3.3.2, major update to foreign exchange code and use of new Yahoo data source
+
 From 3.0.0, only supports Python >= 3.6
 
-Version 2.x.x of the library is a significant change from version 1.x.x which sourced its data from different feeds 
-(UN Stats and the World Bank). Consequently, although most of the api calls work the same way in 2.x.x, the ones that 
-return full country information do so in a different format to 1.x.x. The format they use is a dictionary using
-[Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags as keys.
+Version 2.x.x of the library is a significant change from version 1.x.x which sourced 
+its data from different feeds (UN Stats and the World Bank). Consequently, although 
+most of the api calls work the same way in 2.x.x, the ones that return full country 
+information do so in a different format to 1.x.x. The format they use is a dictionary 
+using [Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags as keys.
 
 # Description of Utilities
 
@@ -116,23 +121,33 @@ Examples of usage:
 
 ## Currencies
 
-Currency conversion to USD is simple:
+Various functions support the conversion of monetary amounts to USD. Note that the 
+returned values are cached to reduce network usage which means that the library is 
+unsuited for use where rates are expected to update while the program is running:
 
     currency = Country.get_currency_from_iso3("usa")  # returns "USD"
+    assert Currency.get_current_rate("usd")  # returns 1
     Currency.get_current_value_in_usd(10, currency)  # returns 10
     gbprate = Currency.get_current_value_in_usd(10, "gbp")
     assert gbprate != 10
     Currency.get_current_value_in_currency(gbprate, "GBP")  # returns 10
     date = parse_date("2020-02-20")
+    Currency.get_historic_rate("gbp", date)  # returns 0.7735000252723694
+    Currency.get_historic_rate("gbp", parse_date("2020-02-20 00:00:00 NZST"),
+                               ignore_timeinfo=False)  # returns 0.76910001039505
     Currency.get_historic_value_in_usd(10, "USD", date)  # returns 10
-    Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 12.877
-    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.765783955890346
-    
-It is also possible to pass in a Retrieve object to Currency.setup() to allow the downloaded files to be saved or 
-previously downloaded files to be reused. It is also possible to change the urls used for current and historic rates
-(the defaults are current_rates_url: https://api.exchangerate.host/latest?base=usd, 
-historic_rates_url: https://codeforiati.org/exchangerates-scraper/consolidated.csv) and to activate fallbacks from 
-current rates to a static file and/or from historic rates to current rates (for which more currencies exist).
+    Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 13.002210200027791
+    Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.735000252723694
+    Currency.get_historic_rate("gbp", parse_date("2020-02-20 00:00:00 NZST", 
+                               timezone_handling=2), ignore_timeinfo=False)
+    # == 0.76910001039505
 
-    Currency.setup(retriever, current_rates_url=my_current_rates_url, historic_rates_url=my_historic_rates_url,
-                   fallback_historic_to_current=True, fallback_current_to_static=True)
+    
+The conversion relies on Yahoo Finance, falling back on exchangerate.host for current 
+rates, and Yahoo Finance falling back on IMF data via IATI for historic rates. Historic 
+rates can also fall back to current rates if desired (this is not the default).
+It is possible to pass in a Retrieve object to Currency.setup() to allow the downloaded 
+files from the secondary sources to be saved or previously downloaded files to be 
+reused and to allow fallbacks from current rates to a static file eg. 
+
+    Currency.setup(retriever, ..., fallback_historic_to_current=True, fallback_current_to_static=True)
