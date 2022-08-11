@@ -13,6 +13,10 @@ from hdx.location.currency import Currency, CurrencyError
 
 class TestCurrency:
     @pytest.fixture(scope="class")
+    def difflimit(self):
+        return 0.003
+
+    @pytest.fixture(scope="class")
     def fixtures(self):
         return join("tests", "fixtures")
 
@@ -46,7 +50,7 @@ class TestCurrency:
         yield retriever, retriever_broken
         UserAgent.clear_global()
 
-    def test_get_current_value_in_usd(self, retrievers):
+    def test_get_current_value_in_usd(self, retrievers, difflimit):
         Currency.setup(no_historic=True)
         assert Currency.get_current_value_in_usd(10, "usd") == 10
         assert Currency.get_current_value_in_currency(10, "usd") == 10
@@ -113,10 +117,10 @@ class TestCurrency:
         Currency._secondary_rates = None
         rate2gbp = Currency.get_current_rate("gbp")
         assert rate2gbp != 1
-        assert (rate1gbp - rate2gbp) / rate1gbp < 0.002
+        assert abs(rate1gbp - rate2gbp) / rate1gbp < difflimit
         rate2xdr = Currency.get_current_rate("xdr")
         assert rate2xdr != 1
-        assert (rate1xdr - rate2xdr) / rate1xdr < 0.002
+        assert abs(rate1xdr - rate2xdr) / rate1xdr < difflimit
 
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
@@ -132,7 +136,7 @@ class TestCurrency:
         assert (
             Currency.get_historic_rate(
                 "gbp",
-                parse_date("2020-02-20 00:00:00 NZST"),
+                parse_date("2020-02-20 00:00:00 NZST", timezone_handling=2),
                 ignore_timeinfo=False,
             )
             == 0.76910001039505

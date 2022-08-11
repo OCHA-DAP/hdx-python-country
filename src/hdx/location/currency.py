@@ -121,9 +121,7 @@ class Currency:
             cls._secondary_historic = dict()
             for row in iterator:
                 currency = row["Currency"]
-                date = cls._get_int_timestamp(
-                    parse_date(row["Date"], force_utc=True)
-                )
+                date = cls._get_int_timestamp(parse_date(row["Date"]))
                 rate = float(row["Rate"])
                 dict_of_dicts_add(
                     cls._secondary_historic, currency, date, rate
@@ -361,7 +359,7 @@ class Currency:
 
     @classmethod
     def get_historic_rate(
-        cls, currency: str, date: datetime, ignore_timeinfo: bool=True
+        cls, currency: str, date: datetime, ignore_timeinfo: bool = True
     ) -> float:
         """
         Get the fx rate for currency on a particular date. Any time and time zone
@@ -423,7 +421,7 @@ class Currency:
         value: Union[int, float],
         currency: str,
         date: datetime,
-        ignore_timeinfo: bool=True,
+        ignore_timeinfo: bool = True,
     ) -> float:
         """
         Get the USD value of the value in local currency on a particular date. Any time
@@ -455,7 +453,7 @@ class Currency:
         usdvalue: Union[int, float],
         currency: str,
         date: datetime,
-        ignore_timeinfo: bool=True,
+        ignore_timeinfo: bool = True,
     ) -> float:
         """
         Get the current value in local currency of the value in USD on a particular
