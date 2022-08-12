@@ -3,7 +3,11 @@ import logging
 from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
-from hdx.utilities.dateparse import get_timestamp_from_datetime, parse_date
+from hdx.utilities.dateparse import (
+    get_timestamp_from_datetime,
+    now_utc,
+    parse_date,
+)
 from hdx.utilities.dictandlist import dict_of_dicts_add
 from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.path import get_temp_dir
@@ -170,7 +174,7 @@ class Currency:
             Optional[float]: fx rate or None
         """
         data = cls._get_primary_rates_data(
-            currency, cls._get_int_timestamp(datetime.utcnow())
+            currency, cls._get_int_timestamp(now_utc())
         )
         if not data:
             return None

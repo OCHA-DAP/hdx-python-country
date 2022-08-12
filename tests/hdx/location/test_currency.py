@@ -13,10 +13,6 @@ from hdx.location.currency import Currency, CurrencyError
 
 class TestCurrency:
     @pytest.fixture(scope="class")
-    def difflimit(self):
-        return 0.003
-
-    @pytest.fixture(scope="class")
     def fixtures(self):
         return join("tests", "fixtures")
 
@@ -50,7 +46,7 @@ class TestCurrency:
         yield retriever, retriever_broken
         UserAgent.clear_global()
 
-    def test_get_current_value_in_usd(self, retrievers, difflimit):
+    def test_get_current_value_in_usd(self, retrievers):
         Currency.setup(no_historic=True)
         assert Currency.get_current_value_in_usd(10, "usd") == 10
         assert Currency.get_current_value_in_currency(10, "usd") == 10
@@ -117,10 +113,18 @@ class TestCurrency:
         Currency._secondary_rates = None
         rate2gbp = Currency.get_current_rate("gbp")
         assert rate2gbp != 1
-        assert abs(rate1gbp - rate2gbp) / rate1gbp < difflimit
+        assert abs(rate1gbp - rate2gbp) / rate1gbp < 0.003
+        Currency.setup(
+            retriever=retrievers[1],
+            primary_rates_url="fail",
+            secondary_rates_url="fail",
+            fallback_current_to_static=False,
+            no_historic=True,
+        )
+        Currency._secondary_rates = None
         rate2xdr = Currency.get_current_rate("xdr")
         assert rate2xdr != 1
-        assert abs(rate1xdr - rate2xdr) / rate1xdr < difflimit
+        assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.025
 
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
