@@ -29,7 +29,7 @@ Dem. for Democratic and Rep. for Republic.
 Mapping administration level one names from a source to a given base set is also handled 
 including phonetic fuzzy name matching.  
 
-It also provides currency conversion to and from USD from local currency.
+It also provides conversion from amounts in local currency to USD and vice-versa.
 
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) 
 (HDX) project. If you have humanitarian related data, please upload your datasets to 
