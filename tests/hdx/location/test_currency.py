@@ -113,7 +113,7 @@ class TestCurrency:
         Currency._secondary_rates = None
         rate2gbp = Currency.get_current_rate("gbp")
         assert rate2gbp != 1
-        assert abs(rate1gbp - rate2gbp) / rate1gbp < 0.003
+        assert abs(rate1gbp - rate2gbp) / rate1gbp < 0.004
         Currency.setup(
             retriever=retrievers[1],
             primary_rates_url="fail",
@@ -124,7 +124,7 @@ class TestCurrency:
         Currency._secondary_rates = None
         rate2xdr = Currency.get_current_rate("xdr")
         assert rate2xdr != 1
-        assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.025
+        assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.033
 
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
