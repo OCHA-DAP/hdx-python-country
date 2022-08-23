@@ -21,7 +21,10 @@ Dem. for Democratic and Rep. for Republic.
 Mapping administration level one names from a source to a given base set is also handled 
 including phonetic fuzzy name matching.  
 
-It also provides conversion from amounts in local currency to USD and vice-versa.
+It also provides foreign exchange rates and conversion from amounts in local currency to 
+USD and vice-versa. The conversion relies on Yahoo Finance, falling back on 
+exchangerate.host for current rates, and Yahoo Finance falling back on IMF data via IATI 
+for historic rates. 
 
 For more information, please read the [documentation](https://hdx-python-country.readthedocs.io/en/latest/). 
 
