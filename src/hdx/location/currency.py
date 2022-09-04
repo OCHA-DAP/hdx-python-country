@@ -282,7 +282,6 @@ class Currency:
         data = cls._get_primary_rates_data(currency, timestamp)
         if not data:
             return None
-        logger.info(data)
         adjclose = data["indicators"]["adjclose"][0].get("adjclose")
         if adjclose is None:
             return None
