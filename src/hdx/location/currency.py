@@ -40,6 +40,7 @@ class Currency:
     _no_historic = False
     _user_agent = "hdx-python-country-rates"
     _retriever = None
+    _log_level = logging.DEBUG
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
@@ -64,6 +65,7 @@ class Currency:
         fallback_historic_to_current: bool = False,
         fallback_current_to_static: bool = False,
         no_historic: bool = False,
+        log_level: int = logging.DEBUG,
     ) -> None:
         """
         Setup the sources. If you wish to use a static fallback file by setting
@@ -78,6 +80,7 @@ class Currency:
             fallback_historic_to_current (bool): If historic unavailable, fallback to current. Defaults to False.
             fallback_current_to_static (bool): Use static file as final fallback. Defaults to False.
             no_historic (bool): Do not set up historic rates. Defaults to False.
+            log_level (int): Level at which to log messages. Defaults to logging.DEBUG.
 
         Returns:
             None
@@ -134,6 +137,7 @@ class Currency:
             logger.exception("Error getting secondary historic rates!")
             cls._secondary_historic = "FAIL"
         cls._fallback_to_current = fallback_historic_to_current
+        cls._log_level = log_level
 
     @classmethod
     def _get_primary_rates_data(
@@ -155,7 +159,9 @@ class Currency:
         if downloader is None:
             downloader = cls._retriever
         try:
-            chart = downloader.download_json(url)["chart"]
+            chart = downloader.download_json(url, log_level=cls._log_level)[
+                "chart"
+            ]
             if chart["error"] is not None:
                 return None
             return chart["result"][0]

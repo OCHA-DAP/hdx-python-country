@@ -128,6 +128,7 @@ Various functions support the conversion of monetary amounts to USD. Note that t
 returned values are cached to reduce network usage which means that the library is 
 unsuited for use where rates are expected to update while the program is running:
 
+    Currency.setup(fallback_historic_to_current=True, fallback_current_to_static=True, log_level=logging.INFO)
     currency = Country.get_currency_from_iso3("usa")  # returns "USD"
     assert Currency.get_current_rate("usd")  # returns 1
     Currency.get_current_value_in_usd(10, currency)  # returns 10
