@@ -59,6 +59,9 @@ class AdminLevel:
         self.init_matches_errors()
         self.phonetics = Phonetics()
 
+    def get_admin_level(self):
+        return self.admin_level
+
     def init_matches_errors(self) -> None:
         """Initialise storage of fuzzy matches, ignored and errors for logging purposes
 
