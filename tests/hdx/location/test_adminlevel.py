@@ -1,5 +1,4 @@
 """location Tests"""
-import sys
 from os.path import join
 
 import pytest
