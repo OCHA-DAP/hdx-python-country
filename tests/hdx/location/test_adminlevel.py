@@ -5,16 +5,16 @@ from os.path import join
 import pytest
 from hdx.utilities.loader import load_yaml
 
-from hdx.location.adminone import AdminOne
+from hdx.location.adminlevel import AdminLevel
 
 
-class TestAdminOne:
+class TestAdminLevel:
     @pytest.fixture(scope="function")
     def config(self):
-        return load_yaml(join("tests", "fixtures", "adminone.yml"))
+        return load_yaml(join("tests", "fixtures", "adminlevel.yml"))
 
-    def test_adminone(self, config):
-        adminone = AdminOne(config)
+    def test_adminlevel(self, config):
+        adminone = AdminLevel(config)
         assert adminone.get_pcode("YEM", "YE30", scrapername="test") == (
             "YE30",
             True,
@@ -117,8 +117,8 @@ class TestAdminOne:
             "test - NER: Could not find ABCDEFGH in map names!",
         ]
 
-    def test_adminone_fuzzy(self, config):
-        adminone = AdminOne(config)
+    def test_adminlevel_fuzzy(self, config):
+        adminone = AdminLevel(config)
         assert adminone.get_pcode("YEM", "Al Dali", scrapername="test") == (
             "YE30",
             False,

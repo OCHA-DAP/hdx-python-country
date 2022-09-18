@@ -1,0 +1,558 @@
+admin_info:
+  - {pcode: AF01, name: Kabul, iso3: AFG}
+  - {pcode: AF02, name: Kapisa, iso3: AFG}
+  - {pcode: AF03, name: Parwan, iso3: AFG}
+  - {pcode: AF04, name: Maidan Wardak, iso3: AFG}
+  - {pcode: AF05, name: Logar, iso3: AFG}
+  - {pcode: AF06, name: Nangarhar, iso3: AFG}
+  - {pcode: AF07, name: Laghman, iso3: AFG}
+  - {pcode: AF08, name: Panjsher, iso3: AFG}
+  - {pcode: AF09, name: Baghlan, iso3: AFG}
+  - {pcode: AF10, name: Bamyan, iso3: AFG}
+  - {pcode: AF11, name: Ghazni, iso3: AFG}
+  - {pcode: AF12, name: Paktika, iso3: AFG}
+  - {pcode: AF13, name: Paktya, iso3: AFG}
+  - {pcode: AF14, name: Khost, iso3: AFG}
+  - {pcode: AF15, name: Kunar, iso3: AFG}
+  - {pcode: AF16, name: Nuristan, iso3: AFG}
+  - {pcode: AF17, name: Badakhshan, iso3: AFG}
+  - {pcode: AF18, name: Takhar, iso3: AFG}
+  - {pcode: AF19, name: Kunduz, iso3: AFG}
+  - {pcode: AF20, name: Samangan, iso3: AFG}
+  - {pcode: AF21, name: Balkh, iso3: AFG}
+  - {pcode: AF22, name: Sar E Pul, iso3: AFG}
+  - {pcode: AF23, name: Ghor, iso3: AFG}
+  - {pcode: AF24, name: Daykundi, iso3: AFG}
+  - {pcode: AF25, name: Uruzgan, iso3: AFG}
+  - {pcode: AF26, name: Zabul, iso3: AFG}
+  - {pcode: AF27, name: Kandahar, iso3: AFG}
+  - {pcode: AF28, name: Jawzjan, iso3: AFG}
+  - {pcode: AF29, name: Faryab, iso3: AFG}
+  - {pcode: AF30, name: Hilmand, iso3: AFG}
+  - {pcode: AF31, name: Badghis, iso3: AFG}
+  - {pcode: AF32, name: Hirat, iso3: AFG}
+  - {pcode: AF33, name: Farah, iso3: AFG}
+  - {pcode: AF34, name: Nimroz, iso3: AFG}
+  - {pcode: BDI001, name: Bubanza, iso3: BDI}
+  - {pcode: BDI002, name: Bujumbura Rural, iso3: BDI}
+  - {pcode: BDI003, name: Bururi, iso3: BDI}
+  - {pcode: BDI004, name: Cankuzo, iso3: BDI}
+  - {pcode: BDI005, name: Cibitoke, iso3: BDI}
+  - {pcode: BDI006, name: Gitega, iso3: BDI}
+  - {pcode: BDI007, name: Karuzi, iso3: BDI}
+  - {pcode: BDI008, name: Kayanza, iso3: BDI}
+  - {pcode: BDI009, name: Kirundo, iso3: BDI}
+  - {pcode: BDI010, name: Makamba, iso3: BDI}
+  - {pcode: BDI011, name: Muramvya, iso3: BDI}
+  - {pcode: BDI012, name: Muyinga, iso3: BDI}
+  - {pcode: BDI013, name: Mwaro, iso3: BDI}
+  - {pcode: BDI014, name: Ngozi, iso3: BDI}
+  - {pcode: BDI015, name: Rutana, iso3: BDI}
+  - {pcode: BDI016, name: Ruyigi, iso3: BDI}
+  - {pcode: BDI017, name: Bujumbura Mairie, iso3: BDI}
+  - {pcode: BDI018, name: Rumonge, iso3: BDI}
+  - {pcode: BF13, name: Centre, iso3: BFA}
+  - {pcode: BF46, name: Boucle Du Mouhoun, iso3: BFA}
+  - {pcode: BF47, name: Cascades, iso3: BFA}
+  - {pcode: BF48, name: Centre Est, iso3: BFA}
+  - {pcode: BF49, name: Centre Nord, iso3: BFA}
+  - {pcode: BF50, name: Centre Ouest, iso3: BFA}
+  - {pcode: BF51, name: Centre Sud, iso3: BFA}
+  - {pcode: BF52, name: Est, iso3: BFA}
+  - {pcode: BF53, name: Hauts Bassins, iso3: BFA}
+  - {pcode: BF54, name: Nord, iso3: BFA}
+  - {pcode: BF55, name: Plateau Central, iso3: BFA}
+  - {pcode: BF56, name: Sahel, iso3: BFA}
+  - {pcode: BF57, name: Sud Ouest, iso3: BFA}
+  - {pcode: CF11, name: Ombella Mpoko, iso3: CAF}
+  - {pcode: CF12, name: Lobaye, iso3: CAF}
+  - {pcode: CF21, name: Mambere Kadei, iso3: CAF}
+  - {pcode: CF22, name: Nana Mambere, iso3: CAF}
+  - {pcode: CF23, name: Sangha Mbaere, iso3: CAF}
+  - {pcode: CF31, name: Ouham Pende, iso3: CAF}
+  - {pcode: CF32, name: Ouham, iso3: CAF}
+  - {pcode: CF41, name: Kemo, iso3: CAF}
+  - {pcode: CF42, name: Nana Gribizi, iso3: CAF}
+  - {pcode: CF43, name: Ouaka, iso3: CAF}
+  - {pcode: CF51, name: Bamingui Bangoran, iso3: CAF}
+  - {pcode: CF52, name: Haute Kotto, iso3: CAF}
+  - {pcode: CF53, name: Vakaga, iso3: CAF}
+  - {pcode: CF61, name: Basse Kotto, iso3: CAF}
+  - {pcode: CF62, name: Mbomou, iso3: CAF}
+  - {pcode: CF63, name: Haut Mbomou, iso3: CAF}
+  - {pcode: CF71, name: Bangui, iso3: CAF}
+  - {pcode: CM001, name: Adamawa, iso3: CMR}
+  - {pcode: CM002, name: Centre, iso3: CMR}
+  - {pcode: CM003, name: East, iso3: CMR}
+  - {pcode: CM004, name: Far North, iso3: CMR}
+  - {pcode: CM005, name: Littoral, iso3: CMR}
+  - {pcode: CM006, name: North, iso3: CMR}
+  - {pcode: CM007, name: North West, iso3: CMR}
+  - {pcode: CM008, name: West, iso3: CMR}
+  - {pcode: CM009, name: South, iso3: CMR}
+  - {pcode: CM010, name: South West, iso3: CMR}
+  - {pcode: CD10, name: Kinshasa, iso3: COD}
+  - {pcode: CD20, name: Kongo Central, iso3: COD}
+  - {pcode: CD31, name: Kwango, iso3: COD}
+  - {pcode: CD32, name: Kwilu, iso3: COD}
+  - {pcode: CD33, name: Mai Ndombe, iso3: COD}
+  - {pcode: CD41, name: Equateur, iso3: COD}
+  - {pcode: CD42, name: Sud Ubangi, iso3: COD}
+  - {pcode: CD43, name: Nord Ubangi, iso3: COD}
+  - {pcode: CD44, name: Mongala, iso3: COD}
+  - {pcode: CD45, name: Tshuapa, iso3: COD}
+  - {pcode: CD51, name: Tshopo, iso3: COD}
+  - {pcode: CD52, name: Bas Uele, iso3: COD}
+  - {pcode: CD53, name: Haut Uele, iso3: COD}
+  - {pcode: CD54, name: Ituri, iso3: COD}
+  - {pcode: CD61, name: Nord Kivu, iso3: COD}
+  - {pcode: CD62, name: Sud Kivu, iso3: COD}
+  - {pcode: CD63, name: Maniema, iso3: COD}
+  - {pcode: CD71, name: Haut Katanga, iso3: COD}
+  - {pcode: CD72, name: Lualaba, iso3: COD}
+  - {pcode: CD73, name: Haut Lomami, iso3: COD}
+  - {pcode: CD74, name: Tanganyika, iso3: COD}
+  - {pcode: CD81, name: Lomami, iso3: COD}
+  - {pcode: CD82, name: Kasai Oriental, iso3: COD}
+  - {pcode: CD83, name: Sankuru, iso3: COD}
+  - {pcode: CD91, name: Kasai Central, iso3: COD}
+  - {pcode: CD92, name: Kasai, iso3: COD}
+  - {pcode: CO05, name: Antioquia, iso3: COL}
+  - {pcode: CO08, name: Atlantico, iso3: COL}
+  - {pcode: CO11, name: 'Bogota, D.C.', iso3: COL}
+  - {pcode: CO13, name: Bolivar, iso3: COL}
+  - {pcode: CO15, name: Boyaca, iso3: COL}
+  - {pcode: CO17, name: Caldas, iso3: COL}
+  - {pcode: CO18, name: Caqueta, iso3: COL}
+  - {pcode: CO19, name: Cauca, iso3: COL}
+  - {pcode: CO20, name: Cesar, iso3: COL}
+  - {pcode: CO23, name: Cordoba, iso3: COL}
+  - {pcode: CO25, name: Cundinamarca, iso3: COL}
+  - {pcode: CO27, name: Choco, iso3: COL}
+  - {pcode: CO41, name: Huila, iso3: COL}
+  - {pcode: CO44, name: La Guajira, iso3: COL}
+  - {pcode: CO47, name: Magdalena, iso3: COL}
+  - {pcode: CO50, name: Meta, iso3: COL}
+  - {pcode: CO52, name: Narino, iso3: COL}
+  - {pcode: CO54, name: Norte de Santander, iso3: COL}
+  - {pcode: CO63, name: Quindio, iso3: COL}
+  - {pcode: CO66, name: Risaralda, iso3: COL}
+  - {pcode: CO68, name: Santander, iso3: COL}
+  - {pcode: CO70, name: Sucre, iso3: COL}
+  - {pcode: CO73, name: Tolima, iso3: COL}
+  - {pcode: CO76, name: Valle del Cauca, iso3: COL}
+  - {pcode: CO81, name: Arauca, iso3: COL}
+  - {pcode: CO85, name: Casanare, iso3: COL}
+  - {pcode: CO86, name: Putumayo, iso3: COL}
+  - {pcode: CO88, name: "Archipielago de San Andres, Providencia y Santa Catalina", iso3: COL}
+  - {pcode: CO91, name: Amazonas, iso3: COL}
+  - {pcode: CO94, name: Guainia, iso3: COL}
+  - {pcode: CO95, name: Guaviare, iso3: COL}
+  - {pcode: CO97, name: Vaupes, iso3: COL}
+  - {pcode: CO99, name: Vichada, iso3: COL}
+  - {pcode: ET01, name: Tigray, iso3: ETH}
+  - {pcode: ET02, name: Afar, iso3: ETH}
+  - {pcode: ET03, name: Amhara, iso3: ETH}
+  - {pcode: ET04, name: Oromia, iso3: ETH}
+  - {pcode: ET05, name: Somali, iso3: ETH}
+  - {pcode: ET06, name: Benishangul Gumz, iso3: ETH}
+  - {pcode: ET07, name: Snnp, iso3: ETH}
+  - {pcode: ET12, name: Gambela, iso3: ETH}
+  - {pcode: ET13, name: Harari, iso3: ETH}
+  - {pcode: ET14, name: Addis Ababa, iso3: ETH}
+  - {pcode: ET15, name: Dire Dawa, iso3: ETH}
+  - {pcode: HT01, name: West, iso3: HTI}
+  - {pcode: HT02, name: South East, iso3: HTI}
+  - {pcode: HT03, name: North, iso3: HTI}
+  - {pcode: HT04, name: North East, iso3: HTI}
+  - {pcode: HT05, name: Artibonite, iso3: HTI}
+  - {pcode: HT06, name: Centre, iso3: HTI}
+  - {pcode: HT07, name: South, iso3: HTI}
+  - {pcode: HT08, name: Grande'Anse, iso3: HTI}
+  - {pcode: HT09, name: North West, iso3: HTI}
+  - {pcode: HT10, name: Nippes, iso3: HTI}
+  - {pcode: IQG01, name: Al Anbar, iso3: IRQ}
+  - {pcode: IQG02, name: Al Basrah, iso3: IRQ}
+  - {pcode: IQG03, name: Al Muthanna, iso3: IRQ}
+  - {pcode: IQG04, name: Al Najaf, iso3: IRQ}
+  - {pcode: IQG05, name: Al Qadissiya, iso3: IRQ}
+  - {pcode: IQG06, name: Al Sulaymaniyah, iso3: IRQ}
+  - {pcode: IQG07, name: Babil, iso3: IRQ}
+  - {pcode: IQG08, name: Baghdad, iso3: IRQ}
+  - {pcode: IQG09, name: Duhok, iso3: IRQ}
+  - {pcode: IQG10, name: Diyala, iso3: IRQ}
+  - {pcode: IQG11, name: Erbil, iso3: IRQ}
+  - {pcode: IQG12, name: Kerbala, iso3: IRQ}
+  - {pcode: IQG13, name: Kirkuk, iso3: IRQ}
+  - {pcode: IQG14, name: Maysan, iso3: IRQ}
+  - {pcode: IQG15, name: Ninewa, iso3: IRQ}
+  - {pcode: IQG16, name: Salah Al Din, iso3: IRQ}
+  - {pcode: IQG17, name: Thi Qar, iso3: IRQ}
+  - {pcode: IQG18, name: Wassit, iso3: IRQ}
+  - {pcode: LY01, name: East, iso3: LBY}
+  - {pcode: LY02, name: West, iso3: LBY}
+  - {pcode: LY03, name: South, iso3: LBY}
+  - {pcode: ML01, name: Kayes, iso3: MLI}
+  - {pcode: ML02, name: Koulikoro, iso3: MLI}
+  - {pcode: ML03, name: Sikasso, iso3: MLI}
+  - {pcode: ML04, name: Segou, iso3: MLI}
+  - {pcode: ML05, name: Mopti, iso3: MLI}
+  - {pcode: ML06, name: Tombouctou, iso3: MLI}
+  - {pcode: ML07, name: Gao, iso3: MLI}
+  - {pcode: ML08, name: Kidal, iso3: MLI}
+  - {pcode: ML09, name: Bamako, iso3: MLI}
+  - {pcode: MMR001, name: Kachin, iso3: MMR}
+  - {pcode: MMR002, name: Kayah, iso3: MMR}
+  - {pcode: MMR003, name: Kayin, iso3: MMR}
+  - {pcode: MMR004, name: Chin, iso3: MMR}
+  - {pcode: MMR005, name: Sagaing, iso3: MMR}
+  - {pcode: MMR006, name: Tanintharyi, iso3: MMR}
+  - {pcode: MMR009, name: Magway, iso3: MMR}
+  - {pcode: MMR010, name: Mandalay, iso3: MMR}
+  - {pcode: MMR011, name: Mon, iso3: MMR}
+  - {pcode: MMR012, name: Rakhine, iso3: MMR}
+  - {pcode: MMR013, name: Yangon, iso3: MMR}
+  - {pcode: MMR017, name: Ayeyarwady, iso3: MMR}
+  - {pcode: MMR018, name: Nay Pyi Taw, iso3: MMR}
+  - {pcode: MMR111, name: Bago, iso3: MMR}
+  - {pcode: MMR222, name: Shan, iso3: MMR}
+  - {pcode: NER001, name: Agadez, iso3: NER}
+  - {pcode: NER002, name: Diffa, iso3: NER}
+  - {pcode: NER003, name: Dosso, iso3: NER}
+  - {pcode: NER004, name: Maradi, iso3: NER}
+  - {pcode: NER005, name: Tahoua, iso3: NER}
+  - {pcode: NER006, name: Tillaberi, iso3: NER}
+  - {pcode: NER007, name: Zinder, iso3: NER}
+  - {pcode: NER008, name: Niamey, iso3: NER}
+  - {pcode: NG001, name: Abia, iso3: NGA}
+  - {pcode: NG002, name: Adamawa, iso3: NGA}
+  - {pcode: NG003, name: Akwa Ibom, iso3: NGA}
+  - {pcode: NG004, name: Anambra, iso3: NGA}
+  - {pcode: NG005, name: Bauchi, iso3: NGA}
+  - {pcode: NG006, name: Bayelsa, iso3: NGA}
+  - {pcode: NG007, name: Benue, iso3: NGA}
+  - {pcode: NG008, name: Borno, iso3: NGA}
+  - {pcode: NG009, name: Cross River, iso3: NGA}
+  - {pcode: NG010, name: Delta, iso3: NGA}
+  - {pcode: NG011, name: Ebonyi, iso3: NGA}
+  - {pcode: NG012, name: Edo, iso3: NGA}
+  - {pcode: NG013, name: Ekiti, iso3: NGA}
+  - {pcode: NG014, name: Enugu, iso3: NGA}
+  - {pcode: NG015, name: Federal Capital Territory, iso3: NGA}
+  - {pcode: NG016, name: Gombe, iso3: NGA}
+  - {pcode: NG017, name: Imo, iso3: NGA}
+  - {pcode: NG018, name: Jigawa, iso3: NGA}
+  - {pcode: NG019, name: Kaduna, iso3: NGA}
+  - {pcode: NG020, name: Kano, iso3: NGA}
+  - {pcode: NG021, name: Katsina, iso3: NGA}
+  - {pcode: NG022, name: Kebbi, iso3: NGA}
+  - {pcode: NG023, name: Kogi, iso3: NGA}
+  - {pcode: NG024, name: Kwara, iso3: NGA}
+  - {pcode: NG025, name: Lagos, iso3: NGA}
+  - {pcode: NG026, name: Nasarawa, iso3: NGA}
+  - {pcode: NG027, name: Niger, iso3: NGA}
+  - {pcode: NG028, name: Ogun, iso3: NGA}
+  - {pcode: NG029, name: Ondo, iso3: NGA}
+  - {pcode: NG030, name: Osun, iso3: NGA}
+  - {pcode: NG031, name: Oyo, iso3: NGA}
+  - {pcode: NG032, name: Plateau, iso3: NGA}
+  - {pcode: NG033, name: Rivers, iso3: NGA}
+  - {pcode: NG034, name: Sokoto, iso3: NGA}
+  - {pcode: NG035, name: Taraba, iso3: NGA}
+  - {pcode: NG036, name: Yobe, iso3: NGA}
+  - {pcode: NG037, name: Zamfara, iso3: NGA}
+  - {pcode: PS1, name: Gaza Strip, iso3: PSE}
+  - {pcode: PS2, name: No Mans Land, iso3: PSE}
+  - {pcode: PS3, name: West Bank, iso3: PSE}
+  - {pcode: SD01, name: Khartoum, iso3: SDN}
+  - {pcode: SD02, name: North Darfur, iso3: SDN}
+  - {pcode: SD03, name: South Darfur, iso3: SDN}
+  - {pcode: SD04, name: West Darfur, iso3: SDN}
+  - {pcode: SD05, name: East Darfur, iso3: SDN}
+  - {pcode: SD06, name: Central Darfur, iso3: SDN}
+  - {pcode: SD07, name: South Kordofan, iso3: SDN}
+  - {pcode: SD08, name: Blue Nile, iso3: SDN}
+  - {pcode: SD09, name: White Nile, iso3: SDN}
+  - {pcode: SD10, name: Red Sea, iso3: SDN}
+  - {pcode: SD11, name: Kassala, iso3: SDN}
+  - {pcode: SD12, name: Gedaref, iso3: SDN}
+  - {pcode: SD13, name: North Kordofan, iso3: SDN}
+  - {pcode: SD14, name: Sennar, iso3: SDN}
+  - {pcode: SD15, name: Aj Jazirah, iso3: SDN}
+  - {pcode: SD16, name: River Nile, iso3: SDN}
+  - {pcode: SD17, name: Northern, iso3: SDN}
+  - {pcode: SD18, name: West Kordofan, iso3: SDN}
+  - {pcode: SD19, name: Abyei Pca, iso3: SDN}
+  - {pcode: SO11, name: Awdal, iso3: SOM}
+  - {pcode: SO12, name: Woqooyi Galbeed, iso3: SOM}
+  - {pcode: SO13, name: Togdheer, iso3: SOM}
+  - {pcode: SO14, name: Sool, iso3: SOM}
+  - {pcode: SO15, name: Sanaag, iso3: SOM}
+  - {pcode: SO16, name: Bari, iso3: SOM}
+  - {pcode: SO17, name: Nugaal, iso3: SOM}
+  - {pcode: SO18, name: Mudug, iso3: SOM}
+  - {pcode: SO19, name: Galgaduud, iso3: SOM}
+  - {pcode: SO20, name: Hiraan, iso3: SOM}
+  - {pcode: SO21, name: Middle Shabelle, iso3: SOM}
+  - {pcode: SO22, name: Banadir, iso3: SOM}
+  - {pcode: SO23, name: Lower Shabelle, iso3: SOM}
+  - {pcode: SO24, name: Bay, iso3: SOM}
+  - {pcode: SO25, name: Bakool, iso3: SOM}
+  - {pcode: SO26, name: Gedo, iso3: SOM}
+  - {pcode: SO27, name: Middle Juba, iso3: SOM}
+  - {pcode: SO28, name: Lower Juba, iso3: SOM}
+  - {pcode: SS01, name: Central Equatoria, iso3: SSD}
+  - {pcode: SS02, name: Eastern Equatoria, iso3: SSD}
+  - {pcode: SS03, name: Jonglei, iso3: SSD}
+  - {pcode: SS04, name: Lakes, iso3: SSD}
+  - {pcode: SS05, name: Northern Bahr El Ghazal, iso3: SSD}
+  - {pcode: SS06, name: Unity, iso3: SSD}
+  - {pcode: SS07, name: Upper Nile, iso3: SSD}
+  - {pcode: SS08, name: Warrap, iso3: SSD}
+  - {pcode: SS09, name: Western Bahr El Ghazal, iso3: SSD}
+  - {pcode: SS10, name: Western Equatoria, iso3: SSD}
+  - {pcode: SY01, name: Damascus, iso3: SYR}
+  - {pcode: SY02, name: Aleppo, iso3: SYR}
+  - {pcode: SY03, name: Rural Damascus, iso3: SYR}
+  - {pcode: SY04, name: Homs, iso3: SYR}
+  - {pcode: SY05, name: Hama, iso3: SYR}
+  - {pcode: SY06, name: Lattakia, iso3: SYR}
+  - {pcode: SY07, name: Idleb, iso3: SYR}
+  - {pcode: SY08, name: Al Hasakeh, iso3: SYR}
+  - {pcode: SY09, name: Deir Ez Zor, iso3: SYR}
+  - {pcode: SY10, name: Tartous, iso3: SYR}
+  - {pcode: SY11, name: Ar Raqqa, iso3: SYR}
+  - {pcode: SY12, name: Dara, iso3: SYR}
+  - {pcode: SY13, name: As Sweida, iso3: SYR}
+  - {pcode: SY14, name: Quneitra, iso3: SYR}
+  - {pcode: TD01, name: Batha, iso3: TCD}
+  - {pcode: TD02, name: Borkou, iso3: TCD}
+  - {pcode: TD03, name: Chari Baguirmi, iso3: TCD}
+  - {pcode: TD04, name: Guera, iso3: TCD}
+  - {pcode: TD05, name: Hadjer Lamis, iso3: TCD}
+  - {pcode: TD06, name: Kanem, iso3: TCD}
+  - {pcode: TD07, name: Lac, iso3: TCD}
+  - {pcode: TD08, name: Logone Occidental, iso3: TCD}
+  - {pcode: TD09, name: Logone Oriental, iso3: TCD}
+  - {pcode: TD10, name: Mandoul, iso3: TCD}
+  - {pcode: TD11, name: Mayo Kebbi Est, iso3: TCD}
+  - {pcode: TD12, name: Mayo Kebbi Ouest, iso3: TCD}
+  - {pcode: TD13, name: Moyen Chari, iso3: TCD}
+  - {pcode: TD14, name: Ouaddai, iso3: TCD}
+  - {pcode: TD15, name: Salamat, iso3: TCD}
+  - {pcode: TD16, name: Tandjile, iso3: TCD}
+  - {pcode: TD17, name: Wadi Fira, iso3: TCD}
+  - {pcode: TD18, name: Ndjamena, iso3: TCD}
+  - {pcode: TD19, name: Barh El Gazel, iso3: TCD}
+  - {pcode: TD20, name: Ennedi Est, iso3: TCD}
+  - {pcode: TD21, name: Sila, iso3: TCD}
+  - {pcode: TD22, name: Tibesti, iso3: TCD}
+  - {pcode: TD23, name: Ennedi Ouest, iso3: TCD}
+  - {pcode: UA01, name: Avtonomna Respublika Krym, iso3: UKR}
+  - {pcode: UA05, name: Vinnytska, iso3: UKR}
+  - {pcode: UA07, name: Volynska, iso3: UKR}
+  - {pcode: UA12, name: Dnipropetrovska, iso3: UKR}
+  - {pcode: UA14, name: Donetska, iso3: UKR}
+  - {pcode: UA18, name: Zhytomyrska, iso3: UKR}
+  - {pcode: UA21, name: Zakarpatska, iso3: UKR}
+  - {pcode: UA23, name: Zaporizka, iso3: UKR}
+  - {pcode: UA26, name: Ivano Frankivska, iso3: UKR}
+  - {pcode: UA32, name: Kyivska, iso3: UKR}
+  - {pcode: UA35, name: Kirovohradska, iso3: UKR}
+  - {pcode: UA44, name: Luhanska, iso3: UKR}
+  - {pcode: UA46, name: Lvivska, iso3: UKR}
+  - {pcode: UA48, name: Mykolaivska, iso3: UKR}
+  - {pcode: UA51, name: Odeska, iso3: UKR}
+  - {pcode: UA53, name: Poltavska, iso3: UKR}
+  - {pcode: UA56, name: Rivnenska, iso3: UKR}
+  - {pcode: UA59, name: Sumska, iso3: UKR}
+  - {pcode: UA61, name: Ternopilska, iso3: UKR}
+  - {pcode: UA63, name: Kharkivska, iso3: UKR}
+  - {pcode: UA65, name: Khersonska, iso3: UKR}
+  - {pcode: UA68, name: Khmelnytska, iso3: UKR}
+  - {pcode: UA71, name: Cherkaska, iso3: UKR}
+  - {pcode: UA73, name: Chernivetska, iso3: UKR}
+  - {pcode: UA74, name: Chernihivska, iso3: UKR}
+  - {pcode: UA80, name: Kyivska, iso3: UKR}
+  - {pcode: UA85, name: Sevastopol, iso3: UKR}
+  - {pcode: VE01, name: Distrito Federal, iso3: VEN}
+  - {pcode: VE02, name: Amazonas, iso3: VEN}
+  - {pcode: VE03, name: Anzoategui, iso3: VEN}
+  - {pcode: VE04, name: Apure, iso3: VEN}
+  - {pcode: VE05, name: Aragua, iso3: VEN}
+  - {pcode: VE06, name: Barinas, iso3: VEN}
+  - {pcode: VE07, name: Bolivar, iso3: VEN}
+  - {pcode: VE08, name: Carabobo, iso3: VEN}
+  - {pcode: VE09, name: Cojedes, iso3: VEN}
+  - {pcode: VE10, name: Delta Amacuro, iso3: VEN}
+  - {pcode: VE11, name: Falcon, iso3: VEN}
+  - {pcode: VE12, name: Guarico, iso3: VEN}
+  - {pcode: VE13, name: Lara, iso3: VEN}
+  - {pcode: VE14, name: Merida, iso3: VEN}
+  - {pcode: VE15, name: Miranda, iso3: VEN}
+  - {pcode: VE16, name: Monagas, iso3: VEN}
+  - {pcode: VE17, name: Nueva Esparta, iso3: VEN}
+  - {pcode: VE18, name: Portuguesa, iso3: VEN}
+  - {pcode: VE19, name: Sucre, iso3: VEN}
+  - {pcode: VE20, name: Tachira, iso3: VEN}
+  - {pcode: VE21, name: Trujillo, iso3: VEN}
+  - {pcode: VE22, name: Yaracuy, iso3: VEN}
+  - {pcode: VE23, name: Zulia, iso3: VEN}
+  - {pcode: VE24, name: Vargas, iso3: VEN}
+  - {pcode: YE11, name: Ibb, iso3: YEM}
+  - {pcode: YE12, name: Abyan, iso3: YEM}
+  - {pcode: YE13, name: Sanaa City, iso3: YEM}
+  - {pcode: YE14, name: Al Bayda, iso3: YEM}
+  - {pcode: YE15, name: Taiz, iso3: YEM}
+  - {pcode: YE16, name: Al Jawf, iso3: YEM}
+  - {pcode: YE17, name: Hajjah, iso3: YEM}
+  - {pcode: YE18, name: Al Hodeidah, iso3: YEM}
+  - {pcode: YE19, name: Hadramawt, iso3: YEM}
+  - {pcode: YE20, name: Dhamar, iso3: YEM}
+  - {pcode: YE21, name: Shabwah, iso3: YEM}
+  - {pcode: YE22, name: Sadah, iso3: YEM}
+  - {pcode: YE23, name: Sanaa, iso3: YEM}
+  - {pcode: YE24, name: Aden, iso3: YEM}
+  - {pcode: YE25, name: Lahj, iso3: YEM}
+  - {pcode: YE26, name: Marib, iso3: YEM}
+  - {pcode: YE27, name: Al Mahwit, iso3: YEM}
+  - {pcode: YE28, name: Al Maharah, iso3: YEM}
+  - {pcode: YE29, name: Amran, iso3: YEM}
+  - {pcode: YE30, name: Ad Dali, iso3: YEM}
+  - {pcode: YE31, name: Raymah, iso3: YEM}
+  - {pcode: YE32, name: Socotra, iso3: YEM}
+  - {pcode: ZW10, name: Bulawayo, iso3: ZWE}
+  - {pcode: ZW11, name: Manicaland, iso3: ZWE}
+  - {pcode: ZW12, name: Mashonaland Central, iso3: ZWE}
+  - {pcode: ZW13, name: Mashonaland East, iso3: ZWE}
+  - {pcode: ZW14, name: Mashonaland West, iso3: ZWE}
+  - {pcode: ZW15, name: Matabeleland North, iso3: ZWE}
+  - {pcode: ZW16, name: Matabeleland South, iso3: ZWE}
+  - {pcode: ZW17, name: Midlands, iso3: ZWE}
+  - {pcode: ZW18, name: Masvingo, iso3: ZWE}
+  - {pcode: ZW19, name: Harare, iso3: ZWE}
+  - {pcode: XYZ123456, name: Random, iso3: XYZ}
+
+countries_fuzzy_try:
+  - NER
+  - NGA
+  - UKR
+  - YEM
+
+admin_name_mappings:
+  "Nord-Ouest": "HT09"
+  "nord-ouest": "HT09"
+  "nord-quest": "HT09"
+  "north-west": "HT09"
+  "Abuja": "NG015"
+  "FCT": "NG015"
+  "FCT (Abuja)": "NG015"
+  "FCT Abuja": "NG015"
+  "Abuja FCT": "NG015"
+  "C.EST": "BF48"
+  "C.NORD": "BF49"
+  "C.OUEST": "BF50"
+  "C.SUD": "BF51"
+  "centre-ouest": "BF50"
+  "Centre-Ouest": "BF50"
+  "central /south": "BF51"
+  "central/south": "BF51"
+  "S.OUEST": "BF57"
+  "Bas congo": "CD20"
+  "Bas-congo": "CD20"
+  "bas-congo": "CD20"
+  "MUTHANA": "IQG03"
+  "Gezira": "SD15"
+  "Gazira": "SD15"
+  "Hasaka": "SY08"
+  "Hassake": "SY08"
+  "al-raka": "SY11"
+  "al-amana": "YE23"
+  "PL.Sool": "SO14"
+  "Sc.Mudug": "SO18"
+  "Amanat Al Asimah / أمانة العاصمة": "YE13"
+  "Juba Dhexe": "SO27"
+  "Juba Hoose": "SO28"
+  "Shabelle Dhexe": "SO21"
+  "Shabelle Hoose": "SO23"
+  "ben-gumz": "ET06"
+  "Rural-Dam": "SY03"
+  "al-qunitara": "SY14"
+  "harare /chitungwiza": "ZW19"
+  "B MOUHOUN": "BF46"
+  "H BASSINS": "BF53"
+  "P CENTRAL": "BF55"
+  "EXTREME NORD": "CM004"
+  "Extreme Nord": "CM004"
+  "Extr�me-Nord": "CM004"
+  "extreme nord": "CM004"
+  "extr�me-nord": "CM004"
+  "SAN_ANDRES_ISLAS": "CO88"
+  "FCT, Abuja": "NG015"
+  "PL.Mudug": "SO18"
+  "PL.Sanag": "SO15"
+  "DAR SILA": "TD21"
+  "Sana'a Govt.": "YE23"
+  "DISTRITO CAPITAL": "VE01"
+  "Chernigovskaja Oblast": "UA74"
+  "Chernіvеtskaja Oblast": "UA73"
+  "Crimea": "UA01"
+  "Luganskaja Oblast": "UA44"
+  "Rovenskaja Oblast": "UA56"
+  "Sevastopol City": "UA85"
+  "Zapоrіzskaja Oblast": "UA23"
+  "CU Niamey": "NER008"
+
+admin_name_replacements:
+  " urban": ""
+  "sud": "south"
+  "ouest": "west"
+  "est": "east"
+  "nord": "north"
+  "'": ""
+  "/": " "
+  ".": " "
+  " region": ""
+  " oblast": ""
+
+admin_fuzzy_dont:
+  - "nord"
+  - "north"
+  - "sud"
+  - "south"
+  - "est"
+  - "east"
+  - "ouest"
+  - "west"
+  - "comoe"
+  - "mouhoun"
+  - "nahouri"
+  - "houet"
+  - "nayala"
+  - "seno"
+  - "soum"
+  - "sourou"
+  - "yaound�"
+  - "katanga"
+  - "ta'amem"
+  - "sabha"
+  - "bago(east)"
+  - "bago(west)"
+  - "bago (east)"
+  - "bago (west)"
+  - "dakoro"
+  - "mayahi"
+  - "tessaoua"
+  - "south south"
+  - "BET"
+  - "b. e. t."
+  - "b.e.t."
+  - "mayo-kebbi"
+  - "mayo kebbi"
+  - "desert"
+  - "south & east"
+  - "menaka"
+  - "mordex"
+  - "sahil"
+  - "say'on"
+  - "syria"
