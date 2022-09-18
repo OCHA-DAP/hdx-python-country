@@ -1,7 +1,7 @@
 # Summary
 
 The HDX Python Country Library provides utilities to map between country and region 
-codes and names and to match administrative level one names from different sources.
+codes and names and to match administrative level names from different sources.
 It also provides utilities for foreign exchange enabling obtaining current and historic 
 FX rates for different currencies.
 
@@ -9,7 +9,7 @@ FX rates for different currencies.
 
 1. [Information](#information)
 2. [Countries](#countries)
-3. [Administration level one](#administration-level-one)
+3. [Administration Level](#administration-level)
 4. [Currencies](#currencies)
 
 # Information
@@ -26,7 +26,7 @@ It can exact match English, French, Spanish, Russian, Chinese and Arabic. There 
 fuzzy matching for English look up that can handle abbreviations in country names like 
 Dem. for Democratic and Rep. for Republic.
 
-Mapping administration level one names from a source to a given base set is also handled 
+Mapping administration level names from a source to a given base set is also handled 
 including phonetic fuzzy name matching.  
 
 It also provides foreign exchange rates and conversion from amounts in local currency to 
@@ -101,26 +101,26 @@ The usage of the country mappings functionality is best illustrated by some exam
     Country.get_countries_in_region(13)
     # ["BLZ", "CRI", "GTM", "HND", "MEX", "NIC", "PAN", "SLV"]
 
-## Administration Level One
+## Administration Level
 
-The administration level one mappings requires using an input configuration dictionary, admin_config, with key 
-*admin1_info* which is a list with values of the form:
+The administration level mappings requires using an input configuration dictionary, 
+admin_config, with key *admin_info* which is a list with values of the form:
 
     {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
 
 Various other keys are optional:
 
 *countries_fuzzy_try* are countries (iso3 codes) for which to try fuzzy matching. Default is all countries.
-*admin1_name_mappings* is a dictionary of mappings from name to pcode (for where fuzzy matching fails)
-*admin1_name_replacements* is a dictionary of textual replacements to try when fuzzy matching
-*admin1_fuzzy_dont* is a list of names for which fuzzy matching should not be tried
+*admin_name_mappings* is a dictionary of mappings from name to pcode (for where fuzzy matching fails)
+*admin_name_replacements* is a dictionary of textual replacements to try when fuzzy matching
+*admin_fuzzy_dont* is a list of names for which fuzzy matching should not be tried
 
 Examples of usage:
 
-    adminone = AdminOne(config)
-    adminone.get_pcode("YEM", "YEM030", scrapername="test")  # returns ("YE30", True)
+    adminlevel = AdminLevel(config)
+    adminlevel.get_pcode("YEM", "YEM030", scrapername="test")  # returns ("YE30", True)
     # Fuzzy matching in Python 3 only
-    adminone.get_pcode("YEM", "Al Dhale"e / الضالع", scrapername="test")  # returns ("YE30", False)
+    adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", scrapername="test")  # returns ("YE30", False)
 
 ## Currencies
 

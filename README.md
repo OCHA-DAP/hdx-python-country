@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/pypi/dm/hdx-python-country.svg)](https://pypistats.org/packages/hdx-python-country)
 
 The HDX Python Country Library provides utilities to map between country and region 
-codes and names and to match administrative level one names from different sources.
+codes and names and to match administrative level names from different sources.
 It also provides utilities for foreign exchange enabling obtaining current and historic 
 FX rates for different currencies.
 
@@ -18,7 +18,7 @@ It can exact match English, French, Spanish, Russian, Chinese and Arabic. There 
 fuzzy matching for English look up that can handle abbreviations in country names like 
 Dem. for Democratic and Rep. for Republic.
 
-Mapping administration level one names from a source to a given base set is also handled 
+Mapping administration level names from a source to a given base set is also handled 
 including phonetic fuzzy name matching.  
 
 It also provides foreign exchange rates and conversion from amounts in local currency to 
