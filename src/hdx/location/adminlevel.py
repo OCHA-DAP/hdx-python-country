@@ -76,7 +76,8 @@ class AdminLevel:
     def convert_admin1_pcode_length(
         self, countryiso3: str, pcode: str, scrapername: Optional[str] = None
     ) -> Optional[str]:
-        """Standardise pcode length by country and match to an internal pcode
+        """Standardise pcode length by country and match to an internal pcode. Only
+        works for admin1 pcodes.
 
         Args:
             countryiso3 (str): Iso3 country code
