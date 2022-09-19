@@ -118,9 +118,9 @@ Various other keys are optional:
 Examples of usage:
 
     adminlevel = AdminLevel(config)
-    adminlevel.get_pcode("YEM", "YEM030", scrapername="test")  # returns ("YE30", True)
-    # Fuzzy matching in Python 3 only
-    adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", scrapername="test")  # returns ("YE30", False)
+    adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)
+    adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع")  # returns ("YE30", False)
+    adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", fuzzy_match=False)  # returns (None, True)
 
 ## Currencies
 

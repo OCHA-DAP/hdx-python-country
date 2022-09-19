@@ -77,7 +77,7 @@ class AdminLevel:
         self.errors = set()
 
     def convert_admin1_pcode_length(
-        self, countryiso3: str, pcode: str, scrapername: Optional[str] = None
+        self, countryiso3: str, pcode: str, logname: Optional[str] = None
     ) -> Optional[str]:
         """Standardise pcode length by country and match to an internal pcode. Only
         works for admin1 pcodes.
@@ -85,7 +85,7 @@ class AdminLevel:
         Args:
             countryiso3 (str): Iso3 country code
             pcode (str): P code for admin one
-            scrapername (Optional[str]): Name of scraper for logging purposes. Defaults to None (don't log).
+            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
 
         Returns:
             Optional[str]: Matched P code or None if no match
@@ -115,10 +115,10 @@ class AdminLevel:
         else:
             pcode = None
         if pcode in self.pcodes:
-            if scrapername:
+            if logname:
                 self.matches.add(
                     (
-                        scrapername,
+                        logname,
                         countryiso3,
                         pcode,
                         self.pcode_to_name[pcode],
@@ -129,14 +129,14 @@ class AdminLevel:
         return None
 
     def fuzzy_pcode(
-        self, countryiso3: str, name: str, scrapername: Optional[str] = None
+        self, countryiso3: str, name: str, logname: Optional[str] = None
     ) -> Optional[str]:
         """Fuzzy match name to pcode
 
         Args:
             countryiso3 (str): Iso3 country code
             name (str): Name to match
-            scrapername (Optional[str]): Name of scraper for logging purposes. Defaults to None (don't log).
+            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
 
         Returns:
             Optional[str]: Matched P code or None if no match
@@ -145,11 +145,11 @@ class AdminLevel:
             self.countries_fuzzy_try is not None
             and countryiso3 not in self.countries_fuzzy_try
         ):
-            self.ignored.add((scrapername, countryiso3))
+            self.ignored.add((logname, countryiso3))
             return None
         name_to_pcode = self.name_to_pcode.get(countryiso3)
         if not name_to_pcode:
-            self.errors.add((scrapername, countryiso3))
+            self.errors.add((logname, countryiso3))
             return None
         adm_name_lookup = clean_name(name)
         adm_name_lookup2 = multiple_replace(
@@ -159,7 +159,7 @@ class AdminLevel:
             adm_name_lookup, name_to_pcode.get(adm_name_lookup2)
         )
         if not pcode and name.lower() in self.admin_fuzzy_dont:
-            self.ignored.add((scrapername, countryiso3, name))
+            self.ignored.add((logname, countryiso3, name))
             return None
         if not pcode:
             for map_name in name_to_pcode:
@@ -167,7 +167,7 @@ class AdminLevel:
                     pcode = name_to_pcode[map_name]
                     self.matches.add(
                         (
-                            scrapername,
+                            logname,
                             countryiso3,
                             name,
                             self.pcode_to_name[pcode],
@@ -180,7 +180,7 @@ class AdminLevel:
                     pcode = name_to_pcode[map_name]
                     self.matches.add(
                         (
-                            scrapername,
+                            logname,
                             countryiso3,
                             name,
                             self.pcode_to_name[pcode],
@@ -212,14 +212,14 @@ class AdminLevel:
             )
 
             if matching_index is None:
-                self.errors.add((scrapername, countryiso3, name))
+                self.errors.add((logname, countryiso3, name))
                 return None
 
             map_name = map_names[matching_index]
             pcode = name_to_pcode[map_name]
             self.matches.add(
                 (
-                    scrapername,
+                    logname,
                     countryiso3,
                     name,
                     self.pcode_to_name[pcode],
@@ -232,16 +232,16 @@ class AdminLevel:
         self,
         countryiso3: str,
         name: str,
-        scrapername: Optional[str] = None,
-        name_is_pcode: bool = False,
+        fuzzy_match: bool = True,
+        logname: Optional[str] = None,
     ) -> Tuple[Optional[str], bool]:
         """Get pcode for a given name
 
         Args:
             countryiso3 (str): Iso3 country code
             name (str): Name to match
-            scrapername (Optional[str]): Name of scraper for logging purposes. Defaults to None (don't log).
-            name_is_pcode (bool): Whether name is known to be a p-code. Defaults to False.
+            fuzzy_match (bool): Whether to try fuzzy matching. Defaults to True.
+            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
 
         Returns:
             Tuple[Optional[str], bool]: (Matched P code or None if no match, True if exact match or False if not)
@@ -258,15 +258,14 @@ class AdminLevel:
             return name, True
         if self.admin_level == 1:
             pcode = self.convert_admin1_pcode_length(
-                countryiso3, name, scrapername
+                countryiso3, name, logname
             )
-        if pcode:
-            adm = pcode
-            exact = True
-        else:
-            adm = self.fuzzy_pcode(countryiso3, name, scrapername)
-            exact = False
-        return adm, exact
+            if pcode:
+                return pcode, True
+        if not fuzzy_match:
+            return None, True
+        pcode = self.fuzzy_pcode(countryiso3, name, logname)
+        return pcode, False
 
     def output_matches(self) -> List[str]:
         """Output log of matches
