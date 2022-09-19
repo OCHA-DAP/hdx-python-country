@@ -59,6 +59,9 @@ class AdminLevel:
         self.init_matches_errors()
         self.phonetics = Phonetics()
 
+    def get_pcode_list(self):
+        return self.pcodes
+
     def get_admin_level(self):
         return self.admin_level
 
@@ -226,7 +229,11 @@ class AdminLevel:
         return pcode
 
     def get_pcode(
-        self, countryiso3: str, name: str, scrapername: Optional[str] = None
+        self,
+        countryiso3: str,
+        name: str,
+        scrapername: Optional[str] = None,
+        name_is_pcode: bool = False,
     ) -> Tuple[Optional[str], bool]:
         """Get pcode for a given name
 
@@ -234,6 +241,7 @@ class AdminLevel:
             countryiso3 (str): Iso3 country code
             name (str): Name to match
             scrapername (Optional[str]): Name of scraper for logging purposes. Defaults to None (don't log).
+            name_is_pcode (bool): Whether name is known to be a p-code. Defaults to False.
 
         Returns:
             Tuple[Optional[str], bool]: (Matched P code or None if no match, True if exact match or False if not)
