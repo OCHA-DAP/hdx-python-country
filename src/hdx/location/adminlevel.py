@@ -145,11 +145,13 @@ class AdminLevel:
             self.countries_fuzzy_try is not None
             and countryiso3 not in self.countries_fuzzy_try
         ):
-            self.ignored.add((logname, countryiso3))
+            if logname:
+                self.ignored.add((logname, countryiso3))
             return None
         name_to_pcode = self.name_to_pcode.get(countryiso3)
         if not name_to_pcode:
-            self.errors.add((logname, countryiso3))
+            if logname:
+                self.errors.add((logname, countryiso3))
             return None
         adm_name_lookup = clean_name(name)
         adm_name_lookup2 = multiple_replace(
@@ -159,13 +161,15 @@ class AdminLevel:
             adm_name_lookup, name_to_pcode.get(adm_name_lookup2)
         )
         if not pcode and name.lower() in self.admin_fuzzy_dont:
-            self.ignored.add((logname, countryiso3, name))
+            if logname:
+                self.ignored.add((logname, countryiso3, name))
             return None
         if not pcode:
             for map_name in name_to_pcode:
                 if adm_name_lookup in map_name:
                     pcode = name_to_pcode[map_name]
-                    self.matches.add(
+                    if logname:
+                        self.matches.add(
                         (
                             logname,
                             countryiso3,
@@ -178,7 +182,8 @@ class AdminLevel:
             for map_name in name_to_pcode:
                 if adm_name_lookup2 in map_name:
                     pcode = name_to_pcode[map_name]
-                    self.matches.add(
+                    if logname:
+                        self.matches.add(
                         (
                             logname,
                             countryiso3,
@@ -212,20 +217,22 @@ class AdminLevel:
             )
 
             if matching_index is None:
-                self.errors.add((logname, countryiso3, name))
+                if logname:
+                    self.errors.add((logname, countryiso3, name))
                 return None
 
             map_name = map_names[matching_index]
             pcode = name_to_pcode[map_name]
-            self.matches.add(
-                (
-                    logname,
-                    countryiso3,
-                    name,
-                    self.pcode_to_name[pcode],
-                    "fuzzy",
+            if logname:
+                self.matches.add(
+                    (
+                        logname,
+                        countryiso3,
+                        name,
+                        self.pcode_to_name[pcode],
+                        "fuzzy",
+                    )
                 )
-            )
         return pcode
 
     def get_pcode(
