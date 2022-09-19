@@ -59,11 +59,29 @@ class AdminLevel:
         self.init_matches_errors()
         self.phonetics = Phonetics()
 
-    def get_pcode_list(self):
+    def get_pcode_list(self) -> List[str]:
+        """Get list of all pcodes
+
+        Returns:
+            List[str]: List of pcodes
+        """
         return self.pcodes
 
-    def get_admin_level(self):
+    def get_admin_level(self) -> int:
+        """Get admin level
+
+        Returns:
+            int: Admin level
+        """
         return self.admin_level
+
+    def get_pcode_length(self, countryiso3: str) -> Optional[int]:
+        """Get pcode length for country
+
+        Returns:
+            Optional[int]: Country's pcode length or None
+        """
+        return self.pcode_lengths.get(countryiso3)
 
     def init_matches_errors(self) -> None:
         """Initialise storage of fuzzy matches, ignored and errors for logging purposes
@@ -170,28 +188,28 @@ class AdminLevel:
                     pcode = name_to_pcode[map_name]
                     if logname:
                         self.matches.add(
-                        (
-                            logname,
-                            countryiso3,
-                            name,
-                            self.pcode_to_name[pcode],
-                            "substring",
+                            (
+                                logname,
+                                countryiso3,
+                                name,
+                                self.pcode_to_name[pcode],
+                                "substring",
+                            )
                         )
-                    )
                     break
             for map_name in name_to_pcode:
                 if adm_name_lookup2 in map_name:
                     pcode = name_to_pcode[map_name]
                     if logname:
                         self.matches.add(
-                        (
-                            logname,
-                            countryiso3,
-                            name,
-                            self.pcode_to_name[pcode],
-                            "substring",
+                            (
+                                logname,
+                                countryiso3,
+                                name,
+                                self.pcode_to_name[pcode],
+                                "substring",
+                            )
                         )
-                    )
                     break
         if not pcode:
             map_names = list(name_to_pcode.keys())
