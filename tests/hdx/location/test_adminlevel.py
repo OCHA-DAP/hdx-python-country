@@ -14,7 +14,7 @@ class TestAdminLevel:
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
-        assert adminone.get_admin_level() == 1
+        assert adminone.get_admin_level("YEM") == 1
         assert len(adminone.get_pcode_list()) == 433
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (

@@ -26,11 +26,18 @@ class AdminLevel:
     Args:
         admin_config (Dict): Configuration dictionary
         admin_level (int): Admin level. Defaults to 1.
+        admin_level_overrides (Dict): Countries at other admin levels.
     """
 
-    def __init__(self, admin_config: Dict, admin_level: int = 1) -> None:
+    def __init__(
+        self,
+        admin_config: Dict,
+        admin_level: int = 1,
+        admin_level_overrides: Dict = dict(),
+    ) -> None:
         admin_info = admin_config["admin_info"]
         self.admin_level = admin_level
+        self.admin_level_overrides = admin_level_overrides
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
         self.admin_name_mappings = admin_config.get(
             "admin_name_mappings", dict()
@@ -67,16 +74,25 @@ class AdminLevel:
         """
         return self.pcodes
 
-    def get_admin_level(self) -> int:
-        """Get admin level
+    def get_admin_level(self, countryiso3: str) -> int:
+        """Get admin level for country
+
+        Args:
+            countryiso3 (str): Iso3 country code
 
         Returns:
             int: Admin level
         """
+        admin_level = self.admin_level_overrides.get(countryiso3)
+        if admin_level:
+            return admin_level
         return self.admin_level
 
     def get_pcode_length(self, countryiso3: str) -> Optional[int]:
         """Get pcode length for country
+
+        Args:
+            countryiso3 (str): Iso3 country code
 
         Returns:
             Optional[int]: Country's pcode length or None
@@ -281,7 +297,7 @@ class AdminLevel:
                 return pcode, True
         if name in self.pcodes:  # name is a pcode
             return name, True
-        if self.admin_level == 1:
+        if self.get_admin_level(countryiso3) == 1:
             pcode = self.convert_admin1_pcode_length(
                 countryiso3, name, logname
             )
