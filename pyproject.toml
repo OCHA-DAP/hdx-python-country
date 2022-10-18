@@ -111,6 +111,7 @@ python =
 [testenv]
 recreate = true
 wheel = true
+wheel_pep517 = build
 deps =
     -r test-requirements.txt
 commands =

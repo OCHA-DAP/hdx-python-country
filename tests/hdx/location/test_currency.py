@@ -113,7 +113,7 @@ class TestCurrency:
         Currency._secondary_rates = None
         rate2gbp = Currency.get_current_rate("gbp")
         assert rate2gbp != 1
-        assert abs(rate1gbp - rate2gbp) / rate1gbp < 0.004
+        assert abs(rate1gbp - rate2gbp) / rate1gbp < 0.007
         Currency.setup(
             retriever=retrievers[1],
             primary_rates_url="fail",
