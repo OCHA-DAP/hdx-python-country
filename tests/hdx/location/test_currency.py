@@ -126,6 +126,16 @@ class TestCurrency:
         assert rate2xdr != 1
         assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.1
 
+    def test_get_current_value_in_usd_fixednnow(self, retrievers):
+        date = parse_date("2020-02-20")
+        Currency.setup(no_historic=True, fixed_now=date)
+        assert Currency.get_current_rate("usd") == 1
+        assert Currency.get_current_value_in_usd(10, "USD") == 10
+        assert Currency.get_current_value_in_currency(10, "usd") == 10
+        assert Currency.get_current_rate("gbp") == 0.7735000252723694
+        # falls back to secondary current rates
+        assert Currency.get_current_rate("xdr") == 0.744042
+
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
     ):
@@ -136,6 +146,7 @@ class TestCurrency:
         assert Currency.get_historic_value_in_usd(10, "USD", date) == 10
         assert Currency.get_historic_value_in_currency(10, "usd", date) == 10
         assert Currency.get_historic_rate("gbp", date) == 0.7735000252723694
+        # falls back to secondary historic rates
         assert Currency.get_historic_rate("xdr", date) == 0.7275806206896552
         assert (
             Currency.get_historic_rate(

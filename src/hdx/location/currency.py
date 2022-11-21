@@ -41,6 +41,7 @@ class Currency:
     _user_agent = "hdx-python-country-rates"
     _retriever = None
     _log_level = logging.DEBUG
+    _fixed_now = None
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
@@ -65,6 +66,7 @@ class Currency:
         fallback_historic_to_current: bool = False,
         fallback_current_to_static: bool = False,
         no_historic: bool = False,
+        fixed_now: Optional[datetime] = None,
         log_level: int = logging.DEBUG,
     ) -> None:
         """
@@ -80,6 +82,7 @@ class Currency:
             fallback_historic_to_current (bool): If historic unavailable, fallback to current. Defaults to False.
             fallback_current_to_static (bool): Use static file as final fallback. Defaults to False.
             no_historic (bool): Do not set up historic rates. Defaults to False.
+            fixed_now (Optional[datetime]): Use a fixed datetime for now. Defaults to None (use datetime.now()).
             log_level (int): Level at which to log messages. Defaults to logging.DEBUG.
 
         Returns:
@@ -114,6 +117,8 @@ class Currency:
         except (DownloadError, OSError):
             logger.exception("Error getting secondary current rates!")
             cls._secondary_rates = "FAIL"
+        cls._fixed_now = fixed_now
+        cls._log_level = log_level
         if no_historic:
             cls._no_historic = True
         if cls._no_historic:
@@ -137,7 +142,6 @@ class Currency:
             logger.exception("Error getting secondary historic rates!")
             cls._secondary_historic = "FAIL"
         cls._fallback_to_current = fallback_historic_to_current
-        cls._log_level = log_level
 
     @classmethod
     def _get_primary_rates_data(
@@ -169,21 +173,38 @@ class Currency:
             return None
 
     @classmethod
-    def _get_primary_current_rate(cls, currency: str) -> Optional[float]:
+    def _get_primary_rate(
+        cls, currency: str, timestamp: Optional[int] = None
+    ) -> Optional[float]:
         """
-        Get the primary current fx rate for currency
+        Get the primary current fx rate for currency ofr a given timestamp. If no timestamp is supplied,
+        datetime.now() will be used unless fixed_now was passed in the constructor.
 
         Args:
             currency (str): Currency
+            timestamp (Optional[int]): Timestamp to use for fx conversion. Defaults to None (datetime.now())
 
         Returns:
             Optional[float]: fx rate or None
         """
-        data = cls._get_primary_rates_data(
-            currency, cls._get_int_timestamp(now_utc())
-        )
+        if timestamp is None:
+            if cls._fixed_now:
+                now = cls._fixed_now
+                get_close = True
+            else:
+                now = now_utc()
+                get_close = False
+            timestamp = cls._get_int_timestamp(now)
+        else:
+            get_close = True
+        data = cls._get_primary_rates_data(currency, timestamp)
         if not data:
             return None
+        if get_close:
+            adjclose = data["indicators"]["adjclose"][0].get("adjclose")
+            if adjclose is None:
+                return None
+            return adjclose[0]
         return data["meta"]["regularMarketPrice"]
 
     @classmethod
@@ -220,7 +241,7 @@ class Currency:
         fx_rate = cls._cached_current_rates.get(currency)
         if fx_rate is not None:
             return fx_rate
-        fx_rate = cls._get_primary_current_rate(currency)
+        fx_rate = cls._get_primary_rate(currency)
         if fx_rate is not None:
             cls._cached_current_rates[currency] = fx_rate
             return fx_rate
@@ -270,28 +291,6 @@ class Currency:
             return usdvalue
         fx_rate = cls.get_current_rate(currency)
         return usdvalue * fx_rate
-
-    @classmethod
-    def _get_primary_historic_rate(
-        cls, currency: str, timestamp: int
-    ) -> Optional[float]:
-        """
-        Get the primary fx rate for currency on a particular date
-
-        Args:
-            currency (str): Currency
-            timestamp (int): Timestamp to use for fx conversion
-
-        Returns:
-            Optional[float]: fx rate or None
-        """
-        data = cls._get_primary_rates_data(currency, timestamp)
-        if not data:
-            return None
-        adjclose = data["indicators"]["adjclose"][0].get("adjclose")
-        if adjclose is None:
-            return None
-        return adjclose[0]
 
     @classmethod
     def _get_interpolated_rate(
@@ -401,7 +400,7 @@ class Currency:
             fx_rate = currency_data.get(timestamp)
             if fx_rate is not None:
                 return fx_rate
-        fx_rate = cls._get_primary_historic_rate(currency, timestamp)
+        fx_rate = cls._get_primary_rate(currency, timestamp)
         if fx_rate is not None:
             dict_of_dicts_add(
                 cls._cached_historic_rates, currency, timestamp, fx_rate
