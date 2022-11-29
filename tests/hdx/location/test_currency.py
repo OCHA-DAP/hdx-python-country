@@ -17,6 +17,10 @@ class TestCurrency:
         return join("tests", "fixtures")
 
     @pytest.fixture(scope="class")
+    def secondary_rates_url(self, fixtures):
+        return join(fixtures, "secondary_rates.json")
+
+    @pytest.fixture(scope="class")
     def secondary_historic_url(self, fixtures):
         return join(fixtures, "secondary_historic_rates.csv")
 
@@ -46,7 +50,7 @@ class TestCurrency:
         yield retriever, retriever_broken
         UserAgent.clear_global()
 
-    def test_get_current_value_in_usd(self, retrievers):
+    def test_get_current_value_in_usd(self, retrievers, secondary_rates_url):
         Currency.setup(no_historic=True)
         assert Currency.get_current_value_in_usd(10, "usd") == 10
         assert Currency.get_current_value_in_currency(10, "usd") == 10
@@ -79,6 +83,13 @@ class TestCurrency:
             Currency.get_current_value_in_usd(10, "XYZ")
         with pytest.raises(CurrencyError):
             Currency.get_current_value_in_currency(10, "XYZ")
+        Currency.setup(
+            no_historic=True,
+            primary_rates_url="fail",
+            secondary_rates_url=secondary_rates_url,
+        )
+        xdrrate = Currency.get_current_value_in_usd(10, "xdr")
+        assert xdrrate == 14.35012585060371
         with pytest.raises(CurrencyError):
             Currency.setup(
                 retriever=retriever,
@@ -126,15 +137,21 @@ class TestCurrency:
         assert rate2xdr != 1
         assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.1
 
-    def test_get_current_value_in_usd_fixednnow(self, retrievers):
+    def test_get_current_value_in_usd_fixednnow(
+        self, retrievers, secondary_rates_url
+    ):
         date = parse_date("2020-02-20")
-        Currency.setup(no_historic=True, fixed_now=date)
+        Currency.setup(
+            no_historic=True,
+            fixed_now=date,
+            secondary_rates_url=secondary_rates_url,
+        )
         assert Currency.get_current_rate("usd") == 1
         assert Currency.get_current_value_in_usd(10, "USD") == 10
         assert Currency.get_current_value_in_currency(10, "usd") == 10
         assert Currency.get_current_rate("gbp") == 0.7735000252723694
         # falls back to secondary current rates
-        assert Currency.get_current_rate("xdr") == 0.744042
+        assert Currency.get_current_rate("xdr") == 0.696858
 
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
