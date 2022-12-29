@@ -121,7 +121,7 @@ commands =
 wheel_build_env = py311
 deps =
     flakeheaven
-    flake8
+    flake8==4.0.1
     flake8-isort
     flake8-black
 commands =

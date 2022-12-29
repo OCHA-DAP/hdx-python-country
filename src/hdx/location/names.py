@@ -6,8 +6,18 @@ from unidecode import unidecode
 non_ascii = "([^\x00-\x7F])+"
 
 
-def clean_name(name):
-    # Replace accented characters with non accented ones
+def clean_name(name: str) -> str:
+    """
+    Replace accented characters with non-accented ones in given name. Also
+    strip whitespace from start and end and make lwoercase.
+
+    Args:
+        name (str): Name to change
+
+    Returns:
+        str: Name without accented characters
+    """
+    #
     clean_name = "".join(
         c
         for c in unicodedata.normalize("NFD", name)

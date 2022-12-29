@@ -1,15 +1,32 @@
+from typing import Callable, Optional
+
 import pyphonetics
+from hdx.utilities.typehint import ListTuple
 
 
 class Phonetics(pyphonetics.RefinedSoundex):
     def match(
         self,
-        possible_names,
-        name,
-        alternative_name=None,
-        transform_possible_names=list(),
-        threshold=2,
-    ):
+        possible_names: ListTuple,
+        name: str,
+        alternative_name: Optional[str] = None,
+        transform_possible_names: ListTuple[Callable] = list(),
+        threshold: int = 2,
+    ) -> Optional[int]:
+        """
+        Match name to one of the given possible names. Returns None if no match
+        or the index of the matching name
+
+        Args:
+            possible_names (ListTuple): Possible names
+            name (str): Name to match
+            alternative_name (str): Alternative name to match. Defaults to None.
+            transform_possible_names (ListTuple[Callable]): Functions to transform possible names.
+            threshold: Match threshold. Defaults to 2.
+
+        Returns:
+            Optional[int]: Index of matching name from possible names or None
+        """
         mindistance = None
         matching_index = None
 
