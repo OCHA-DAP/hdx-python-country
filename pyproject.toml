@@ -1,5 +1,5 @@
 [build-system]
-requires = [ "setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
+requires = [ "setuptools>=65", "setuptools_scm[toml]>=7.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -91,7 +91,6 @@ output_directory = "docs"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-isolated_build = true
 envlist = py311, lint
 
 [gh-actions]
@@ -100,15 +99,14 @@ python =
 
 [testenv]
 recreate = true
-wheel = true
-wheel_pep517 = build
+package = wheel
+wheel_build_env = .pkg
 deps =
     -r test-requirements.txt
 commands =
     pytest --cov=hdx --no-cov-on-fail --junitxml=.tox/test-results.xml --cov-report=xml --cov-report=term-missing
 
 [testenv:lint]
-wheel_build_env = py311
 deps =
     flake8
     flake8-isort
@@ -118,18 +116,16 @@ commands =
     flake8 src tests
 
 [testenv:docs]
-wheel_build_env = py311
 deps =
     pydoc-markdown
 commands =
     pydoc-markdown
 
 [testenv:publish]
-wheel_build_env = py311
-passenv = SSH_AUTH_SOCK TWINE_USERNAME TWINE_PASSWORD
+pass_env = SSH_AUTH_SOCK, TWINE_USERNAME, TWINE_PASSWORD
 deps =
     twine
 
 commands =
-    twine upload {distdir}/*
+    twine upload {work_dir}/{package_env}/dist/*
 """
