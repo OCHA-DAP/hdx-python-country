@@ -42,6 +42,7 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top. 
 
 ## Breaking Changes
+From 3.4.6, Python 3.7 no longer supported
 
 From 3.3.2, major update to foreign exchange code and use of new Yahoo data source
 
