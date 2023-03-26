@@ -747,11 +747,21 @@ class Country:
                     return iso3
         elif re.search(r"[\u4e00-\u9fff]+", countryupper):
             for country in countriesdata["countries"]:
-                if countriesdata["countries"][country]["#country+alt+i_zh+name+v_unterm"] == countryupper:
+                if (
+                    countriesdata["countries"][country][
+                        "#country+alt+i_zh+name+v_unterm"
+                    ]
+                    == countryupper
+                ):
                     return country
-        elif re.search(r"[\u0621-\u064A]+", countryupper):
+        elif re.search(r"[\u0600-\u06FF]+", countryupper):
             for country in countriesdata["countries"]:
-                if countriesdata["countries"][country]["#country+alt+i_ar+name+v_unterm"] == countryupper:
+                if (
+                    countriesdata["countries"][country][
+                        "#country+alt+i_ar+name+v_unterm"
+                    ]
+                    == countryupper
+                ):
                     return country
 
         if exception is not None:
