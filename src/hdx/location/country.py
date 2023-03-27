@@ -745,6 +745,24 @@ class Country:
                 iso3 = countriesdata["countrynames2iso3"].get(candidate)
                 if iso3 is not None:
                     return iso3
+        elif re.search(r"[\u4e00-\u9fff]+", countryupper):
+            for country in countriesdata["countries"]:
+                if (
+                    countriesdata["countries"][country][
+                        "#country+alt+i_zh+name+v_unterm"
+                    ]
+                    == countryupper
+                ):
+                    return country
+        elif re.search(r"[\u0600-\u06FF]+", countryupper):
+            for country in countriesdata["countries"]:
+                if (
+                    countriesdata["countries"][country][
+                        "#country+alt+i_ar+name+v_unterm"
+                    ]
+                    == countryupper
+                ):
+                    return country
 
         if exception is not None:
             raise exception

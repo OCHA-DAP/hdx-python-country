@@ -453,6 +453,10 @@ class TestCountry:
         assert Country.get_iso3_country_code("jpn") == "JPN"
         assert Country.get_iso3_country_code("Dem. Rep. of the Congo") == "COD"
         assert Country.get_iso3_country_code("Russian Fed.") == "RUS"
+        assert Country.get_iso3_country_code("中国") == "CHN"
+        assert (
+            Country.get_iso3_country_code("المملكة العربية السعودية") == "SAU"
+        )
         assert (
             Country.get_iso3_country_code("Micronesia (Federated States of)")
             == "FSM"
