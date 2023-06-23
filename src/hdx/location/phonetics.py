@@ -1,6 +1,7 @@
 from typing import Callable, Optional
 
 import pyphonetics
+
 from hdx.utilities.typehint import ListTuple
 
 

@@ -1,12 +1,12 @@
 import logging
 from typing import Dict, List, Optional, Tuple
 
-from hdx.utilities.text import multiple_replace
 from unidecode import unidecode
 
 from hdx.location.country import Country
 from hdx.location.names import clean_name
 from hdx.location.phonetics import Phonetics
+from hdx.utilities.text import multiple_replace
 
 logger = logging.getLogger(__name__)
 
