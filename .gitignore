@@ -94,5 +94,5 @@ ENV/
 # IntelliJ
 .idea/
 
-# setuptools_scm
+# hatch-vcs
 _version.py

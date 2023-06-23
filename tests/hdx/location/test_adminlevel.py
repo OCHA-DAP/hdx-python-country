@@ -2,9 +2,9 @@
 from os.path import join
 
 import pytest
-from hdx.utilities.loader import load_yaml
 
 from hdx.location.adminlevel import AdminLevel
+from hdx.utilities.loader import load_yaml
 
 
 class TestAdminLevel:

@@ -1,0 +1,32 @@
+loaders:
+  - type: python
+    search_path:
+      - ../src
+    packages:
+      - hdx.location
+renderer:
+  type: mkdocs
+  output_directory: docs
+  mkdocs_config:
+    site_name: HDX Python Country
+    theme: readthedocs
+    repo_url: "https://github.com/OCHA-DAP/hdx-python-country"
+  markdown:
+    source_linker:
+      type: github
+      repo: OCHA-DAP/hdx-python-country
+  pages:
+    - title: Home
+      name: index
+      source: main.md
+    - title: API Documentation
+      children:
+      - title: Countries
+        contents:
+          - hdx.location.country.*
+      - title: Administration level one
+        contents:
+          - hdx.location.adminone.*
+      - title: Currencies
+        contents:
+          - hdx.location.currency.*
