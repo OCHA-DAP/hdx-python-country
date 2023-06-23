@@ -48,7 +48,7 @@ content-type = "text/markdown"
 Homepage = "https://github.com/OCHA-DAP/hdx-python-country"
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "pytest-loguru"]
+test = ["pytest", "pytest-cov"]
 dev = ["pre-commit"]
 
 
@@ -76,7 +76,7 @@ version_scheme = "python-simplified-semver"
 # Tests
 
 [tool.hatch.envs.test]
-features = ["html", "email", "test"]
+features = ["test"]
 
 [tool.hatch.envs.test.scripts]
 test = """

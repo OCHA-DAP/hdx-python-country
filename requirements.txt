@@ -62,9 +62,7 @@ jsonschema==4.17.3
 libhxl==5.0.1
     # via hdx-python-country (pyproject.toml)
 loguru==0.7.0
-    # via
-    #   hdx-python-utilities
-    #   pytest-loguru
+    # via hdx-python-utilities
 markdown-it-py==3.0.0
     # via rich
 marko==2.0.0
@@ -104,10 +102,7 @@ pytest==7.3.2
     #   hdx-python-country (pyproject.toml)
     #   libhxl
     #   pytest-cov
-    #   pytest-loguru
 pytest-cov==4.1.0
-    # via hdx-python-country (pyproject.toml)
-pytest-loguru==0.2.0
     # via hdx-python-country (pyproject.toml)
 python-dateutil==2.8.2
     # via
