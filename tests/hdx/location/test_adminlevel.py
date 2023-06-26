@@ -10,7 +10,7 @@ from hdx.utilities.loader import load_yaml
 class TestAdminLevel:
     @pytest.fixture(scope="function")
     def config(self):
-        return load_yaml(join("tests", "fixtures", "adminlevel.yml"))
+        return load_yaml(join("tests", "fixtures", "adminlevel.yaml"))
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
