@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">=3.8"
 
 dependencies = [
-    "hdx-python-utilities>=3.5.9",
+    "hdx-python-utilities>=3.6.1",
     "libhxl",
     "pyphonetics",
 ]

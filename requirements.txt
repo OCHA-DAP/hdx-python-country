@@ -35,7 +35,7 @@ filelock==3.12.2
     # via virtualenv
 frictionless==5.13.1
     # via hdx-python-utilities
-hdx-python-utilities==3.6.0
+hdx-python-utilities==3.6.1
     # via hdx-python-country (pyproject.toml)
 humanize==4.6.0
     # via frictionless
