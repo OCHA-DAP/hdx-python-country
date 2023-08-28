@@ -318,7 +318,7 @@ class Country:
         iso3: str,
         use_live: bool = True,
         exception: Optional[ExceptionUpperBound] = None,
-        shortname: bool = False,
+        formal: bool = False,
     ) -> Optional[str]:
         """Get country name from ISO3 code
 
@@ -326,7 +326,7 @@ class Country:
             iso3 (str): ISO3 code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
-            shortname (bool): Return preferred name if False, short name if True. Defaults to False.
+            formal (bool): Return preferred name if False, formal name if True. Defaults to False.
 
         Returns:
             Optional[str]: Country name
@@ -338,8 +338,11 @@ class Country:
             countryname = countryinfo.get("#country+name+override")
             if countryname is not None:
                 return countryname
-            if shortname:
-                return countryinfo.get("#country+alt+i_en+name+v_unterm")
+            if formal:
+                countryname = countryinfo.get("#country+formal+i_en+name+v_unterm")
+                if countryname is None or countryname == "":
+                    countryname = countryinfo.get("#country+name+preferred")
+                return countryname
             else:
                 return countryinfo.get("#country+name+preferred")
         return None
@@ -454,7 +457,7 @@ class Country:
         iso2: str,
         use_live: bool = True,
         exception: Optional[ExceptionUpperBound] = None,
-        shortname: bool = False,
+        formal: bool = False,
     ) -> Optional[str]:
         """Get country name from ISO2 code
 
@@ -462,7 +465,7 @@ class Country:
             iso2 (str): ISO2 code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
-            shortname (bool): Return preferred name if False, short name if True. Defaults to False.
+            formal (bool): Return preferred name if False, formal name if True. Defaults to False.
 
         Returns:
             Optional[str]: Country name
@@ -472,7 +475,7 @@ class Country:
         )
         if iso3 is not None:
             return cls.get_country_name_from_iso3(
-                iso3, exception=exception, shortname=shortname
+                iso3, exception=exception, formal=formal
             )
         return None
 
@@ -584,7 +587,7 @@ class Country:
         m49: int,
         use_live: bool = True,
         exception: Optional[ExceptionUpperBound] = None,
-        shortname: bool = False,
+        formal: bool = False,
     ) -> Optional[str]:
         """Get country name from M49 code
 
@@ -592,7 +595,7 @@ class Country:
             m49 (int): M49 numeric code for which to get country name
             use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
             exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
-            shortname (bool): Return preferred name if False, short name if True. Defaults to False.
+            formal (bool): Return preferred name if False, formal name if True. Defaults to False.
 
         Returns:
             Optional[str]: Country name
@@ -602,7 +605,7 @@ class Country:
         )
         if iso3 is not None:
             return cls.get_country_name_from_iso3(
-                iso3, exception=exception, shortname=shortname
+                iso3, exception=exception, formal=formal
             )
         return None
 
