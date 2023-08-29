@@ -407,7 +407,7 @@ class TestCountry:
             "#country+name+short+v_reliefweb": "oPt",
             "#country+regex": "palestin|\\bgaza|west.?bank",
             "#currency+code": "ILS",
-            "date+start": "2013-02-06",
+            "#date+start": "2013-02-06",
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
