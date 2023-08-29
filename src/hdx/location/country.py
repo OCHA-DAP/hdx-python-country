@@ -339,7 +339,9 @@ class Country:
             if countryname is not None:
                 return countryname
             if formal:
-                countryname = countryinfo.get("#country+formal+i_en+name+v_unterm")
+                countryname = countryinfo.get(
+                    "#country+formal+i_en+name+v_unterm"
+                )
                 if countryname is None or countryname == "":
                     countryname = countryinfo.get("#country+name+preferred")
                 return countryname

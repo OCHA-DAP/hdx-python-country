@@ -429,7 +429,8 @@ class TestCountry:
     def test_get_country_name_from_m49(self):
         assert Country.get_country_name_from_m49(4) == "Afghanistan"
         assert (
-            Country.get_country_name_from_m49(158, formal=True) == "Taiwan (Province of China)"
+            Country.get_country_name_from_m49(158, formal=True)
+            == "Taiwan (Province of China)"
         )
         assert Country.get_country_name_from_m49(882) == "Samoa"
         assert Country.get_country_name_from_m49(9999) is None
