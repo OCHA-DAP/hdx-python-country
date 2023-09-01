@@ -246,12 +246,12 @@ class Country:
         return cls._countriesdata
 
     @classmethod
-    def set_ocha_url(cls, url: str = None) -> None:
+    def set_ocha_url(cls, url: Optional[str] = None) -> None:
         """
-        Set World Bank url from which to retrieve countries data
+        Set OCHA url from which to retrieve countries data
 
         Args:
-            url (str): World Bank url from which to retrieve countries data. Defaults to internal value.
+            url (Optional[str]): OCHA url from which to retrieve countries data. Defaults to internal value.
 
         Returns:
             None

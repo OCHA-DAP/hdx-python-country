@@ -1,27 +1,38 @@
 import logging
 from typing import Dict, List, Optional, Tuple
 
+import hxl
+from hxl import InputOptions
 from unidecode import unidecode
 
 from hdx.location.country import Country
 from hdx.location.names import clean_name
 from hdx.location.phonetics import Phonetics
 from hdx.utilities.text import multiple_replace
+from hdx.utilities.typehint import ListTuple
 
 logger = logging.getLogger(__name__)
 
 
 class AdminLevel:
-    """AdminLevel class which takes in pcodes and then maps names to those pcodes with fuzzy matching if necessary. The
-    input configuration dictionary, admin_config, requires key admin_info which is a list with values of the form:
+    """AdminLevel class which takes in p-codes and then maps names to those
+    p-codes with fuzzy matching if necessary. The input configuration
+    dictionary, admin_config, can contain key admin_info which is a list with
+    values of the form:
     ::
         {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
 
+    If it doesn't, a dataset on HDX is used as the source of p-codes.
+
     Various other keys are optional:
-    countries_fuzzy_try are countries (iso3 codes) for which to try fuzzy matching. Default is all countries.
-    admin_name_mappings is a dictionary of mappings from name to pcode (for where fuzzy matching fails)
-    admin_name_replacements is a dictionary of textual replacements to try when fuzzy matching
-    admin_fuzzy_dont is a list of names for which fuzzy matching should not be tried
+    countries_fuzzy_try are countries (iso3 codes) for which to try fuzzy
+    matching. Default is all countries.
+    admin_name_mappings is a dictionary of mappings from name to p-code (for
+    where fuzzy matching fails)
+    admin_name_replacements is a dictionary of textual replacements to try when
+    fuzzy matching
+    admin_fuzzy_dont is a list of names for which fuzzy matching should not be
+    tried
 
     Args:
         admin_config (Dict): Configuration dictionary
@@ -29,13 +40,15 @@ class AdminLevel:
         admin_level_overrides (Dict): Countries at other admin levels.
     """
 
+    _pcode_dataset_int = "global-pcodes"
+    _pcode_dataset = _pcode_dataset_int
+
     def __init__(
         self,
         admin_config: Dict,
         admin_level: int = 1,
         admin_level_overrides: Dict = dict(),
     ) -> None:
-        admin_info = admin_config["admin_info"]
         self.admin_level = admin_level
         self.admin_level_overrides = admin_level_overrides
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
@@ -52,6 +65,25 @@ class AdminLevel:
         self.pcode_to_name = dict()
         self.pcode_to_iso3 = dict()
 
+        admin_info = admin_config.get("admin_info")
+        if admin_info:
+            self.setup_from_admin_info(admin_info)
+        else:
+            self.setup_from_dataset()
+        self.init_matches_errors()
+        self.phonetics = Phonetics()
+
+    def setup_from_admin_info(self, admin_info: ListTuple[Dict]) -> None:
+        """
+        Setup p-codes from admin_info which is a list with values of the form:
+        ::
+            {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
+        Args:
+            admin_info (ListTuple[Dict]): p-code dictionary
+
+        Returns:
+            None
+        """
         for row in admin_info:
             countryiso3 = row["iso3"]
             pcode = row.get("pcode")
@@ -63,8 +95,52 @@ class AdminLevel:
             name_to_pcode[unidecode(adm_name).lower()] = pcode
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
-        self.init_matches_errors()
-        self.phonetics = Phonetics()
+
+    def setup_from_dataset(self, admin_level: int) -> None:
+        """
+        Setup p-codes from global p-codes dataset on HDX
+
+        Args:
+            admin_level (int): Level to retrieve
+
+        Returns:
+            None
+        """
+        try:
+            admin_info = hxl.data(
+                self._pcode_dataset, InputOptions(encoding="utf-8")
+            )
+            for row in admin_info:
+                adminlevel = row.get("#geo+admin_level")
+                if adminlevel != admin_level:
+                    continue
+                countryiso3 = row.get("#country+code")
+                pcode = row.get("#adm+code")
+                self.pcodes.append(pcode)
+                self.pcode_lengths[countryiso3] = len(pcode)
+                adm_name = row.get("name")
+                self.pcode_to_name[pcode] = adm_name
+                name_to_pcode = self.name_to_pcode.get(countryiso3, dict())
+                name_to_pcode[unidecode(adm_name).lower()] = pcode
+                self.name_to_pcode[countryiso3] = name_to_pcode
+                self.pcode_to_iso3[pcode] = countryiso3
+        except OSError:
+            logger.exception("Download of admin info from dataset failed!")
+
+    @classmethod
+    def set_pcode_dataset(cls, pcode: Optional[str] = None) -> None:
+        """
+        Set dataset from which to retrieve admin data
+
+        Args:
+            pcode (Optional[str]): Dataset from which to retrieve admin data. Defaults to internal value.
+
+        Returns:
+            None
+        """
+        if pcode is None:
+            pcode = cls._pcode_dataset_int
+        cls._pcode_dataset = pcode
 
     def get_pcode_list(self) -> List[str]:
         """Get list of all pcodes
