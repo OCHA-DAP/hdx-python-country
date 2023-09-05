@@ -42,6 +42,9 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top. 
 
 ## Breaking Changes
+From 3.5.4, after creating an Adminlevel, call either setup_from_admin_info,
+setup_from_libhxl_dataset or setup_from_url.
+
 From 3.4.6, Python 3.7 no longer supported
 
 From 3.3.2, major update to foreign exchange code and use of new Yahoo data source
@@ -104,21 +107,33 @@ The usage of the country mappings functionality is best illustrated by some exam
 
 ## Administration Level
 
-The administration level mappings requires using an input configuration dictionary, 
-admin_config, with key *admin_info* which is a list with values of the form:
+The administration level mappings takes input configuration dictionary, 
+*admin_config*, which defaults to an empty dictionary.  
 
-    {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
-
-Various other keys are optional:
+*admin_config* can have the following optional keys:
 
 *countries_fuzzy_try* are countries (iso3 codes) for which to try fuzzy matching. Default is all countries.
 *admin_name_mappings* is a dictionary of mappings from name to pcode (for where fuzzy matching fails)
 *admin_name_replacements* is a dictionary of textual replacements to try when fuzzy matching
 *admin_fuzzy_dont* is a list of names for which fuzzy matching should not be tried
 
+Once an AdminLevel object is constructed, one of three setup methods must be 
+called: *setup_from_admin_info*, *setup_from_libhxl_dataset* or 
+*setup_from_url*.
+
+Method *setup_from_admin_info* takes key *admin_info* which is a list with 
+values of the form:
+
+    {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
+
+Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
+*setup_from_url* takes a URL which defaults to the global p-codes dataset on 
+HDX.
+
 Examples of usage:
 
     adminlevel = AdminLevel(config)
+    adminlevel.setup_from_admin_info(admin_info)
     adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع")  # returns ("YE30", False)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", fuzzy_match=False)  # returns (None, True)

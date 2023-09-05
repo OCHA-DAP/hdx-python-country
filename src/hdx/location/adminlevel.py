@@ -16,15 +16,10 @@ logger = logging.getLogger(__name__)
 
 class AdminLevel:
     """AdminLevel class which takes in p-codes and then maps names to those
-    p-codes with fuzzy matching if necessary. The input configuration
-    dictionary, admin_config, can contain key admin_info which is a list with
-    values of the form:
-    ::
-        {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
+    p-codes with fuzzy matching if necessary.
 
-    If it doesn't, a dataset on HDX is used as the source of p-codes.
-
-    Various other keys are optional:
+    The dictionary admin_config, which defaults to an empty dictionary, can
+    have the following optional keys:
     countries_fuzzy_try are countries (iso3 codes) for which to try fuzzy
     matching. Default is all countries.
     admin_name_mappings is a dictionary of mappings from name to p-code (for
@@ -35,7 +30,7 @@ class AdminLevel:
     tried
 
     Args:
-        admin_config (Dict): Configuration dictionary
+        admin_config (Dict): Configuration dictionary. Defaults to {}.
         admin_level (int): Admin level. Defaults to 1.
         admin_level_overrides (Dict): Countries at other admin levels.
     """
@@ -45,31 +40,24 @@ class AdminLevel:
 
     def __init__(
         self,
-        admin_config: Dict,
+        admin_config: Dict = {},
         admin_level: int = 1,
-        admin_level_overrides: Dict = dict(),
+        admin_level_overrides: Dict = {},
     ) -> None:
         self.admin_level = admin_level
         self.admin_level_overrides = admin_level_overrides
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
-        self.admin_name_mappings = admin_config.get(
-            "admin_name_mappings", dict()
-        )
+        self.admin_name_mappings = admin_config.get("admin_name_mappings", {})
         self.admin_name_replacements = admin_config.get(
-            "admin_name_replacements", dict()
+            "admin_name_replacements", {}
         )
         self.admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", list())
         self.pcodes = list()
-        self.pcode_lengths = dict()
-        self.name_to_pcode = dict()
-        self.pcode_to_name = dict()
-        self.pcode_to_iso3 = dict()
+        self.pcode_lengths = {}
+        self.name_to_pcode = {}
+        self.pcode_to_name = {}
+        self.pcode_to_iso3 = {}
 
-        admin_info = admin_config.get("admin_info")
-        if admin_info:
-            self.setup_from_admin_info(admin_info)
-        else:
-            self.setup_from_dataset()
         self.init_matches_errors()
         self.phonetics = Phonetics()
 
@@ -91,39 +79,58 @@ class AdminLevel:
             self.pcode_lengths[countryiso3] = len(pcode)
             adm_name = row["name"]
             self.pcode_to_name[pcode] = adm_name
-            name_to_pcode = self.name_to_pcode.get(countryiso3, dict())
+            name_to_pcode = self.name_to_pcode.get(countryiso3, {})
             name_to_pcode[unidecode(adm_name).lower()] = pcode
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
 
-    def setup_from_dataset(self, admin_level: int) -> None:
+    def setup_from_libhxl_dataset(
+        self, admin_level: int, libhxl_dataset: hxl.Dataset
+    ) -> None:
         """
-        Setup p-codes from global p-codes dataset on HDX
+        Setup p-codes from a libhxl Dataset object.
 
         Args:
             admin_level (int): Level to retrieve
+            admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
 
         Returns:
             None
         """
         try:
-            admin_info = hxl.data(
-                self._pcode_dataset, InputOptions(encoding="utf-8")
+            admin_info = libhxl_dataset.with_rows(
+                f"#geo+admin_level={admin_level}"
             )
             for row in admin_info:
-                adminlevel = row.get("#geo+admin_level")
-                if adminlevel != admin_level:
-                    continue
                 countryiso3 = row.get("#country+code")
                 pcode = row.get("#adm+code")
                 self.pcodes.append(pcode)
                 self.pcode_lengths[countryiso3] = len(pcode)
                 adm_name = row.get("name")
                 self.pcode_to_name[pcode] = adm_name
-                name_to_pcode = self.name_to_pcode.get(countryiso3, dict())
+                name_to_pcode = self.name_to_pcode.get(countryiso3, {})
                 name_to_pcode[unidecode(adm_name).lower()] = pcode
                 self.name_to_pcode[countryiso3] = name_to_pcode
                 self.pcode_to_iso3[pcode] = countryiso3
+        except OSError:
+            logger.exception("Download of admin info from dataset failed!")
+
+    def setup_from_url(
+        self, admin_level: int, admin_url: str = _pcode_dataset
+    ) -> None:
+        """
+        Setup p-codes from a URL. Defaults to global p-codes dataset on HDX.
+
+        Args:
+            admin_level (int): Level to retrieve
+            admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
+
+        Returns:
+            None
+        """
+        try:
+            admin_info = hxl.data(admin_url, InputOptions(encoding="utf-8"))
+            self.setup_from_libhxl_dataset(admin_level, admin_info)
         except OSError:
             logger.exception("Download of admin info from dataset failed!")
 
