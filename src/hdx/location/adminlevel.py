@@ -137,7 +137,7 @@ class AdminLevel:
                 pcode = row.get("#adm+code")
                 self.pcodes.append(pcode)
                 self.pcode_lengths[countryiso3] = len(pcode)
-                adm_name = row.get("name")
+                adm_name = row.get("#adm+name")
                 self.pcode_to_name[pcode] = adm_name
                 name_to_pcode = self.name_to_pcode.get(countryiso3, {})
                 name_to_pcode[unidecode(adm_name).lower()] = pcode
