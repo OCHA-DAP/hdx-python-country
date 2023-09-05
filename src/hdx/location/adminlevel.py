@@ -35,8 +35,8 @@ class AdminLevel:
         admin_level_overrides (Dict): Countries at other admin levels.
     """
 
-    _pcode_dataset_int = "global-pcodes"
-    _pcode_dataset = _pcode_dataset_int
+    _admin_url_int = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
+    _admin_url = _admin_url_int
 
     def __init__(
         self,
@@ -62,24 +62,22 @@ class AdminLevel:
         self.phonetics = Phonetics()
 
     @classmethod
-    def set_pcode_dataset(cls, pcode: Optional[str] = None) -> None:
+    def set_default_admin_url(cls, admin_url: Optional[str] = None) -> None:
         """
-        Set dataset from which to retrieve admin data
+        Set default admin URL from which to retrieve admin data
 
         Args:
-            pcode (Optional[str]): Dataset from which to retrieve admin data. Defaults to internal value.
+            admin_url (Optional[str]): Admin URL from which to retrieve admin data. Defaults to internal value.
 
         Returns:
             None
         """
-        if pcode is None:
-            pcode = cls._pcode_dataset_int
-        cls._pcode_dataset = pcode
+        if admin_url is None:
+            admin_url = cls._admin_url_int
+        cls._admin_url = admin_url
 
     @classmethod
-    def get_libhxl_dataset(
-        cls, admin_url: str = _pcode_dataset
-    ) -> hxl.Dataset:
+    def get_libhxl_dataset(cls, admin_url: str = _admin_url) -> hxl.Dataset:
         """
         Get libhxl Dataset object given a URL which defaults to global p-codes
         dataset on HDX.
@@ -150,7 +148,7 @@ class AdminLevel:
                 "Download of admin info from libhxl Dataset failed!"
             )
 
-    def setup_from_url(self, admin_url: str = _pcode_dataset) -> None:
+    def setup_from_url(self, admin_url: str = _admin_url) -> None:
         """
         Setup p-codes from a URL. Defaults to global p-codes dataset on HDX.
 
