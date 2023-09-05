@@ -120,14 +120,11 @@ class AdminLevel:
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
 
-    def setup_from_libhxl_dataset(
-        self, admin_level: int, libhxl_dataset: hxl.Dataset
-    ) -> None:
+    def setup_from_libhxl_dataset(self, libhxl_dataset: hxl.Dataset) -> None:
         """
         Setup p-codes from a libhxl Dataset object.
 
         Args:
-            admin_level (int): Level to retrieve
             libhxl_dataset (hxl.Dataset): Dataset object from libhxl library
 
         Returns:
@@ -135,7 +132,7 @@ class AdminLevel:
         """
         try:
             admin_info = libhxl_dataset.with_rows(
-                f"#geo+admin_level={admin_level}"
+                f"#geo+admin_level={self.admin_level}"
             )
             for row in admin_info:
                 countryiso3 = row.get("#country+code")
@@ -153,21 +150,18 @@ class AdminLevel:
                 "Download of admin info from libhxl Dataset failed!"
             )
 
-    def setup_from_url(
-        self, admin_level: int, admin_url: str = _pcode_dataset
-    ) -> None:
+    def setup_from_url(self, admin_url: str = _pcode_dataset) -> None:
         """
         Setup p-codes from a URL. Defaults to global p-codes dataset on HDX.
 
         Args:
-            admin_level (int): Level to retrieve
             admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
 
         Returns:
             None
         """
         admin_info = self.get_libhxl_dataset(admin_url)
-        self.setup_from_libhxl_dataset(admin_level, admin_info)
+        self.setup_from_libhxl_dataset(admin_info)
 
     def get_pcode_list(self) -> List[str]:
         """Get list of all pcodes
