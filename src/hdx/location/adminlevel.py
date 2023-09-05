@@ -61,6 +61,42 @@ class AdminLevel:
         self.init_matches_errors()
         self.phonetics = Phonetics()
 
+    @classmethod
+    def set_pcode_dataset(cls, pcode: Optional[str] = None) -> None:
+        """
+        Set dataset from which to retrieve admin data
+
+        Args:
+            pcode (Optional[str]): Dataset from which to retrieve admin data. Defaults to internal value.
+
+        Returns:
+            None
+        """
+        if pcode is None:
+            pcode = cls._pcode_dataset_int
+        cls._pcode_dataset = pcode
+
+    @classmethod
+    def get_libhxl_dataset(
+        cls, admin_url: str = _pcode_dataset
+    ) -> hxl.Dataset:
+        """
+        Get libhxl Dataset object given a URL which defaults to global p-codes
+        dataset on HDX.
+
+        Args:
+            admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
+
+        Returns:
+            None
+        """
+        try:
+            return hxl.data(admin_url, InputOptions(encoding="utf-8"))
+        except OSError:
+            logger.exception(
+                f"Setup of libhxl Dataset object with {admin_url} failed!"
+            )
+
     def setup_from_admin_info(self, admin_info: ListTuple[Dict]) -> None:
         """
         Setup p-codes from admin_info which is a list with values of the form:
@@ -92,7 +128,7 @@ class AdminLevel:
 
         Args:
             admin_level (int): Level to retrieve
-            admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
+            libhxl_dataset (hxl.Dataset): Dataset object from libhxl library
 
         Returns:
             None
@@ -113,7 +149,9 @@ class AdminLevel:
                 self.name_to_pcode[countryiso3] = name_to_pcode
                 self.pcode_to_iso3[pcode] = countryiso3
         except OSError:
-            logger.exception("Download of admin info from dataset failed!")
+            logger.exception(
+                "Download of admin info from libhxl Dataset failed!"
+            )
 
     def setup_from_url(
         self, admin_level: int, admin_url: str = _pcode_dataset
@@ -128,26 +166,8 @@ class AdminLevel:
         Returns:
             None
         """
-        try:
-            admin_info = hxl.data(admin_url, InputOptions(encoding="utf-8"))
-            self.setup_from_libhxl_dataset(admin_level, admin_info)
-        except OSError:
-            logger.exception("Download of admin info from dataset failed!")
-
-    @classmethod
-    def set_pcode_dataset(cls, pcode: Optional[str] = None) -> None:
-        """
-        Set dataset from which to retrieve admin data
-
-        Args:
-            pcode (Optional[str]): Dataset from which to retrieve admin data. Defaults to internal value.
-
-        Returns:
-            None
-        """
-        if pcode is None:
-            pcode = cls._pcode_dataset_int
-        cls._pcode_dataset = pcode
+        admin_info = self.get_libhxl_dataset(admin_url)
+        self.setup_from_libhxl_dataset(admin_level, admin_info)
 
     def get_pcode_list(self) -> List[str]:
         """Get list of all pcodes
