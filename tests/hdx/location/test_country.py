@@ -183,7 +183,7 @@ class TestCountry:
         assert Country.get_country_info_from_iso2("ab") is None
         assert Country.get_country_info_from_iso2("TW") == {
             "#country+alt+i_ar+name+v_unterm": "",
-            "#country+alt+i_en+name+v_unterm": "",
+            "#country+alt+i_en+name+v_unterm": "Taiwan (Province of China)",
             "#country+alt+i_es+name+v_unterm": "",
             "#country+alt+i_fr+name+v_unterm": "",
             "#country+alt+i_ru+name+v_unterm": "",
@@ -568,7 +568,7 @@ class TestCountry:
         )
         assert Country.get_iso3_country_code_fuzzy("Falkland Isl.") == (
             "FLK",
-            False,
+            True,
         )
         assert Country.get_iso3_country_code_fuzzy("Czech Republic") == (
             "CZE",
