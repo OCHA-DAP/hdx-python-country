@@ -19,8 +19,8 @@ class TestCountry:
         assert Country.get_country_name_from_iso3("Pol") == "Poland"
         assert Country.get_country_name_from_iso3("SGP") == "Singapore"
         assert (
-            Country.get_country_name_from_iso3("SGP", shortname=True)
-            == "Singapore"
+            Country.get_country_name_from_iso3("SGP", formal=True)
+            == "the Republic of Singapore"
         )
         assert Country.get_country_name_from_iso3("uy") is None
         with pytest.raises(LocationError):
@@ -31,16 +31,16 @@ class TestCountry:
             == "Venezuela (Bolivarian Republic of)"
         )
         assert (
-            Country.get_country_name_from_iso3("vEn", shortname=True)
-            == "Venezuela"
+            Country.get_country_name_from_iso3("vEn", formal=True)
+            == "the Bolivarian Republic of Venezuela"
         )
         assert (
             Country.get_country_name_from_iso3("TWN")
             == "Taiwan (Province of China)"
         )
         assert (
-            Country.get_country_name_from_iso3("TWN", shortname=True)
-            == "Taiwan"
+            Country.get_country_name_from_iso3("TWN", formal=True)
+            == "Taiwan (Province of China)"
         )
         assert Country.get_country_name_from_iso3("PSE") == "oPt"
 
@@ -64,25 +64,28 @@ class TestCountry:
             "#country+alt+i_fr+name+v_unterm": "Bosnie-Herzégovine (la)",
             "#country+alt+i_ru+name+v_unterm": "Босния и Герцеговина",
             "#country+alt+i_zh+name+v_unterm": "波斯尼亚和黑塞哥维那",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "",
             "#country+alt+name+v_hrinfo_country": "",
             "#country+alt+name+v_iso": "",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "70",
             "#country+code+v_fts": "28",
             "#country+code+v_hrinfo_country": "208",
             "#country+code+v_iso2": "BA",
             "#country+code+v_iso3": "BIH",
             "#country+code+v_reliefweb": "40",
+            "#country+formal+i_en+name+v_unterm": "Bosnia and Herzegovina",
             "#country+name+preferred": "Bosnia and Herzegovina",
             "#country+name+short+v_reliefweb": "",
             "#country+regex": "herzegovina|bosnia",
             "#currency+code": "BAM",
+            "#date+start": "1993-01-01",
             "#geo+admin_level": "0",
             "#geo+lat": "44.16506495",
             "#geo+lon": "17.79105724",
+            "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "28",
@@ -100,26 +103,29 @@ class TestCountry:
             "#country+alt+i_fr+name+v_unterm": "État de Palestine (l')",
             "#country+alt+i_ru+name+v_unterm": "Государство Палестина",
             "#country+alt+i_zh+name+v_unterm": "巴勒斯坦国",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "occupied Palestinian territory",
             "#country+alt+name+v_hrinfo_country": "occupied Palestinian territory",
             "#country+alt+name+v_iso": "Palestine, State of",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "occupied Palestinian territory",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "275",
             "#country+code+v_fts": "171",
             "#country+code+v_hrinfo_country": "351",
             "#country+code+v_iso2": "PS",
             "#country+code+v_iso3": "PSE",
             "#country+code+v_reliefweb": "180",
+            "#country+formal+i_en+name+v_unterm": "the State of Palestine",
             "#country+name+override": "oPt",
             "#country+name+preferred": "State of Palestine",
             "#country+name+short+v_reliefweb": "oPt",
             "#country+regex": "palestin|\\bgaza|west.?bank",
             "#currency+code": "ILS",
+            "#date+start": "2013-02-06",
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
+            "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "170",
@@ -145,25 +151,28 @@ class TestCountry:
             "#country+alt+i_fr+name+v_unterm": "Japon (le)",
             "#country+alt+i_ru+name+v_unterm": "Япония",
             "#country+alt+i_zh+name+v_unterm": "日本",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "",
             "#country+alt+name+v_hrinfo_country": "",
             "#country+alt+name+v_iso": "",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "392",
             "#country+code+v_fts": "112",
             "#country+code+v_hrinfo_country": "292",
             "#country+code+v_iso2": "JP",
             "#country+code+v_iso3": "JPN",
             "#country+code+v_reliefweb": "128",
+            "#country+formal+i_en+name+v_unterm": "Japan",
             "#country+name+preferred": "Japan",
             "#country+name+short+v_reliefweb": "",
             "#country+regex": "japan",
             "#currency+code": "JPY",
+            "#date+start": "1974-01-01",
             "#geo+admin_level": "0",
             "#geo+lat": "37.63209801",
             "#geo+lon": "138.0812256",
+            "#indicator+incomelevel": "High",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "112",
@@ -177,30 +186,33 @@ class TestCountry:
         assert Country.get_country_info_from_iso2("ab") is None
         assert Country.get_country_info_from_iso2("TW") == {
             "#country+alt+i_ar+name+v_unterm": "",
-            "#country+alt+i_en+name+v_unterm": "Taiwan",
+            "#country+alt+i_en+name+v_unterm": "Taiwan (Province of China)",
             "#country+alt+i_es+name+v_unterm": "",
             "#country+alt+i_fr+name+v_unterm": "",
             "#country+alt+i_ru+name+v_unterm": "",
             "#country+alt+i_zh+name+v_unterm": "",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "Taiwan, Province of China",
             "#country+alt+name+v_hrinfo_country": "Taiwan, Province of China",
             "#country+alt+name+v_iso": "",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "China - Taiwan Province",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "158",
             "#country+code+v_fts": "219",
             "#country+code+v_hrinfo_country": "399",
             "#country+code+v_iso2": "TW",
             "#country+code+v_iso3": "TWN",
             "#country+code+v_reliefweb": "61",
+            "#country+formal+i_en+name+v_unterm": "",
             "#country+name+preferred": "Taiwan (Province of China)",
             "#country+name+short+v_reliefweb": "",
             "#country+regex": ".*taiwan|.*taipei|.*formosa|^(?!.*\\bdem)(?!.*\\bpe)(?!.*\\bdr)(^rep.*).*\\bchina.*(?!.*\\bdem.*)(?!\\bpe.*)(?!.*\\bdr.*).*|^ROC$|^taiwan r\\.?o\\.?c\\.?$",
             "#currency+code": "TWD",
+            "#date+start": "1974-01-01",
             "#geo+admin_level": "0",
             "#geo+lat": "23.74652012",
             "#geo+lon": "120.9621301",
+            "#indicator+incomelevel": "High",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "N",
             "#meta+id": "218",
@@ -219,26 +231,29 @@ class TestCountry:
             "#country+alt+i_fr+name+v_unterm": "État de Palestine (l')",
             "#country+alt+i_ru+name+v_unterm": "Государство Палестина",
             "#country+alt+i_zh+name+v_unterm": "巴勒斯坦国",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "occupied Palestinian territory",
             "#country+alt+name+v_hrinfo_country": "occupied Palestinian territory",
             "#country+alt+name+v_iso": "Palestine, State of",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "occupied Palestinian territory",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "275",
             "#country+code+v_fts": "171",
             "#country+code+v_hrinfo_country": "351",
             "#country+code+v_iso2": "PS",
             "#country+code+v_iso3": "PSE",
             "#country+code+v_reliefweb": "180",
+            "#country+formal+i_en+name+v_unterm": "the State of Palestine",
             "#country+name+override": "oPt",
             "#country+name+preferred": "State of Palestine",
             "#country+name+short+v_reliefweb": "oPt",
             "#country+regex": "palestin|\\bgaza|west.?bank",
             "#currency+code": "ILS",
+            "#date+start": "2013-02-06",
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
+            "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "170",
@@ -265,8 +280,8 @@ class TestCountry:
             == "Venezuela (Bolivarian Republic of)"
         )
         assert (
-            Country.get_country_name_from_iso2("VE", shortname=True)
-            == "Venezuela"
+            Country.get_country_name_from_iso2("VE", formal=True)
+            == "the Bolivarian Republic of Venezuela"
         )
         assert (
             Country.get_country_name_from_iso2("TW")
@@ -300,28 +315,31 @@ class TestCountry:
             "#country+alt+i_ar+name+v_unterm": "أفغانستان",
             "#country+alt+i_en+name+v_unterm": "Afghanistan",
             "#country+alt+i_es+name+v_unterm": "Afganistán (el)",
-            "#country+alt+i_fr+name+v_unterm": "Afghanistan (l') [masc.]",
+            "#country+alt+i_fr+name+v_unterm": "Afghanistan (l')",
             "#country+alt+i_ru+name+v_unterm": "Афганистан",
             "#country+alt+i_zh+name+v_unterm": "阿富汗",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "",
             "#country+alt+name+v_hrinfo_country": "",
             "#country+alt+name+v_iso": "",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "4",
             "#country+code+v_fts": "1",
             "#country+code+v_hrinfo_country": "181",
             "#country+code+v_iso2": "AF",
             "#country+code+v_iso3": "AFG",
             "#country+code+v_reliefweb": "13",
+            "#country+formal+i_en+name+v_unterm": "the Islamic Republic of Afghanistan",
             "#country+name+preferred": "Afghanistan",
             "#country+name+short+v_reliefweb": "",
             "#country+regex": "afghan",
             "#currency+code": "AFN",
+            "#date+start": "2004-01-26",
             "#geo+admin_level": "0",
             "#geo+lat": "33.83147477",
             "#geo+lon": "66.02621828",
+            "#indicator+incomelevel": "Low",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "1",
@@ -339,25 +357,28 @@ class TestCountry:
             "#country+alt+i_fr+name+v_unterm": "Samoa (le)",
             "#country+alt+i_ru+name+v_unterm": "Самоа",
             "#country+alt+i_zh+name+v_unterm": "萨摩亚",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "",
             "#country+alt+name+v_hrinfo_country": "",
             "#country+alt+name+v_iso": "",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "882",
             "#country+code+v_fts": "193",
             "#country+code+v_hrinfo_country": "373",
             "#country+code+v_iso2": "WS",
             "#country+code+v_iso3": "WSM",
             "#country+code+v_reliefweb": "204",
+            "#country+formal+i_en+name+v_unterm": "the Independent State of Samoa",
             "#country+name+preferred": "Samoa",
             "#country+name+short+v_reliefweb": "",
             "#country+regex": "^(?!.*amer.*)samoa|(\\bindep.*samoa)|^west.*samoa",
             "#currency+code": "WST",
+            "#date+start": "1998-02-05",
             "#geo+admin_level": "0",
             "#geo+lat": "-13.16992041",
             "#geo+lon": "-173.5139768",
+            "#indicator+incomelevel": "Lower middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "192",
@@ -375,26 +396,29 @@ class TestCountry:
             "#country+alt+i_fr+name+v_unterm": "État de Palestine (l')",
             "#country+alt+i_ru+name+v_unterm": "Государство Палестина",
             "#country+alt+i_zh+name+v_unterm": "巴勒斯坦国",
+            "#country+alt+name+v_dgacm": "",
             "#country+alt+name+v_fts": "occupied Palestinian territory",
             "#country+alt+name+v_hrinfo_country": "occupied Palestinian territory",
             "#country+alt+name+v_iso": "Palestine, State of",
             "#country+alt+name+v_m49": "",
             "#country+alt+name+v_reliefweb": "occupied Palestinian territory",
-            "#country+alt+name+v_unterm": "",
             "#country+code+num+v_m49": "275",
             "#country+code+v_fts": "171",
             "#country+code+v_hrinfo_country": "351",
             "#country+code+v_iso2": "PS",
             "#country+code+v_iso3": "PSE",
             "#country+code+v_reliefweb": "180",
+            "#country+formal+i_en+name+v_unterm": "the State of Palestine",
             "#country+name+override": "oPt",
             "#country+name+preferred": "State of Palestine",
             "#country+name+short+v_reliefweb": "oPt",
             "#country+regex": "palestin|\\bgaza|west.?bank",
             "#currency+code": "ILS",
+            "#date+start": "2013-02-06",
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
+            "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
             "#meta+id": "170",
@@ -413,7 +437,8 @@ class TestCountry:
     def test_get_country_name_from_m49(self):
         assert Country.get_country_name_from_m49(4) == "Afghanistan"
         assert (
-            Country.get_country_name_from_m49(158, shortname=True) == "Taiwan"
+            Country.get_country_name_from_m49(158, formal=True)
+            == "Taiwan (Province of China)"
         )
         assert Country.get_country_name_from_m49(882) == "Samoa"
         assert Country.get_country_name_from_m49(9999) is None
@@ -613,7 +638,7 @@ class TestCountry:
             "VGB",
             False,
         )
-        assert Country.get_iso3_country_code_fuzzy("Taiwan") == ("TWN", True)
+        assert Country.get_iso3_country_code_fuzzy("Taiwan") == ("TWN", False)
         assert Country.get_iso3_country_code_fuzzy("Taiwan*") == ("TWN", False)
         assert Country.get_iso3_country_code_fuzzy("Kosovo") == (None, False)
         assert Country.get_iso3_country_code_fuzzy("Kosovo*") == (None, False)
