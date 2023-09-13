@@ -14,6 +14,7 @@ class TestAdminLevel:
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
+        adminone.setup_from_admin_info(config["admin_info"])
         assert adminone.get_admin_level("YEM") == 1
         assert len(adminone.get_pcode_list()) == 433
         assert adminone.get_pcode_length("YEM") == 4
@@ -119,6 +120,7 @@ class TestAdminLevel:
 
     def test_adminlevel_fuzzy(self, config):
         adminone = AdminLevel(config)
+        adminone.setup_from_admin_info(config["admin_info"])
         assert adminone.get_pcode("YEM", "Al Dali", logname="test") == (
             "YE30",
             False,
