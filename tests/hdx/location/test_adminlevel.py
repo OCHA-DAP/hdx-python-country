@@ -2,6 +2,7 @@
 from os.path import join
 
 import pytest
+from hxl.input import HXLIOException
 
 from hdx.location.adminlevel import AdminLevel
 from hdx.utilities.loader import load_yaml
@@ -143,6 +144,8 @@ class TestAdminLevel:
 
     def test_adminlevel_with_url(self, config, url):
         adminone = AdminLevel(config)
+        with pytest.raises(HXLIOException):
+            adminone.setup_from_url("fake_url")
         adminone.setup_from_url(url)
         assert adminone.get_admin_level("YEM") == 1
         assert len(adminone.get_pcode_list()) == 2553

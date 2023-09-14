@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Tuple
 
 import hxl
 from hxl import InputOptions
+from hxl.input import HXLIOException
 from unidecode import unidecode
 
 from hdx.location.country import Country
@@ -90,10 +91,11 @@ class AdminLevel:
         """
         try:
             return hxl.data(admin_url, InputOptions(encoding="utf-8"))
-        except OSError:
+        except HXLIOException:
             logger.exception(
                 f"Setup of libhxl Dataset object with {admin_url} failed!"
             )
+            raise
 
     def setup_from_admin_info(self, admin_info: ListTuple[Dict]) -> None:
         """
@@ -128,25 +130,20 @@ class AdminLevel:
         Returns:
             None
         """
-        try:
-            admin_info = libhxl_dataset.with_rows(
-                f"#geo+admin_level={self.admin_level}"
-            )
-            for row in admin_info:
-                countryiso3 = row.get("#country+code")
-                pcode = row.get("#adm+code")
-                self.pcodes.append(pcode)
-                self.pcode_lengths[countryiso3] = len(pcode)
-                adm_name = row.get("#adm+name")
-                self.pcode_to_name[pcode] = adm_name
-                name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-                name_to_pcode[unidecode(adm_name).lower()] = pcode
-                self.name_to_pcode[countryiso3] = name_to_pcode
-                self.pcode_to_iso3[pcode] = countryiso3
-        except OSError:
-            logger.exception(
-                "Download of admin info from libhxl Dataset failed!"
-            )
+        admin_info = libhxl_dataset.with_rows(
+            f"#geo+admin_level={self.admin_level}"
+        )
+        for row in admin_info:
+            countryiso3 = row.get("#country+code")
+            pcode = row.get("#adm+code")
+            self.pcodes.append(pcode)
+            self.pcode_lengths[countryiso3] = len(pcode)
+            adm_name = row.get("#adm+name")
+            self.pcode_to_name[pcode] = adm_name
+            name_to_pcode = self.name_to_pcode.get(countryiso3, {})
+            name_to_pcode[unidecode(adm_name).lower()] = pcode
+            self.name_to_pcode[countryiso3] = name_to_pcode
+            self.pcode_to_iso3[pcode] = countryiso3
 
     def setup_from_url(self, admin_url: str = _admin_url) -> None:
         """
