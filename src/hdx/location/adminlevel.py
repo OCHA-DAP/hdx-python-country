@@ -36,8 +36,8 @@ class AdminLevel:
         admin_level_overrides (Dict): Countries at other admin levels.
     """
 
-    _admin_url_int = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
-    _admin_url = _admin_url_int
+    _admin_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
+    _admin_url = _admin_url_default
 
     def __init__(
         self,
@@ -74,7 +74,7 @@ class AdminLevel:
             None
         """
         if admin_url is None:
-            admin_url = cls._admin_url_int
+            admin_url = cls._admin_url_default
         cls._admin_url = admin_url
 
     @classmethod

@@ -69,8 +69,8 @@ class Country:
         "PROTECTORATE",
     ]
     _countriesdata = None
-    _ochaurl_int = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
-    _ochaurl = _ochaurl_int
+    _ochaurl_default = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
+    _ochaurl = _ochaurl_default
     _country_name_overrides = dict()
     _country_name_mappings = dict()
 
@@ -257,7 +257,7 @@ class Country:
             None
         """
         if url is None:
-            url = cls._ochaurl_int
+            url = cls._ochaurl_default
         cls._ochaurl = url
 
     @classmethod
