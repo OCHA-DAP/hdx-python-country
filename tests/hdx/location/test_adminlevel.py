@@ -146,7 +146,11 @@ class TestAdminLevel:
         adminone = AdminLevel(config)
         with pytest.raises(HXLIOException):
             adminone.setup_from_url("fake_url")
-        adminone.setup_from_url(url)
+        AdminLevel.set_default_admin_url()
+        assert AdminLevel._admin_url == AdminLevel._admin_url_int
+        AdminLevel.set_default_admin_url(url)
+        assert AdminLevel._admin_url == url
+        adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
         assert len(adminone.get_pcode_list()) == 2553
         assert adminone.get_pcode_length("YEM") == 4
