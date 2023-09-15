@@ -42,7 +42,7 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top. 
 
 ## Breaking Changes
-From 3.5.4, after creating an Adminlevel, call either setup_from_admin_info,
+From 3.5.5, after creating an Adminlevel, call either setup_from_admin_info,
 setup_from_libhxl_dataset or setup_from_url.
 
 From 3.4.6, Python 3.7 no longer supported
