@@ -69,8 +69,8 @@ class Country:
         "PROTECTORATE",
     ]
     _countriesdata = None
-    _ochaurl_int = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
-    _ochaurl = _ochaurl_int
+    _ochaurl_default = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
+    _ochaurl = _ochaurl_default
     _country_name_overrides = dict()
     _country_name_mappings = dict()
 
@@ -246,18 +246,18 @@ class Country:
         return cls._countriesdata
 
     @classmethod
-    def set_ocha_url(cls, url: str = None) -> None:
+    def set_ocha_url(cls, url: Optional[str] = None) -> None:
         """
-        Set World Bank url from which to retrieve countries data
+        Set OCHA url from which to retrieve countries data
 
         Args:
-            url (str): World Bank url from which to retrieve countries data. Defaults to internal value.
+            url (Optional[str]): OCHA url from which to retrieve countries data. Defaults to internal value.
 
         Returns:
             None
         """
         if url is None:
-            url = cls._ochaurl_int
+            url = cls._ochaurl_default
         cls._ochaurl = url
 
     @classmethod
