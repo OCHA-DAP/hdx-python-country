@@ -22,12 +22,12 @@ class CurrencyError(Exception):
 
 class Currency:
     """Currency class for performing currency conversion. Uses Yahoo, falling back on
-    exchangerate.host for current rates and Yahoo falling back on IMF for historic
+    https://github.com/fawazahmed0/currency-api for current rates and Yahoo falling back on IMF for historic
     rates. Note that rate calls are cached.
     """
 
     _primary_rates_url = "https://query2.finance.yahoo.com/v8/finance/chart/{currency}=X?period1={date}&period2={date}&interval=1d&events=div%2Csplit&formatted=false&lang=en-US&region=US&corsDomain=finance.yahoo.com"
-    _secondary_rates_url = "https://api.exchangerate.host/latest?base=usd"
+    _secondary_rates_url = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/usd.min.json"
     _secondary_historic_url = (
         "https://codeforiati.org/imf-exchangerates/imf_exchangerates.csv"
     )
@@ -77,7 +77,7 @@ class Currency:
         Args:
             retriever (Optional[Retrieve]): Retrieve object to use for downloading. Defaults to None (generate a new one).
             primary_rates_url (str): Primary rates url to use. Defaults to Yahoo API.
-            secondary_rates_url (str): Current rates url to use. Defaults to exchangerate.host.
+            secondary_rates_url (str): Current rates url to use. Defaults to currency-api.
             secondary_historic_url (str): Historic rates url to use. Defaults to IMF (via IATI).
             fallback_historic_to_current (bool): If historic unavailable, fallback to current. Defaults to False.
             fallback_current_to_static (bool): Use static file as final fallback. Defaults to False.
@@ -113,7 +113,7 @@ class Currency:
                 "secondary current exchange rates",
                 fallback_current_to_static,
             )
-            cls._secondary_rates = secondary_rates["rates"]
+            cls._secondary_rates = secondary_rates["usd"]
         except (DownloadError, OSError):
             logger.exception("Error getting secondary current rates!")
             cls._secondary_rates = "FAIL"
@@ -222,7 +222,7 @@ class Currency:
             Currency.setup()
         if cls._secondary_rates == "FAIL":
             return None
-        return cls._secondary_rates.get(currency)
+        return cls._secondary_rates.get(currency.lower())
 
     @classmethod
     def get_current_rate(cls, currency: str) -> float:

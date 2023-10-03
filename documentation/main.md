@@ -1,8 +1,8 @@
 # Summary
 
-The HDX Python Country Library provides utilities to map between country and region 
+The HDX Python Country Library provides utilities to map between country and region
 codes and names and to match administrative level names from different sources.
-It also provides utilities for foreign exchange enabling obtaining current and historic 
+It also provides utilities for foreign exchange enabling obtaining current and historic
 FX rates for different currencies.
 
 # Contents
@@ -14,32 +14,32 @@ FX rates for different currencies.
 
 # Information
 
-The library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166) 
-and regions using live official data from the [UN OCHA](https://vocabulary.unocha.org/) 
-feed with fallbacks to an internal static file if there is any problem with retrieving 
+The library provides country mappings including ISO 2 and ISO 3 letter codes (ISO 3166)
+and regions using live official data from the [UN OCHA](https://vocabulary.unocha.org/)
+feed with fallbacks to an internal static file if there is any problem with retrieving
 data from the url. (Also it is possible to force the use of the internal static files.)
 The UN OCHA feed has regex taken from
 [here](https://github.com/konstantinstadler/country_converter/blob/master/country_converter/country_data.tsv).
 with improvements contributed back.
 
-It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a 
-fuzzy matching for English look up that can handle abbreviations in country names like 
+It can exact match English, French, Spanish, Russian, Chinese and Arabic. There is a
+fuzzy matching for English look up that can handle abbreviations in country names like
 Dem. for Democratic and Rep. for Republic.
 
-Mapping administration level names from a source to a given base set is also handled 
-including phonetic fuzzy name matching.  
+Mapping administration level names from a source to a given base set is also handled
+including phonetic fuzzy name matching.
 
-It also provides foreign exchange rates and conversion from amounts in local currency to 
-USD and vice-versa. The conversion relies on Yahoo Finance, falling back on 
-exchangerate.host for current rates, and Yahoo Finance falling back on IMF data via IATI 
-for historic rates. 
+It also provides foreign exchange rates and conversion from amounts in local currency to
+USD and vice-versa. The conversion relies on Yahoo Finance, falling back on
+https://github.com/fawazahmed0/currency-api for current rates, and Yahoo Finance falling back on IMF data via IATI
+for historic rates.
 
-This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/) 
-(HDX) project. If you have humanitarian related data, please upload your datasets to 
+This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/)
+(HDX) project. If you have humanitarian related data, please upload your datasets to
 HDX.
 
 The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-country).
-The library has detailed API documentation which can be found in the menu at the top. 
+The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
 From 3.5.5, after creating an Adminlevel, call either setup_from_admin_info,
@@ -51,10 +51,10 @@ From 3.3.2, major update to foreign exchange code and use of new Yahoo data sour
 
 From 3.0.0, only supports Python >= 3.6
 
-Version 2.x.x of the library is a significant change from version 1.x.x which sourced 
-its data from different feeds (UN Stats and the World Bank). Consequently, although 
-most of the api calls work the same way in 2.x.x, the ones that return full country 
-information do so in a different format to 1.x.x. The format they use is a dictionary 
+Version 2.x.x of the library is a significant change from version 1.x.x which sourced
+its data from different feeds (UN Stats and the World Bank). Consequently, although
+most of the api calls work the same way in 2.x.x, the ones that return full country
+information do so in a different format to 1.x.x. The format they use is a dictionary
 using [Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags as keys.
 
 # Description of Utilities
@@ -64,7 +64,7 @@ using [Humanitarian Exchange Language](https://hxlstandard.org/) (HXL) hashtags 
 The usage of the country mappings functionality is best illustrated by some examples:
 
     from hdx.location.country import Country
-    
+
     Country.countriesdata(use_live=False, country_name_overrides={"PSE": "oPt"})
     # Set up using non live data from repo rather and override default country name
     # (Leaving out this step will use live data and no overrides)
@@ -76,12 +76,12 @@ The usage of the country mappings functionality is best illustrated by some exam
     Country.get_country_name_from_iso2("Pl")  # returns "Poland"
     Country.get_iso3_country_code("UZBEKISTAN")  # returns "UZB"
     Country.get_country_name_from_m49(4)  # returns "Afghanistan"
-    
+
     Country.get_iso3_country_code_fuzzy("Sierra")
     # performs fuzzy match and returns ("SLE", False). The False indicates a fuzzy rather than exact match.
     assert Country.get_iso3_country_code_fuzzy("Czech Rep.")
     # returns ("CZE", False)
-    
+
     Country.get_country_info_from_iso2("jp")
     # Returns dictionary with HXL hashtags as keys. For more on HXL, see http://hxlstandard.org/
     # {"#country+alt+i_ar+name+v_unterm": "اليابان", "#country+alt+i_en+name+v_unterm": "Japan",
@@ -108,8 +108,8 @@ The usage of the country mappings functionality is best illustrated by some exam
 
 ## Administration Level
 
-The administration level mappings takes input configuration dictionary, 
-*admin_config*, which defaults to an empty dictionary.  
+The administration level mappings takes input configuration dictionary,
+*admin_config*, which defaults to an empty dictionary.
 
 *admin_config* can have the following optional keys:
 
@@ -118,17 +118,17 @@ The administration level mappings takes input configuration dictionary,
 *admin_name_replacements* is a dictionary of textual replacements to try when fuzzy matching
 *admin_fuzzy_dont* is a list of names for which fuzzy matching should not be tried
 
-Once an AdminLevel object is constructed, one of three setup methods must be 
-called: *setup_from_admin_info*, *setup_from_libhxl_dataset* or 
+Once an AdminLevel object is constructed, one of three setup methods must be
+called: *setup_from_admin_info*, *setup_from_libhxl_dataset* or
 *setup_from_url*.
 
-Method *setup_from_admin_info* takes key *admin_info* which is a list with 
+Method *setup_from_admin_info* takes key *admin_info* which is a list with
 values of the form:
 
     {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
 
 Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
-*setup_from_url* takes a URL which defaults to the global p-codes dataset on 
+*setup_from_url* takes a URL which defaults to the global p-codes dataset on
 HDX.
 
 Examples of usage:
@@ -141,8 +141,8 @@ Examples of usage:
 
 ## Currencies
 
-Various functions support the conversion of monetary amounts to USD. Note that the 
-returned values are cached to reduce network usage which means that the library is 
+Various functions support the conversion of monetary amounts to USD. Note that the
+returned values are cached to reduce network usage which means that the library is
 unsuited for use where rates are expected to update while the program is running:
 
     Currency.setup(fallback_historic_to_current=True, fallback_current_to_static=True, log_level=logging.INFO)
@@ -159,13 +159,13 @@ unsuited for use where rates are expected to update while the program is running
     Currency.get_historic_value_in_usd(10, "USD", date)  # returns 10
     Currency.get_historic_value_in_usd(10, "gbp", date)  # returns 13.002210200027791
     Currency.get_historic_value_in_currency(10, "gbp", date)  # returns 7.735000252723694
-    Currency.get_historic_rate("gbp", parse_date("2020-02-20 00:00:00 NZST", 
+    Currency.get_historic_rate("gbp", parse_date("2020-02-20 00:00:00 NZST",
                                timezone_handling=2), ignore_timeinfo=False)
     # == 0.76910001039505
- 
-Historic rates can be made to fall back to current rates if desired (this is not the 
-default). It is possible to pass in a Retrieve object to Currency.setup() to allow the 
-downloaded files from the secondary sources to be saved or previously downloaded files 
-to be reused and to allow fallbacks from current rates to a static file eg. 
+
+Historic rates can be made to fall back to current rates if desired (this is not the
+default). It is possible to pass in a Retrieve object to Currency.setup() to allow the
+downloaded files from the secondary sources to be saved or previously downloaded files
+to be reused and to allow fallbacks from current rates to a static file eg.
 
     Currency.setup(retriever, ..., fallback_historic_to_current=True, fallback_current_to_static=True)

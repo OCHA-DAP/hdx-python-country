@@ -73,11 +73,11 @@ class TestCurrency:
             no_historic=True,
         )
         assert (
-            Currency.get_current_value_in_usd(10, "gbp") == 13.844298710126688
+            Currency.get_current_value_in_usd(10, "gbp") == 12.076629158709528
         )
         assert (
             Currency.get_current_value_in_currency(10, "gbp")
-            == 7.223190000000001
+            == 8.280456299999999
         )
         with pytest.raises(CurrencyError):
             Currency.get_current_value_in_usd(10, "XYZ")
@@ -89,7 +89,7 @@ class TestCurrency:
             secondary_rates_url=secondary_rates_url,
         )
         xdrrate = Currency.get_current_value_in_usd(10, "xdr")
-        assert xdrrate == 14.35012585060371
+        assert xdrrate == 13.075473660667791
         with pytest.raises(CurrencyError):
             Currency.setup(
                 retriever=retriever,
@@ -151,7 +151,7 @@ class TestCurrency:
         assert Currency.get_current_value_in_currency(10, "usd") == 10
         assert Currency.get_current_rate("gbp") == 0.7735000252723694
         # falls back to secondary current rates
-        assert Currency.get_current_rate("xdr") == 0.696858
+        assert Currency.get_current_rate("xdr") == 0.76479065
 
     def test_get_historic_value_in_usd(
         self, retrievers, secondary_historic_url
@@ -212,7 +212,7 @@ class TestCurrency:
         )
         assert (
             Currency.get_historic_value_in_usd(10, "gbp", date)
-            == 13.844298710126688
+            == 12.076629158709528
         )
         Currency.setup(
             retriever=retriever,
