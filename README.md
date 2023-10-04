@@ -23,8 +23,8 @@ including phonetic fuzzy name matching.
 
 It also provides foreign exchange rates and conversion from amounts in local currency to
 USD and vice-versa. The conversion relies on Yahoo Finance, falling back on
-https://github.com/fawazahmed0/currency-api for current rates, and Yahoo Finance falling back on IMF data via IATI
-for historic rates.
+[currency-api](https://github.com/fawazahmed0/currency-api) for current rates,
+and Yahoo Finance falling back on IMF data via IATI for historic rates.
 
 For more information, please read the [documentation](https://hdx-python-country.readthedocs.io/en/latest/).
 

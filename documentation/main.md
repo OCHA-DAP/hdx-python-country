@@ -31,8 +31,8 @@ including phonetic fuzzy name matching.
 
 It also provides foreign exchange rates and conversion from amounts in local currency to
 USD and vice-versa. The conversion relies on Yahoo Finance, falling back on
-https://github.com/fawazahmed0/currency-api for current rates, and Yahoo Finance falling back on IMF data via IATI
-for historic rates.
+[currency-api](https://github.com/fawazahmed0/currency-api) for current rates,
+and Yahoo Finance falling back on IMF data via IATI for historic rates.
 
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/)
 (HDX) project. If you have humanitarian related data, please upload your datasets to
