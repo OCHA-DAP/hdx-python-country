@@ -19,6 +19,11 @@ class TestAdminLevel:
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
+        adminone.setup_from_admin_info(
+            config["admin_info"], countryiso3s=("yem",)
+        )
+        assert len(adminone.get_pcode_list()) == 22
+        adminone = AdminLevel(config)
         adminone.setup_from_admin_info(config["admin_info"])
         assert adminone.get_admin_level("YEM") == 1
         assert len(adminone.get_pcode_list()) == 433
@@ -150,6 +155,9 @@ class TestAdminLevel:
         assert AdminLevel._admin_url == AdminLevel._admin_url_default
         AdminLevel.set_default_admin_url(url)
         assert AdminLevel._admin_url == url
+        adminone.setup_from_url(countryiso3s=("YEM",))
+        assert len(adminone.get_pcode_list()) == 22
+        adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
         assert len(adminone.get_pcode_list()) == 2553
