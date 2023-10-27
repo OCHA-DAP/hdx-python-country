@@ -131,10 +131,13 @@ Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
 *setup_from_url* takes a URL which defaults to the global p-codes dataset on
 HDX.
 
+These methods also have optional parameter *countryiso3s* which is a tuple or
+list of country ISO3 codes to be read or None if all countries are desired.
+
 Examples of usage:
 
     adminlevel = AdminLevel(config)
-    adminlevel.setup_from_admin_info(admin_info)
+    adminlevel.setup_from_admin_info(admin_info, countryiso3s=("YEM",))
     adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع")  # returns ("YE30", False)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", fuzzy_match=False)  # returns (None, True)

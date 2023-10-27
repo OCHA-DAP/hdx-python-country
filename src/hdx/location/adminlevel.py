@@ -97,20 +97,31 @@ class AdminLevel:
             )
             raise
 
-    def setup_from_admin_info(self, admin_info: ListTuple[Dict]) -> None:
+    def setup_from_admin_info(
+        self,
+        admin_info: ListTuple[Dict],
+        countryiso3s: Optional[ListTuple[str]] = None,
+    ) -> None:
         """
         Setup p-codes from admin_info which is a list with values of the form:
         ::
             {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
         Args:
             admin_info (ListTuple[Dict]): p-code dictionary
+            countryiso3s (Optional[ListTuple[str]]): Countries to read. Defaults to None (all).
 
         Returns:
             None
         """
+        if countryiso3s:
+            countryiso3s = [
+                countryiso3.upper() for countryiso3 in countryiso3s
+            ]
         for row in admin_info:
-            countryiso3 = row["iso3"]
-            pcode = row.get("pcode")
+            countryiso3 = row["iso3"].upper()
+            if countryiso3s and countryiso3 not in countryiso3s:
+                continue
+            pcode = row.get("pcode").upper()
             self.pcodes.append(pcode)
             self.pcode_lengths[countryiso3] = len(pcode)
             adm_name = row["name"]
@@ -120,12 +131,17 @@ class AdminLevel:
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
 
-    def setup_from_libhxl_dataset(self, libhxl_dataset: hxl.Dataset) -> None:
+    def setup_from_libhxl_dataset(
+        self,
+        libhxl_dataset: hxl.Dataset,
+        countryiso3s: Optional[ListTuple[str]] = None,
+    ) -> None:
         """
         Setup p-codes from a libhxl Dataset object.
 
         Args:
             libhxl_dataset (hxl.Dataset): Dataset object from libhxl library
+            countryiso3s (Optional[ListTuple[str]]): Countries to read. Defaults to None (all).
 
         Returns:
             None
@@ -133,9 +149,15 @@ class AdminLevel:
         admin_info = libhxl_dataset.with_rows(
             f"#geo+admin_level={self.admin_level}"
         )
+        if countryiso3s:
+            countryiso3s = [
+                countryiso3.upper() for countryiso3 in countryiso3s
+            ]
         for row in admin_info:
-            countryiso3 = row.get("#country+code")
-            pcode = row.get("#adm+code")
+            countryiso3 = row.get("#country+code").upper()
+            if countryiso3s and countryiso3 not in countryiso3s:
+                continue
+            pcode = row.get("#adm+code").upper()
             self.pcodes.append(pcode)
             self.pcode_lengths[countryiso3] = len(pcode)
             adm_name = row.get("#adm+name")
@@ -145,18 +167,23 @@ class AdminLevel:
             self.name_to_pcode[countryiso3] = name_to_pcode
             self.pcode_to_iso3[pcode] = countryiso3
 
-    def setup_from_url(self, admin_url: str = _admin_url) -> None:
+    def setup_from_url(
+        self,
+        admin_url: str = _admin_url,
+        countryiso3s: Optional[ListTuple[str]] = None,
+    ) -> None:
         """
         Setup p-codes from a URL. Defaults to global p-codes dataset on HDX.
 
         Args:
             admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
+            countryiso3s (Optional[ListTuple[str]]): Countries to read. Defaults to None (all).
 
         Returns:
             None
         """
         admin_info = self.get_libhxl_dataset(admin_url)
-        self.setup_from_libhxl_dataset(admin_info)
+        self.setup_from_libhxl_dataset(admin_info, countryiso3s)
 
     def get_pcode_list(self) -> List[str]:
         """Get list of all pcodes
