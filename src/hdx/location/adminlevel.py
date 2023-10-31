@@ -368,7 +368,7 @@ class AdminLevel:
                     else:
                         admin_changes.append(str(admin_no))
             elif len_new_pcode > total_length:
-                if admin_length <= 2 and pcode_parts[admin_no][0] == "0":
+                if admin_length <= 2 and pcode_part[0] == "0":
                     pcode_part = pcode_part[1:]
                     if self.parent_admins and admin_no < self.admin_level:
                         parent_pcode = [
