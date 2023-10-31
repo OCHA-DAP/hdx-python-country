@@ -264,11 +264,12 @@ class AdminLevel:
     def convert_admin_pcode_length(
         self, countryiso3: str, pcode: str, logname: Optional[str] = None
     ) -> Optional[str]:
-        """Standardise pcode length by country and match to an internal pcode
+        """Standardise pcode length by country and match to an internal pcode.
+        Requires that p-code formats be loaded (eg. using load_pcode_formats)
 
         Args:
-            countryiso3 (str): Iso3 country code
-            pcode (str): P code for admin one
+            countryiso3 (str): ISO3 country code
+            pcode (str): P code to match
             logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
 
         Returns:
@@ -350,12 +351,12 @@ class AdminLevel:
     def convert_admin1_pcode_length(
         self, countryiso3: str, pcode: str, logname: Optional[str] = None
     ) -> Optional[str]:
-        """Standardise pcode length by country and match to an internal pcode. Only
-        works for admin1 pcodes.
+        """Standardise pcode length by country and match to an internal pcode.
+        Only works for admin1 pcodes.
 
         Args:
-            countryiso3 (str): Iso3 country code
-            pcode (str): P code for admin one
+            countryiso3 (str): ISO3 country code
+            pcode (str): P code for admin one to match
             logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
 
         Returns:
