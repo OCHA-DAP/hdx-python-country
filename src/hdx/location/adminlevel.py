@@ -349,6 +349,12 @@ class AdminLevel:
                     admin_changes.append(str(admin_no))
                     new_pcode = "".join(pcode_parts)
                 break
+            elif part_length > admin_length and admin_no == self.admin_level:
+                if pcode_part[0] == "0":
+                    pcode_parts[admin_no] = pcode_part[1:]
+                    admin_changes.append(str(admin_no))
+                    new_pcode = "".join(pcode_parts)
+                    break
             if len_new_pcode < total_length:
                 if admin_length > 2 and pos in self.zeroes[countryiso3]:
                     pcode_part = f"0{pcode_part}"

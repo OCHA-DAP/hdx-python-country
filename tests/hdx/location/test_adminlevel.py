@@ -392,6 +392,35 @@ class TestAdminLevel:
             None,
             True,
         )
+
+        assert admintwo.get_pcode(
+            "DZA", "DZ009009", logname="test", fuzzy_match=False
+        ) == (
+            "DZ009009",
+            True,
+        )
+        assert admintwo.get_pcode(
+            "DZA", "DZ0090009", logname="test", fuzzy_match=False
+        ) == (
+            "DZ009009",
+            True,
+        )
+
+        assert admintwo.get_pcode(
+            "COL", "CO08849", logname="test", fuzzy_match=False
+        ) == (
+            "CO08849",
+            True,
+        )
+        # Algorithm removes 0 to make CO80849 and hence fails (it has no
+        # knowledge that CO80 is an invalid admin 1)
+        assert admintwo.get_pcode(
+            "COL", "CO080849", logname="test", fuzzy_match=False
+        ) == (
+            None,
+            True,
+        )
+
         admintwo.set_parent_admins_from_adminlevels([adminone])
         # The lookup in admin1 reveals that adding a 0 prefix to the admin1
         # is not a valid admin1 (NER000) so the algorithm tries adding
@@ -400,9 +429,24 @@ class TestAdminLevel:
             "NER004009",
             True,
         )
+        # The lookup in admin1 reveals that removing the 0 prefix from the
+        # admin1 is not a valid admin1 (CO80849) so the algorithm tries
+        # removing the 0 prefix at the admin2 level instead and hence succeeds
+        assert admintwo.get_pcode(
+            "COL", "CO080849", logname="test", fuzzy_match=False
+        ) == (
+            "CO08849",
+            True,
+        )
 
         admintwo.set_parent_admins([adminone.pcodes])
         assert admintwo.get_pcode("NER", "NE00409", logname="test") == (
             "NER004009",
+            True,
+        )
+        assert admintwo.get_pcode(
+            "COL", "CO080849", logname="test", fuzzy_match=False
+        ) == (
+            "CO08849",
             True,
         )
