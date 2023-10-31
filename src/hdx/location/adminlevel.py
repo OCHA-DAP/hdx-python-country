@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Dict, List, Optional, Tuple
 
 import hxl
@@ -9,6 +10,7 @@ from unidecode import unidecode
 from hdx.location.country import Country
 from hdx.location.names import clean_name
 from hdx.location.phonetics import Phonetics
+from hdx.utilities.dictandlist import dict_of_sets_add
 from hdx.utilities.text import multiple_replace
 from hdx.utilities.typehint import ListTuple
 
@@ -38,6 +40,9 @@ class AdminLevel:
 
     _admin_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
     _admin_url = _admin_url_default
+    _formats_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f1161807-dab4-4331-b7b0-4e5dac56e0e4/download/global_pcode_lengths.csv"
+    _formats_url = _formats_url_default
+    letters_regex = re.compile(r"^[^\d]*")
 
     def __init__(
         self,
@@ -58,6 +63,8 @@ class AdminLevel:
         self.name_to_pcode = {}
         self.pcode_to_name = {}
         self.pcode_to_iso3 = {}
+        self.pcode_formats = {}
+        self.zeroes = {}
 
         self.init_matches_errors()
         self.phonetics = Phonetics()
@@ -185,6 +192,31 @@ class AdminLevel:
         admin_info = self.get_libhxl_dataset(admin_url)
         self.setup_from_libhxl_dataset(admin_info, countryiso3s)
 
+    def load_pcode_formats(self, formats_url: str = _formats_url) -> None:
+        """
+        Load p-code formats from a URL. Defaults to global p-codes dataset on HDX.
+
+        Args:
+            formats_url (str): URL from which to load data. Defaults to global p-codes dataset.
+
+        Returns:
+            None
+        """
+        formats_info = self.get_libhxl_dataset(formats_url)
+        for row in formats_info:
+            pcode_format = [int(row.get("#country+len"))]
+            for admin_no in range(1, 4):
+                length = row.get(f"#adm{admin_no}+len")
+                if not length or "|" in length:
+                    break
+                pcode_format.append(int(length))
+            self.pcode_formats[row.get("#country+code")] = pcode_format
+
+        for pcode in self.pcodes:
+            countryiso3 = self.pcode_to_iso3[pcode]
+            for x in re.finditer("0", pcode):
+                dict_of_sets_add(self.zeroes, countryiso3, x.start())
+
     def get_pcode_list(self) -> List[str]:
         """Get list of all pcodes
 
@@ -228,6 +260,92 @@ class AdminLevel:
         self.matches = set()
         self.ignored = set()
         self.errors = set()
+
+    def convert_admin_pcode_length(
+        self, countryiso3: str, pcode: str, logname: Optional[str] = None
+    ) -> Optional[str]:
+        """Standardise pcode length by country and match to an internal pcode
+
+        Args:
+            countryiso3 (str): Iso3 country code
+            pcode (str): P code for admin one
+            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
+
+        Returns:
+            Optional[str]: Matched P code or None if no match
+        """
+        pcode_format = self.pcode_formats.get(countryiso3)
+        if not pcode_format:
+            if self.get_admin_level(countryiso3) == 1:
+                return self.convert_admin1_pcode_length(
+                    countryiso3, pcode, logname
+                )
+            return None
+        countryiso = self.letters_regex.match(pcode).group()
+        countryiso_length = len(countryiso)
+        if countryiso_length > pcode_format[0]:
+            countryiso2 = Country.get_iso2_from_iso3(countryiso3)
+            pcode_parts = [countryiso2, pcode[3:]]
+        elif countryiso_length < pcode_format[0]:
+            pcode_parts = [countryiso3, pcode[2:]]
+        else:
+            pcode_parts = [countryiso, pcode[countryiso_length:]]
+        new_pcode = "".join(pcode_parts)
+        if new_pcode in self.pcodes:
+            if logname:
+                self.matches.add(
+                    (
+                        logname,
+                        countryiso3,
+                        new_pcode,
+                        self.pcode_to_name[new_pcode],
+                        "pcode length conversion-country",
+                    )
+                )
+            return new_pcode
+        total_length = sum(pcode_format[: self.admin_level + 1])
+        admin_changes = []
+        for admin_no in range(1, self.admin_level + 1):
+            len_new_pcode = len(new_pcode)
+            if len_new_pcode == total_length:
+                break
+            admin_length = pcode_format[admin_no]
+            pcode_part = pcode_parts[admin_no]
+            part_length = len(pcode_part)
+            if part_length == admin_length:
+                break
+            pos = sum(pcode_format[:admin_no])
+            if part_length < admin_length:
+                if pos in self.zeroes[countryiso3]:
+                    pcode_parts[admin_no] = f"0{pcode_part}"
+                    admin_changes.append(str(admin_no))
+                    new_pcode = "".join(pcode_parts)
+                break
+            if len_new_pcode < total_length:
+                if pos in self.zeroes[countryiso3]:
+                    pcode_part = f"0{pcode_part}"
+                admin_changes.append(str(admin_no))
+            elif len_new_pcode > total_length:
+                if admin_length == 2 and pcode_parts[admin_no][0] == "0":
+                    pcode_part = pcode_part[1:]
+                    admin_changes.append(str(admin_no))
+            pcode_parts[admin_no] = pcode_part[:admin_length]
+            pcode_parts.append(pcode_part[admin_length:])
+            new_pcode = "".join(pcode_parts)
+        if new_pcode in self.pcodes:
+            if logname:
+                admin_changes_str = ",".join(admin_changes)
+                self.matches.add(
+                    (
+                        logname,
+                        countryiso3,
+                        new_pcode,
+                        self.pcode_to_name[new_pcode],
+                        f"pcode length conversion-admins {admin_changes_str}",
+                    )
+                )
+            return new_pcode
+        return None
 
     def convert_admin1_pcode_length(
         self, countryiso3: str, pcode: str, logname: Optional[str] = None
@@ -416,12 +534,9 @@ class AdminLevel:
                 return pcode, True
         if name in self.pcodes:  # name is a pcode
             return name, True
-        if self.get_admin_level(countryiso3) == 1:
-            pcode = self.convert_admin1_pcode_length(
-                countryiso3, name, logname
-            )
-            if pcode:
-                return pcode, True
+        pcode = self.convert_admin_pcode_length(countryiso3, name, logname)
+        if pcode:
+            return pcode, True
         if not fuzzy_match:
             return None, True
         pcode = self.fuzzy_pcode(countryiso3, name, logname)

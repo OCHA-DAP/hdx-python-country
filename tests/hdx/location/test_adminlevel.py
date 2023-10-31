@@ -15,7 +15,11 @@ class TestAdminLevel:
 
     @pytest.fixture(scope="function")
     def url(self):
-        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/admin_dataset/tests/fixtures/global_pcodes_adm_1_2.csv"
+        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/main/tests/fixtures/global_pcodes_adm_1_2.csv"
+
+    @pytest.fixture(scope="function")
+    def formats_url(self):
+        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/pcode_formats/tests/fixtures/global_pcode_lengths.csv"
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
@@ -160,7 +164,7 @@ class TestAdminLevel:
         adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
-        assert len(adminone.get_pcode_list()) == 2553
+        assert len(adminone.get_pcode_list()) == 2552
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (
             "YE30",
@@ -262,3 +266,130 @@ class TestAdminLevel:
             "test - Could not find ABC in map names!",
             "test - NER: Could not find ABCDEFGH in map names!",
         ]
+
+    def test_adminlevel_pcode_formats(self, config, url, formats_url):
+        adminone = AdminLevel(config)
+        adminone.setup_from_url(admin_url=url)
+        adminone.load_pcode_formats(formats_url=formats_url)
+        assert adminone.get_pcode("YEM", "YE30", logname="test") == (
+            "YE30",
+            True,
+        )
+        assert adminone.get_pcode("YEM", "YEM30", logname="test") == (
+            "YE30",
+            True,
+        )
+        assert adminone.get_pcode("YEM", "YEM030", logname="test") == (
+            "YE30",
+            True,
+        )
+        assert adminone.get_pcode("NGA", "NG015", logname="test") == (
+            "NG015",
+            True,
+        )
+        assert adminone.get_pcode("NGA", "NG15", logname="test") == (
+            "NG015",
+            True,
+        )
+        assert adminone.get_pcode("NGA", "NGA015", logname="test") == (
+            "NG015",
+            True,
+        )
+        assert adminone.get_pcode("NER", "NER004", logname="test") == (
+            "NER004",
+            True,
+        )
+        assert adminone.get_pcode("NER", "NE04", logname="test") == (
+            "NER004",
+            True,
+        )
+        assert adminone.get_pcode("NER", "NE004", logname="test") == (
+            "NER004",
+            True,
+        )
+        assert adminone.get_pcode("ABC", "NE004", logname="test") == (
+            None,
+            False,
+        )
+
+        admintwo = AdminLevel(config, admin_level=2)
+        admintwo.setup_from_url(admin_url=url)
+        admintwo.load_pcode_formats(formats_url=formats_url)
+        assert admintwo.get_pcode("YEM", "YE3001", logname="test") == (
+            "YE3001",
+            True,
+        )
+        assert admintwo.get_pcode("YEM", "YEM3001", logname="test") == (
+            "YE3001",
+            True,
+        )
+        assert admintwo.get_pcode("YEM", "YEM03001", logname="test") == (
+            "YE3001",
+            True,
+        )
+        assert admintwo.get_pcode("YEM", "YE301", logname="test") == (
+            "YE3001",
+            True,
+        )
+        assert admintwo.get_pcode("YEM", "YEM30001", logname="test") == (
+            "YE3001",
+            True,
+        )
+        assert admintwo.get_pcode("YEM", "YEM030001", logname="test") == (
+            "YE3001",
+            True,
+        )
+        assert admintwo.get_pcode("NGA", "NG015001", logname="test") == (
+            "NG015001",
+            True,
+        )
+        assert admintwo.get_pcode("NGA", "NG15001", logname="test") == (
+            "NG015001",
+            True,
+        )
+        assert admintwo.get_pcode("NGA", "NGA015001", logname="test") == (
+            "NG015001",
+            True,
+        )
+        assert admintwo.get_pcode("NGA", "NG1501", logname="test") == (
+            "NG015001",
+            True,
+        )
+        # Algorithm inserts 0 to make NG001501 and hence fails (NG001 is in any
+        # case a valid admin 1)
+        assert admintwo.get_pcode(
+            "NGA", "NG01501", logname="test", fuzzy_match=False
+        ) == (
+            None,
+            True,
+        )
+        # Algorithm can only insert one zero per admin level right now
+        assert admintwo.get_pcode(
+            "NGA", "NG0151", logname="test", fuzzy_match=False
+        ) == (
+            None,
+            True,
+        )
+        assert admintwo.get_pcode(
+            "NGA", "NG151", logname="test", fuzzy_match=False
+        ) == (
+            None,
+            True,
+        )
+        assert admintwo.get_pcode("NER", "NER004009", logname="test") == (
+            "NER004009",
+            True,
+        )
+        assert admintwo.get_pcode("NER", "NE04009", logname="test") == (
+            "NER004009",
+            True,
+        )
+        # Algorithm inserts 0 to make NER000409 and hence fails (it has no
+        # knowledge that NER000 is an invalid admin 1 and could consider
+        # adding this knowledge if it proves necessary)
+        assert admintwo.get_pcode(
+            "NER", "NE00409", logname="test", fuzzy_match=False
+        ) == (
+            None,
+            True,
+        )
