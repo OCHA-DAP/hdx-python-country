@@ -314,6 +314,13 @@ class TestAdminLevel:
 
         admintwo = AdminLevel(config, admin_level=2)
         admintwo.setup_from_url(admin_url=url)
+        assert admintwo.get_pcode(
+            "YEM", "YE03001", logname="test", fuzzy_match=False
+        ) == (
+            None,
+            True,
+        )
+
         admintwo.load_pcode_formats(formats_url=formats_url)
         assert admintwo.get_pcode("YEM", "YE3001", logname="test") == (
             "YE3001",
@@ -440,13 +447,11 @@ class TestAdminLevel:
         )
 
         admintwo.set_parent_admins([adminone.pcodes])
-        assert admintwo.get_pcode("NER", "NE00409", logname="test") == (
-            "NER004009",
+        assert admintwo.get_pcode("YEM", "YEM03001", logname="test") == (
+            "YE3001",
             True,
         )
-        assert admintwo.get_pcode(
-            "COL", "CO080849", logname="test", fuzzy_match=False
-        ) == (
-            "CO08849",
+        assert admintwo.get_pcode("NGA", "NG1501", logname="test") == (
+            "NG015001",
             True,
         )
