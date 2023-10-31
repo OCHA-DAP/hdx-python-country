@@ -65,6 +65,7 @@ class AdminLevel:
         self.pcode_to_iso3 = {}
         self.pcode_formats = {}
         self.zeroes = {}
+        self.parent_admins = []
 
         self.init_matches_errors()
         self.phonetics = Phonetics()
@@ -217,6 +218,32 @@ class AdminLevel:
             for x in re.finditer("0", pcode):
                 dict_of_sets_add(self.zeroes, countryiso3, x.start())
 
+    def set_parent_admins(self, parent_admins: List[List]) -> None:
+        """
+        Set parent admins
+
+        Args:
+            parent_admins (List[List]): List of P-codes per parent admin
+
+        Returns:
+            None
+        """
+        self.parent_admins = parent_admins
+
+    def set_parent_admins_from_adminlevels(
+        self, adminlevels: List["AdminLevel"]
+    ) -> None:
+        """
+        Set parent admins from AdminLevel objects
+
+        Args:
+            parent_admins (List[AdminLevel]): List of parent AdminLevel objects
+
+        Returns:
+            None
+        """
+        self.parent_admins = [adminlevel.pcodes for adminlevel in adminlevels]
+
     def get_pcode_list(self) -> List[str]:
         """Get list of all pcodes
 
@@ -325,11 +352,39 @@ class AdminLevel:
             if len_new_pcode < total_length:
                 if pos in self.zeroes[countryiso3]:
                     pcode_part = f"0{pcode_part}"
-                admin_changes.append(str(admin_no))
+                    if self.parent_admins and admin_no < self.admin_level:
+                        parent_pcode = [
+                            pcode_parts[i] for i in range(admin_no)
+                        ]
+                        parent_pcode.append(pcode_part[:admin_length])
+                        parent_pcode = "".join(parent_pcode)
+                        if (
+                            parent_pcode
+                            not in self.parent_admins[admin_no - 1]
+                        ):
+                            pcode_part = pcode_part[1:]
+                        else:
+                            admin_changes.append(str(admin_no))
+                    else:
+                        admin_changes.append(str(admin_no))
             elif len_new_pcode > total_length:
                 if admin_length == 2 and pcode_parts[admin_no][0] == "0":
                     pcode_part = pcode_part[1:]
-                    admin_changes.append(str(admin_no))
+                    if self.parent_admins and admin_no < self.admin_level:
+                        parent_pcode = [
+                            pcode_parts[i] for i in range(admin_no)
+                        ]
+                        parent_pcode.append(pcode_part[:admin_length])
+                        parent_pcode = "".join(parent_pcode)
+                        if (
+                            parent_pcode
+                            not in self.parent_admins[admin_no - 1]
+                        ):
+                            pcode_part = f"0{pcode_part}"
+                        else:
+                            admin_changes.append(str(admin_no))
+                    else:
+                        admin_changes.append(str(admin_no))
             pcode_parts[admin_no] = pcode_part[:admin_length]
             pcode_parts.append(pcode_part[admin_length:])
             new_pcode = "".join(pcode_parts)
