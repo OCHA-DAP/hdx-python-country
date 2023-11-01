@@ -136,6 +136,9 @@ list of country ISO3 codes to be read or None if all countries are desired.
 
 Examples of usage:
 
+    AdminLevel.looks_like_pcode("YEM123")  # returns True
+    AdminLevel.looks_like_pcode("Yemen")  # returns False
+    AdminLevel.looks_like_pcode("YEME123")  # returns False
     adminlevel = AdminLevel(config)
     adminlevel.setup_from_admin_info(admin_info, countryiso3s=("YEM",))
     adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)

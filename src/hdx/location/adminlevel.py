@@ -38,11 +38,11 @@ class AdminLevel:
         admin_level_overrides (Dict): Countries at other admin levels.
     """
 
+    pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d*)$")
     _admin_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
     _admin_url = _admin_url_default
     _formats_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f1161807-dab4-4331-b7b0-4e5dac56e0e4/download/global_pcode_lengths.csv"
     _formats_url = _formats_url_default
-    letters_regex = re.compile(r"^[^\d]*")
 
     def __init__(
         self,
@@ -69,6 +69,21 @@ class AdminLevel:
 
         self.init_matches_errors()
         self.phonetics = Phonetics()
+
+    @classmethod
+    def looks_like_pcode(cls, string: str) -> bool:
+        """Check if a string looks like a p-code using regex matching of format.
+        Checks for 2 or 3 letter country iso code at start and then numbers.
+
+        Args:
+            string (str): String to check
+
+        Returns:
+            bool: Whether string looks like a p-code
+        """
+        if cls.pcode_regex.match(string):
+            return True
+        return False
 
     @classmethod
     def set_default_admin_url(cls, admin_url: Optional[str] = None) -> None:
@@ -302,6 +317,9 @@ class AdminLevel:
         Returns:
             Optional[str]: Matched P code or None if no match
         """
+        match = self.pcode_regex.match(pcode)
+        if not match:
+            return None
         pcode_format = self.pcode_formats.get(countryiso3)
         if not pcode_format:
             if self.get_admin_level(countryiso3) == 1:
@@ -309,15 +327,15 @@ class AdminLevel:
                     countryiso3, pcode, logname
                 )
             return None
-        countryiso = self.letters_regex.match(pcode).group()
+        countryiso, digits = match.groups()
         countryiso_length = len(countryiso)
         if countryiso_length > pcode_format[0]:
             countryiso2 = Country.get_iso2_from_iso3(countryiso3)
-            pcode_parts = [countryiso2, pcode[3:]]
+            pcode_parts = [countryiso2, digits]
         elif countryiso_length < pcode_format[0]:
-            pcode_parts = [countryiso3, pcode[2:]]
+            pcode_parts = [countryiso3, digits]
         else:
-            pcode_parts = [countryiso, pcode[countryiso_length:]]
+            pcode_parts = [countryiso, digits]
         new_pcode = "".join(pcode_parts)
         if new_pcode in self.pcodes:
             if logname:
@@ -589,20 +607,26 @@ class AdminLevel:
         pcode = self.admin_name_mappings.get(name)
         if pcode and self.pcode_to_iso3[pcode] == countryiso3:
             return pcode, True
-        name_to_pcode = self.name_to_pcode.get(countryiso3)
-        if name_to_pcode is not None:
-            pcode = name_to_pcode.get(name.lower())
-            if pcode:
-                return pcode, True
-        if name in self.pcodes:  # name is a pcode
-            return name, True
-        pcode = self.convert_admin_pcode_length(countryiso3, name, logname)
-        if pcode:
+        if self.looks_like_pcode(name):
+            pcode = name.upper()
+            if pcode in self.pcodes:  # name is a p-code
+                return name, True
+            # name looks like a p-code, but doesn't match p-codes
+            # so try adjusting p-code length
+            pcode = self.convert_admin_pcode_length(
+                countryiso3, pcode, logname
+            )
             return pcode, True
-        if not fuzzy_match:
-            return None, True
-        pcode = self.fuzzy_pcode(countryiso3, name, logname)
-        return pcode, False
+        else:
+            name_to_pcode = self.name_to_pcode.get(countryiso3)
+            if name_to_pcode is not None:
+                pcode = name_to_pcode.get(name.lower())
+                if pcode:
+                    return pcode, True
+            if not fuzzy_match:
+                return None, True
+            pcode = self.fuzzy_pcode(countryiso3, name, logname)
+            return pcode, False
 
     def output_matches(self) -> List[str]:
         """Output log of matches

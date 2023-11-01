@@ -70,14 +70,26 @@ class TestAdminLevel:
         )
         assert adminone.get_pcode("ABC", "NE004", logname="test") == (
             None,
+            True,
+        )
+        assert adminone.get_pcode("ABC", "BLAH", logname="test") == (
+            None,
             False,
         )
         config["countries_fuzzy_try"].append("ABC")
         assert adminone.get_pcode("ABC", "NE004", logname="test") == (
             None,
+            True,
+        )
+        assert adminone.get_pcode("ABC", "BLAH", logname="test") == (
+            None,
             False,
         )
         assert adminone.get_pcode("XYZ", "XYZ123", logname="test") == (
+            None,
+            True,
+        )
+        assert adminone.get_pcode("XYZ", "BLAH", logname="test") == (
             None,
             False,
         )
@@ -204,14 +216,26 @@ class TestAdminLevel:
         )
         assert adminone.get_pcode("ABC", "NE004", logname="test") == (
             None,
+            True,
+        )
+        assert adminone.get_pcode("ABC", "BLAH", logname="test") == (
+            None,
             False,
         )
         config["countries_fuzzy_try"].append("ABC")
         assert adminone.get_pcode("ABC", "NE004", logname="test") == (
             None,
+            True,
+        )
+        assert adminone.get_pcode("ABC", "BLAH", logname="test") == (
+            None,
             False,
         )
         assert adminone.get_pcode("XYZ", "XYZ123", logname="test") == (
+            None,
+            True,
+        )
+        assert adminone.get_pcode("XYZ", "BLAH", logname="test") == (
             None,
             False,
         )
@@ -309,7 +333,7 @@ class TestAdminLevel:
         )
         assert adminone.get_pcode("ABC", "NE004", logname="test") == (
             None,
-            False,
+            True,
         )
 
         admintwo = AdminLevel(config, admin_level=2)
