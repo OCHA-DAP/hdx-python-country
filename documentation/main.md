@@ -128,19 +128,38 @@ values of the form:
     {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
 
 Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
-*setup_from_url* takes a URL which defaults to the global p-codes dataset on
-HDX.
+*setup_from_url* takes a URL which defaults to a resource in the global p-codes
+dataset on HDX.
 
 These methods also have optional parameter *countryiso3s* which is a tuple or
 list of country ISO3 codes to be read or None if all countries are desired.
 
 Examples of usage:
 
+    AdminLevel.looks_like_pcode("YEM123")  # returns True
+    AdminLevel.looks_like_pcode("Yemen")  # returns False
+    AdminLevel.looks_like_pcode("YEME123")  # returns False
     adminlevel = AdminLevel(config)
     adminlevel.setup_from_admin_info(admin_info, countryiso3s=("YEM",))
     adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع")  # returns ("YE30", False)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", fuzzy_match=False)  # returns (None, True)
+
+There is basic admin 1 p-code length conversion by default. A more advanced
+p-code length conversion can be activated by calling *load_pcode_formats*
+which takes a URL that defaults to a resource in the global p-codes dataset on
+HDX:
+
+    admintwo.load_pcode_formats()
+    admintwo.get_pcode("YEM", "YEM30001")  # returns ("YE3001", True)
+
+The length conversion can be further enhanced by supplying either parent
+AdminLevel objects in a list or lists of p-codes per parent admin level:
+
+    admintwo.set_parent_admins_from_adminlevels([adminone])
+    admintwo.get_pcode("NER", "NE00409")  # returns ("NER004009", True)
+    admintwo.set_parent_admins([adminone.pcodes])
+    admintwo.get_pcode("NER", "NE00409")  # returns ("NER004009", True)
 
 ## Currencies
 
