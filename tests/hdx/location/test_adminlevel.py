@@ -348,9 +348,7 @@ class TestAdminLevel:
 
         admintwo = AdminLevel(config, admin_level=2)
         admintwo.setup_from_url(admin_url=url)
-        assert admintwo.get_pcode(
-            "YEM", "YE03001", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("YEM", "YE03001", logname="test") == (
             None,
             True,
         )
@@ -396,24 +394,22 @@ class TestAdminLevel:
             "NG015001",
             True,
         )
+        assert admintwo.get_pcode("NGA", "NG3614", logname="test") == (
+            "NG036014",
+            True,
+        )
         # Algorithm inserts 0 to make NG001501 and hence fails (NG001 is in any
         # case a valid admin 1)
-        assert admintwo.get_pcode(
-            "NGA", "NG01501", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("NGA", "NG01501", logname="test") == (
             None,
             True,
         )
         # Algorithm can only insert one zero per admin level right now
-        assert admintwo.get_pcode(
-            "NGA", "NG0151", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("NGA", "NG0151", logname="test") == (
             None,
             True,
         )
-        assert admintwo.get_pcode(
-            "NGA", "NG151", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("NGA", "NG151", logname="test") == (
             None,
             True,
         )
@@ -427,37 +423,27 @@ class TestAdminLevel:
         )
         # Algorithm inserts 0 to make NER000409 and hence fails (it has no
         # knowledge that NER000 is an invalid admin 1)
-        assert admintwo.get_pcode(
-            "NER", "NE00409", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("NER", "NE00409", logname="test") == (
             None,
             True,
         )
 
-        assert admintwo.get_pcode(
-            "DZA", "DZ009009", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("DZA", "DZ009009", logname="test") == (
             "DZ009009",
             True,
         )
-        assert admintwo.get_pcode(
-            "DZA", "DZ0090009", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("DZA", "DZ0090009", logname="test") == (
             "DZ009009",
             True,
         )
 
-        assert admintwo.get_pcode(
-            "COL", "CO08849", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("COL", "CO08849", logname="test") == (
             "CO08849",
             True,
         )
         # Algorithm removes 0 to make CO80849 and hence fails (it has no
         # knowledge that CO80 is an invalid admin 1)
-        assert admintwo.get_pcode(
-            "COL", "CO080849", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("COL", "CO080849", logname="test") == (
             None,
             True,
         )
@@ -473,9 +459,7 @@ class TestAdminLevel:
         # The lookup in admin1 reveals that removing the 0 prefix from the
         # admin1 is not a valid admin1 (CO80849) so the algorithm tries
         # removing the 0 prefix at the admin2 level instead and hence succeeds
-        assert admintwo.get_pcode(
-            "COL", "CO080849", fuzzy_match=False, logname="test"
-        ) == (
+        assert admintwo.get_pcode("COL", "CO080849", logname="test") == (
             "CO08849",
             True,
         )
