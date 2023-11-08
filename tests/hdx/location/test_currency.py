@@ -247,3 +247,13 @@ class TestCurrency:
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * 20 / 29
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * (1582156800-1580428800) / (1582934400 - 1580428800)
         assert Currency.get_historic_rate("gbp", date) == 0.7717896133008268
+
+    def test_broken_rate(self, retrievers, secondary_historic_url):
+        Currency._no_historic = False
+        Currency.setup(secondary_historic_url=secondary_historic_url)
+        # Without the checking against high and low returned by Yahoo API, this
+        # returned 3.140000104904175
+        assert (
+            Currency.get_historic_rate("NGN", parse_date("2017-02-15"))
+            == 314.5
+        )
