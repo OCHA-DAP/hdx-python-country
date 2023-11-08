@@ -201,10 +201,21 @@ class Currency:
         if not data:
             return None
         if get_close:
-            adjclose = data["indicators"]["adjclose"][0].get("adjclose")
+            indicators = data["indicators"]
+            adjclose = indicators["adjclose"][0].get("adjclose")
             if adjclose is None:
                 return None
-            return adjclose[0]
+            adjclose = adjclose[0]
+            # compare with high and low to reveal errors from Yahoo feed
+            quote = indicators["quote"][0]
+            high = quote.get("high")
+            low = quote.get("low")
+            if high and low:
+                high = high[0]
+                low = low[0]
+                if adjclose > high or adjclose < low:
+                    adjclose = low + (high - low) / 2
+            return adjclose
         return data["meta"]["regularMarketPrice"]
 
     @classmethod
