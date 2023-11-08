@@ -173,6 +173,39 @@ class Currency:
             return None
 
     @classmethod
+    def _get_adjclose(cls, indicators: Dict) -> Optional[float]:
+        """
+        Get the adjusted close fx rate from the indicators dictionary returned
+        from the Yahoo API.
+
+        Args:
+            indicators (Dict): Indicators dictionary from Yahoo API
+
+        Returns:
+            Optional[float]: Adjusted close fx rate or None
+        """
+        adjclose = indicators["adjclose"][0].get("adjclose")
+        if adjclose is None:
+            return None
+        adjclose = adjclose[0]
+        # compare with high and low to reveal errors from Yahoo feed
+        quote = indicators["quote"][0]
+        high = quote.get("high")
+        low = quote.get("low")
+        if high and low:
+            high = high[0]
+            low = low[0]
+            if adjclose > high:
+                diff = adjclose / high
+                if diff > 1.1:
+                    adjclose = low + (high - low) / 2
+            elif adjclose < low:
+                diff = low / adjclose
+                if diff > 1.1:
+                    adjclose = low + (high - low) / 2
+        return adjclose
+
+    @classmethod
     def _get_primary_rate(
         cls, currency: str, timestamp: Optional[int] = None
     ) -> Optional[float]:
@@ -201,21 +234,7 @@ class Currency:
         if not data:
             return None
         if get_close:
-            indicators = data["indicators"]
-            adjclose = indicators["adjclose"][0].get("adjclose")
-            if adjclose is None:
-                return None
-            adjclose = adjclose[0]
-            # compare with high and low to reveal errors from Yahoo feed
-            quote = indicators["quote"][0]
-            high = quote.get("high")
-            low = quote.get("low")
-            if high and low:
-                high = high[0]
-                low = low[0]
-                if adjclose > high or adjclose < low:
-                    adjclose = low + (high - low) / 2
-            return adjclose
+            return cls._get_adjclose(data["indicators"])
         return data["meta"]["regularMarketPrice"]
 
     @classmethod
