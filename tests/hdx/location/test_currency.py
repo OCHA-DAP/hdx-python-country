@@ -224,11 +224,11 @@ class TestCurrency:
         )
         assert (
             Currency.get_historic_rate("gbp", parse_date("2010-02-20"))
-            == 0.762107990702283
+            == 0.663042036865137
         )
         assert (
             Currency.get_historic_rate("gbp", parse_date("2030-02-20"))
-            == 0.809028760972452
+            == 0.745156482861401
         )
         assert (
             Currency.get_historic_rate("gbp", parse_date("2020-01-31"))
@@ -248,9 +248,9 @@ class TestCurrency:
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * (1582156800-1580428800) / (1582934400 - 1580428800)
         assert Currency.get_historic_rate("gbp", date) == 0.7717896133008268
 
-    def test_broken_rates(self, retrievers, secondary_historic_url):
+    def test_broken_rates_no_secondary(self, retrievers):
         Currency._no_historic = False
-        Currency.setup(secondary_historic_url=secondary_historic_url)
+        Currency.setup(secondary_historic_url="fail")
         # Without the checking against high and low returned by Yahoo API, this
         # returned 3.140000104904175
         assert (
@@ -263,6 +263,11 @@ class TestCurrency:
             Currency.get_historic_rate("YER", parse_date("2016-09-15"))
             == 249.7249984741211
         )
+
+        # This adjclose value which is the same as the low is wrong!
+        # The high and open are very different so exception is raised
+        with pytest.raises(CurrencyError):
+            Currency.get_historic_rate("COP", parse_date("2015-12-15"))
         # Since the adjclose is not too different from the low and high,
         # despite being outside their range, we use adjclose
         assert (
@@ -276,7 +281,46 @@ class TestCurrency:
             == 601.632568359375
         )
 
-    def test_get_adjclose(self):
+    def test_broken_rates_with_secondary(
+        self, retrievers, secondary_historic_url
+    ):
+        Currency._no_historic = False
+        Currency.setup(secondary_historic_url=secondary_historic_url)
+        # Without the checking against secondary historic rate, this
+        # returned 3.140000104904175
+        assert (
+            Currency.get_historic_rate("NGN", parse_date("2017-02-15"))
+            == 314.5
+        )
+        # Without the checking against secondary historic rate, this
+        # returned 0.10000000149011612
+        assert (
+            Currency.get_historic_rate("YER", parse_date("2016-09-15"))
+            == 249.7249984741211
+        )
+        # Without the checking against secondary historic rate, this
+        # returned 33.13999938964844
+        assert (
+            Currency.get_historic_rate("COP", parse_date("2015-12-15"))
+            == 3269.199951171875
+        )
+
+        # Since the adjclose is not too different from the secondary historic
+        # rate, we use adjclose
+        assert (
+            Currency.get_historic_rate("XAF", parse_date("2022-04-14"))
+            == 605.5509643554688
+        )
+        # Since the adjclose is not too different from the secondary historic
+        # rate, we use adjclose
+        assert (
+            Currency.get_historic_rate("XAF", parse_date("2022-04-15"))
+            == 601.632568359375
+        )
+
+    def test_get_adjclose(self, retrievers, secondary_historic_url):
+        Currency._no_historic = False
+        Currency.setup(secondary_historic_url="fail")
         indicators = {
             "adjclose": [{"adjclose": [3.140000104904175]}],
             "quote": [
@@ -289,7 +333,22 @@ class TestCurrency:
                 }
             ],
         }
-        assert Currency._get_adjclose(indicators) == 314.5
+        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        assert Currency._get_adjclose(indicators, "NGN", timestamp) == 314.5
+        indicators = {
+            "adjclose": [{"adjclose": [33.13999938964844]}],
+            "quote": [
+                {
+                    "close": [33.13999938964844],
+                    "high": [3320.0],
+                    "low": [33.13999938964844],
+                    "open": [3269.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert Currency._get_adjclose(indicators, "COP", timestamp) is None
         indicators = {
             "adjclose": [{"adjclose": [605.5509643554688]}],
             "quote": [
@@ -302,7 +361,11 @@ class TestCurrency:
                 }
             ],
         }
-        assert Currency._get_adjclose(indicators) == 605.5509643554688
+        timestamp = Currency._get_int_timestamp(parse_date("2022-04-14"))
+        assert (
+            Currency._get_adjclose(indicators, "XAF", timestamp)
+            == 605.5509643554688
+        )
         indicators = {
             "adjclose": [{"adjclose": [601.632568359375]}],
             "quote": [
@@ -315,7 +378,11 @@ class TestCurrency:
                 }
             ],
         }
-        assert Currency._get_adjclose(indicators) == 601.632568359375
+        timestamp = Currency._get_int_timestamp(parse_date("2022-04-15"))
+        assert (
+            Currency._get_adjclose(indicators, "XAF", timestamp)
+            == 601.632568359375
+        )
         indicators = {
             "adjclose": [{"adjclose": [314.0000104904175]}],
             "quote": [
@@ -328,4 +395,174 @@ class TestCurrency:
                 }
             ],
         }
-        assert Currency._get_adjclose(indicators) == 3.145
+        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        assert Currency._get_adjclose(indicators, "XXX", timestamp) == 3.145
+
+        Currency.setup(secondary_historic_url=secondary_historic_url)
+        indicators = {
+            "adjclose": [{"adjclose": [3.140000104904175]}],
+            "quote": [
+                {
+                    "close": [3.140000104904175],
+                    "high": [315.0],
+                    "low": [314.0],
+                    "open": [315.0],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        assert Currency._get_adjclose(indicators, "NGN", timestamp) == 314.5
+        indicators = {
+            "adjclose": [{"adjclose": [33.13999938964844]}],
+            "quote": [
+                {
+                    "close": [33.13999938964844],
+                    "high": [3320.0],
+                    "low": [33.13999938964844],
+                    "open": [3269.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert (
+            Currency._get_adjclose(indicators, "COP", timestamp)
+            == 3269.199951171875
+        )
+        indicators = {
+            "adjclose": [{"adjclose": [605.5509643554688]}],
+            "quote": [
+                {
+                    "close": [605.5509643554688],
+                    "high": [602.6080932617188],
+                    "low": [601.632568359375],
+                    "open": [602.6080932617188],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2022-04-14"))
+        assert (
+            Currency._get_adjclose(indicators, "XAF", timestamp)
+            == 605.5509643554688
+        )
+        indicators = {
+            "adjclose": [{"adjclose": [601.632568359375]}],
+            "quote": [
+                {
+                    "close": [601.632568359375],
+                    "high": [606.8197631835938],
+                    "low": [606.8197631835938],
+                    "open": [606.8197631835938],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2022-04-15"))
+        assert (
+            Currency._get_adjclose(indicators, "XAF", timestamp)
+            == 601.632568359375
+        )
+        indicators = {
+            "adjclose": [{"adjclose": [314.0000104904175]}],
+            "quote": [
+                {
+                    "close": [314.0000104904175],
+                    "high": [3.150],
+                    "low": [3.140],
+                    "open": [3.150],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        assert Currency._get_adjclose(indicators, "XXX", timestamp) == 3.145
+        indicators = {
+            "adjclose": [{"adjclose": [33.13999938964844]}],
+            "quote": [
+                {
+                    "close": [33.13999938964844],
+                    "high": [3320.0],
+                    "low": [33.13999938964844],
+                    "open": [33.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert Currency._get_adjclose(indicators, "COP", timestamp) == 3320.0
+        indicators = {
+            "adjclose": [{"adjclose": [33.13999938964844]}],
+            "quote": [
+                {
+                    "close": [33.13999938964844],
+                    "high": [33.200],
+                    "low": [3313.999938964844],
+                    "open": [33.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert (
+            Currency._get_adjclose(indicators, "COP", timestamp)
+            == 3313.999938964844
+        )
+        # Everything is wacky but the values are in the same order of magnitude
+        # as each other so adjclose is assumed to be ok
+        indicators = {
+            "adjclose": [{"adjclose": [33.13999938964844]}],
+            "quote": [
+                {
+                    "close": [33.13999938964844],
+                    "high": [33.200],
+                    "low": [33.999938964844],
+                    "open": [33.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert (
+            Currency._get_adjclose(indicators, "COP", timestamp)
+            == 33.13999938964844
+        )
+        # Everything is wacky and the values are not in the same order of
+        # magnitude as each other so secondary historic rate is returned
+        indicators = {
+            "adjclose": [{"adjclose": [333.13999938964844]}],
+            "quote": [
+                {
+                    "close": [333.13999938964844],
+                    "high": [33333.200],
+                    "low": [3.999938964844],
+                    "open": [33.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert (
+            Currency._get_adjclose(indicators, "COP", timestamp)
+            == 3124.504838709677
+        )
+        # Everything is wacky but adjclose is in the same order of
+        # magnitude as the secondary historic rate so return adjclose
+        indicators = {
+            "adjclose": [{"adjclose": [3270]}],
+            "quote": [
+                {
+                    "close": [3270],
+                    "high": [33333.200],
+                    "low": [3.999938964844],
+                    "open": [33.199951171875],
+                    "volume": [0],
+                }
+            ],
+        }
+        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        assert Currency._get_adjclose(indicators, "COP", timestamp) == 3270
+
+        Currency._no_historic = True
+        assert Currency._get_adjclose(indicators, "COP", timestamp) is None

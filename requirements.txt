@@ -17,7 +17,7 @@ cfgv==3.4.0
     # via pre-commit
 chardet==5.2.0
     # via frictionless
-charset-normalizer==3.3.1
+charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via typer
@@ -29,7 +29,7 @@ distlib==0.3.7
     # via virtualenv
 et-xmlfile==1.1.0
     # via openpyxl
-filelock==3.13.0
+filelock==3.13.1
     # via virtualenv
 frictionless==5.16.0
     # via hdx-python-utilities
@@ -37,7 +37,7 @@ hdx-python-utilities==3.6.2
     # via hdx-python-country (pyproject.toml)
 humanize==4.8.0
     # via frictionless
-identify==2.5.30
+identify==2.5.31
     # via pre-commit
 idna==3.4
     # via requests
@@ -130,7 +130,7 @@ rfc3986==2.0.0
     # via frictionless
 rich==13.6.0
     # via typer
-ruamel-yaml==0.18.2
+ruamel-yaml==0.18.5
     # via hdx-python-utilities
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
@@ -173,7 +173,7 @@ validators==0.22.0
     # via frictionless
 virtualenv==20.24.6
     # via pre-commit
-wheel==0.41.2
+wheel==0.41.3
     # via libhxl
 xlrd==2.0.1
     # via hdx-python-utilities

@@ -42,6 +42,7 @@ class Currency:
     _retriever = None
     _log_level = logging.DEBUG
     _fixed_now = None
+    _threshold = 1.3
 
     @classmethod
     def _get_int_timestamp(cls, date: datetime) -> int:
@@ -173,13 +174,17 @@ class Currency:
             return None
 
     @classmethod
-    def _get_adjclose(cls, indicators: Dict) -> Optional[float]:
+    def _get_adjclose(
+        cls, indicators: Dict, currency: str, timestamp: int
+    ) -> Optional[float]:
         """
         Get the adjusted close fx rate from the indicators dictionary returned
         from the Yahoo API.
 
         Args:
             indicators (Dict): Indicators dictionary from Yahoo API
+            currency (str): Currency
+            timestamp (int): Timestamp to use for fx conversion
 
         Returns:
             Optional[float]: Adjusted close fx rate or None
@@ -187,23 +192,72 @@ class Currency:
         adjclose = indicators["adjclose"][0].get("adjclose")
         if adjclose is None:
             return None
+
+        def beyond_threshold(x, y):
+            if max(x, y) / min(x, y) > cls._threshold:
+                return True
+            return False
+
+        def within_threshold(x, y):
+            if max(x, y) / min(x, y) > cls._threshold:
+                return False
+            return True
+
+        # Compare adjclose to other variables returned by Yahoo API
         adjclose = adjclose[0]
-        # compare with high and low to reveal errors from Yahoo feed
         quote = indicators["quote"][0]
+        open = quote.get("open")
+        fraction_ok = True
+        if open:
+            open = open[0]
+            if beyond_threshold(adjclose, open):
+                fraction_ok = False
         high = quote.get("high")
-        low = quote.get("low")
-        if high and low:
+        if high:
             high = high[0]
+            if beyond_threshold(adjclose, high):
+                fraction_ok = False
+        low = quote.get("low")
+        if low:
             low = low[0]
-            if adjclose > high:
-                diff = adjclose / high
-                if diff > 1.1:
-                    adjclose = low + (high - low) / 2
-            elif adjclose < low:
-                diff = low / adjclose
-                if diff > 1.1:
-                    adjclose = low + (high - low) / 2
-        return adjclose
+            if beyond_threshold(adjclose, low):
+                fraction_ok = False
+        if fraction_ok:
+            # if no discrepancies, adjclose is ok
+            return adjclose
+
+        if cls._no_historic:
+            secondary_fx_rate = None
+        else:
+            secondary_fx_rate = cls._get_secondary_historic_rate(
+                currency, timestamp
+            )
+        if not secondary_fx_rate:
+            # compare with high and low to reveal errors from Yahoo feed
+            if high and low:
+                if within_threshold(low, high):
+                    return low + (high - low) / 2
+            return None
+
+        # compare with secondary historic rate
+        if within_threshold(adjclose, secondary_fx_rate):
+            return adjclose
+        # if adjclose is wacky, find another value to return that is ok
+        if high and low:
+            if within_threshold(high, secondary_fx_rate) and within_threshold(
+                low, secondary_fx_rate
+            ):
+                return low + (high - low) / 2
+        if open:
+            if within_threshold(open, secondary_fx_rate):
+                return open
+        if high:
+            if within_threshold(high, secondary_fx_rate):
+                return high
+        if low:
+            if within_threshold(low, secondary_fx_rate):
+                return low
+        return secondary_fx_rate
 
     @classmethod
     def _get_primary_rate(
@@ -234,7 +288,7 @@ class Currency:
         if not data:
             return None
         if get_close:
-            return cls._get_adjclose(data["indicators"])
+            return cls._get_adjclose(data["indicators"], currency, timestamp)
         return data["meta"]["regularMarketPrice"]
 
     @classmethod
