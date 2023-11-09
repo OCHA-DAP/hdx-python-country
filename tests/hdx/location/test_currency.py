@@ -563,3 +563,6 @@ class TestCurrency:
         }
         timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
         assert Currency._get_adjclose(indicators, "COP", timestamp) == 3270
+
+        Currency._no_historic = True
+        assert Currency._get_adjclose(indicators, "COP", timestamp) is None
