@@ -166,6 +166,10 @@ class TestAdminLevel:
             "YE30",
             False,
         )
+        assert adminone.get_pcode("SOM", "Bay", logname="test") == (
+            "SO24",
+            True,
+        )
         output = adminone.output_matches()
         assert output == [
             "test - YEM: Matching (fuzzy) Al Dali to Ad Dali on map",
