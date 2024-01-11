@@ -19,7 +19,7 @@ class TestAdminLevel:
 
     @pytest.fixture(scope="function")
     def formats_url(self):
-        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/pcode_formats/tests/fixtures/global_pcode_lengths.csv"
+        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/main/tests/fixtures/global_pcode_lengths.csv"
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
@@ -189,7 +189,7 @@ class TestAdminLevel:
         adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
-        assert len(adminone.get_pcode_list()) == 2552
+        assert len(adminone.get_pcode_list()) == 2553
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (
             "YE30",
@@ -216,18 +216,22 @@ class TestAdminLevel:
             True,
         )
         assert adminone.get_pcode("NER", "NER004", logname="test") == (
-            "NER004",
+            "NE004",
             True,
         )
         assert adminone.get_pcode("NER", "NE04", logname="test") == (
-            "NER004",
+            "NE004",
             True,
         )
         assert adminone.get_pcode("NER", "NE004", logname="test") == (
-            "NER004",
+            "NE004",
             True,
         )
         assert adminone.get_pcode("ABC", "NE004", logname="test") == (
+            "NE004",
+            True,
+        )
+        assert adminone.get_pcode("ABC", "NER004", logname="test") == (
             None,
             True,
         )
@@ -236,7 +240,7 @@ class TestAdminLevel:
             False,
         )
         config["countries_fuzzy_try"].append("ABC")
-        assert adminone.get_pcode("ABC", "NE004", logname="test") == (
+        assert adminone.get_pcode("ABC", "NER004", logname="test") == (
             None,
             True,
         )
@@ -284,7 +288,7 @@ class TestAdminLevel:
         )
         output = adminone.output_matches()
         assert output == [
-            "test - NER: Matching (pcode length conversion) NER004 to Maradi on map",
+            "test - NER: Matching (pcode length conversion) NE004 to Maradi on map",
             "test - NGA: Matching (pcode length conversion) NG015 to Federal Capital Territory on map",
             "test - UKR: Matching (substring) Chernihiv Oblast to Chernihivska on map",
             "test - YEM: Matching (substring) Ad Dal to Ad Dali' on map",

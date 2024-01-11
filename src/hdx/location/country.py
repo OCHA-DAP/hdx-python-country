@@ -3,16 +3,14 @@ import copy
 import logging
 import re
 from string import punctuation
-from typing import Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import hxl
 from hxl import InputOptions
 
 from hdx.utilities.path import script_dir_plus_file
 from hdx.utilities.text import get_words_in_sentence
-
-ExceptionUpperBound = TypeVar("T", bound="Exception")
-
+from hdx.utilities.typehint import ExceptionUpperBound
 
 logger = logging.getLogger(__name__)
 
