@@ -35,7 +35,7 @@ requires-python = ">=3.8"
 
 dependencies = [
     "hdx-python-utilities>=3.6.4",
-    "libhxl>=5.1",
+    "libhxl>=5.2",
     "pyphonetics",
 ]
 dynamic = ["version"]
