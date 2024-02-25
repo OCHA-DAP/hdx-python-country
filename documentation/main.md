@@ -29,10 +29,10 @@ Dem. for Democratic and Rep. for Republic.
 Mapping administration level names from a source to a given base set is also handled
 including phonetic fuzzy name matching.
 
-It also provides foreign exchange rates and conversion from amounts in local 
-currency to USD and vice-versa. The conversion relies on Yahoo Finance, falling 
-back on [currency-api](https://github.com/fawazahmed0/currency-api) for current rates, and Yahoo Finance falling back 
-on IMF data via IATI (with interpolation) for historic daily rates. 
+It also provides foreign exchange rates and conversion from amounts in local
+currency to USD and vice-versa. The conversion relies on Yahoo Finance, falling
+back on [currency-api](https://github.com/fawazahmed0/currency-api) for current rates, and Yahoo Finance falling back
+on IMF data via IATI (with interpolation) for historic daily rates.
 
 This library is part of the [Humanitarian Data Exchange](https://data.humdata.org/)
 (HDX) project. If you have humanitarian related data, please upload your datasets to
@@ -185,10 +185,10 @@ unsuited for use where rates are expected to update while the program is running
                                timezone_handling=2), ignore_timeinfo=False)
     # == 0.76910001039505
 
-Historic daily rates can be made to fall back to current rates if desired (this 
-is not the default). It is possible to pass in a Retrieve object to 
+Historic daily rates can be made to fall back to current rates if desired (this
+is not the default). It is possible to pass in a Retrieve object to
 Currency.setup() to allow the downloaded files from the secondary sources to be
-saved or previously downloaded files to be reused and to allow fallbacks from 
+saved or previously downloaded files to be reused and to allow fallbacks from
 current rates to a static file eg.
 
     Currency.setup(retriever, ..., fallback_historic_to_current=True, fallback_current_to_static=True)
