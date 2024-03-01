@@ -1,10 +1,12 @@
 """Currency conversion"""
+
 import logging
+from copy import copy
 from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
+from . import get_int_timestamp
 from hdx.utilities.dateparse import (
-    get_timestamp_from_datetime,
     now_utc,
     parse_date,
 )
@@ -45,19 +47,6 @@ class Currency:
     _threshold = 1.3
 
     @classmethod
-    def _get_int_timestamp(cls, date: datetime) -> int:
-        """
-        Get integer timestamp from datetime object
-
-        Args:
-            date (datetime): datetime object
-
-        Returns:
-            int: Integer timestamp
-        """
-        return int(round(get_timestamp_from_datetime(date)))
-
-    @classmethod
     def setup(
         cls,
         retriever: Optional[Retrieve] = None,
@@ -69,6 +58,8 @@ class Currency:
         no_historic: bool = False,
         fixed_now: Optional[datetime] = None,
         log_level: int = logging.DEBUG,
+        current_rates_cache: Dict = {"USD": 1},
+        historic_rates_cache: Dict = {},
     ) -> None:
         """
         Setup the sources. If you wish to use a static fallback file by setting
@@ -85,13 +76,15 @@ class Currency:
             no_historic (bool): Do not set up historic rates. Defaults to False.
             fixed_now (Optional[datetime]): Use a fixed datetime for now. Defaults to None (use datetime.now()).
             log_level (int): Level at which to log messages. Defaults to logging.DEBUG.
+            current_rates_cache (Dict): Pre-populate current rates cache with given values. Defaults to {"USD": 1}.
+            historic_rates_cache (Dict): Pre-populate historic rates cache with given values. Defaults to {}.
 
         Returns:
             None
         """
 
-        cls._cached_current_rates = {"USD": 1}
-        cls._cached_historic_rates = dict()
+        cls._cached_current_rates = copy(current_rates_cache)
+        cls._cached_historic_rates = copy(historic_rates_cache)
         cls._rates_api = primary_rates_url
         cls._secondary_rates = None
         cls._secondary_historic = None
@@ -131,10 +124,10 @@ class Currency:
                 filename="historic_rates.csv",
                 logstr="secondary historic exchange rates",
             )
-            cls._secondary_historic = dict()
+            cls._secondary_historic = {}
             for row in iterator:
                 currency = row["Currency"]
-                date = cls._get_int_timestamp(parse_date(row["Date"]))
+                date = get_int_timestamp(parse_date(row["Date"]))
                 rate = float(row["Rate"])
                 dict_of_dicts_add(
                     cls._secondary_historic, currency, date, rate
@@ -281,7 +274,7 @@ class Currency:
             else:
                 now = now_utc()
                 get_close = False
-            timestamp = cls._get_int_timestamp(now)
+            timestamp = get_int_timestamp(now)
         else:
             get_close = True
         data = cls._get_primary_rates_data(currency, timestamp)
@@ -479,7 +472,7 @@ class Currency:
             )
         else:
             date = date.astimezone(timezone.utc)
-        timestamp = cls._get_int_timestamp(date)
+        timestamp = get_int_timestamp(date)
         if currency_data is not None:
             fx_rate = currency_data.get(timestamp)
             if fx_rate is not None:

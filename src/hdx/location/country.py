@@ -1,4 +1,5 @@
 """Country location"""
+
 import copy
 import logging
 import re
@@ -69,8 +70,8 @@ class Country:
     _countriesdata = None
     _ochaurl_default = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
     _ochaurl = _ochaurl_default
-    _country_name_overrides = dict()
-    _country_name_mappings = dict()
+    _country_name_overrides = {}
+    _country_name_mappings = {}
 
     @classmethod
     def _add_countriesdata(cls, iso3: str, hxlcountry: hxl.Row) -> Dict:
@@ -131,24 +132,24 @@ class Country:
         if regionname:
             add_country_to_set("regioncodes2countries", regionid, iso3)
             cls._countriesdata["regioncodes2names"][regionid] = regionname
-            cls._countriesdata["regionnames2codes"][
-                regionname.upper()
-            ] = regionid
+            cls._countriesdata["regionnames2codes"][regionname.upper()] = (
+                regionid
+            )
         if sub_regionname:
             add_country_to_set("regioncodes2countries", sub_regionid, iso3)
-            cls._countriesdata["regioncodes2names"][
+            cls._countriesdata["regioncodes2names"][sub_regionid] = (
+                sub_regionname
+            )
+            cls._countriesdata["regionnames2codes"][sub_regionname.upper()] = (
                 sub_regionid
-            ] = sub_regionname
-            cls._countriesdata["regionnames2codes"][
-                sub_regionname.upper()
-            ] = sub_regionid
+            )
         if intermediate_regionname:
             add_country_to_set(
                 "regioncodes2countries", intermediate_regionid, iso3
             )
-            cls._countriesdata["regioncodes2names"][
-                intermediate_regionid
-            ] = intermediate_regionname
+            cls._countriesdata["regioncodes2names"][intermediate_regionid] = (
+                intermediate_regionname
+            )
             cls._countriesdata["regionnames2codes"][
                 intermediate_regionname.upper()
             ] = intermediate_regionid
@@ -167,21 +168,21 @@ class Country:
         Returns:
             None
         """
-        cls._countriesdata = dict()
-        cls._countriesdata["countries"] = dict()
-        cls._countriesdata["iso2iso3"] = dict()
-        cls._countriesdata["m49iso3"] = dict()
-        cls._countriesdata["countrynames2iso3"] = dict()
-        cls._countriesdata["regioncodes2countries"] = dict()
-        cls._countriesdata["regioncodes2names"] = dict()
-        cls._countriesdata["regionnames2codes"] = dict()
-        cls._countriesdata["aliases"] = dict()
-        cls._countriesdata["currencies"] = dict()
+        cls._countriesdata = {}
+        cls._countriesdata["countries"] = {}
+        cls._countriesdata["iso2iso3"] = {}
+        cls._countriesdata["m49iso3"] = {}
+        cls._countriesdata["countrynames2iso3"] = {}
+        cls._countriesdata["regioncodes2countries"] = {}
+        cls._countriesdata["regioncodes2names"] = {}
+        cls._countriesdata["regionnames2codes"] = {}
+        cls._countriesdata["aliases"] = {}
+        cls._countriesdata["currencies"] = {}
 
         for key, value in cls._country_name_mappings.items():
-            cls._countriesdata["countrynames2iso3"][
-                key.upper()
-            ] = value.upper()
+            cls._countriesdata["countrynames2iso3"][key.upper()] = (
+                value.upper()
+            )
 
         for country in countries:
             iso3 = country.get("#country+code+v_iso3")
@@ -891,4 +892,4 @@ class Country:
 
         if exception is not None:
             raise exception
-        return list()
+        return []

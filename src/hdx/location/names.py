@@ -3,7 +3,7 @@ import unicodedata
 
 from unidecode import unidecode
 
-non_ascii = "([^\x00-\x7F])+"
+non_ascii = "([^\x00-\x7f])+"
 
 
 def clean_name(name: str) -> str:

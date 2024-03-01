@@ -58,7 +58,7 @@ class AdminLevel:
             "admin_name_replacements", {}
         )
         self.admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", list())
-        self.pcodes = list()
+        self.pcodes = []
         self.pcode_lengths = {}
         self.name_to_pcode = {}
         self.pcode_to_name = {}
@@ -634,7 +634,7 @@ class AdminLevel:
         Returns:
             List[str]: List of matches
         """
-        output = list()
+        output = []
         for match in sorted(self.matches):
             line = f"{match[0]} - {match[1]}: Matching ({match[4]}) {match[2]} to {match[3]} on map"
             logger.info(line)
@@ -647,7 +647,7 @@ class AdminLevel:
         Returns:
             List[str]: List of ignored
         """
-        output = list()
+        output = []
         for ignored in sorted(self.ignored):
             if len(ignored) == 2:
                 line = f"{ignored[0]} - Ignored {ignored[1]}!"
@@ -663,7 +663,7 @@ class AdminLevel:
         Returns:
             List[str]: List of errors
         """
-        output = list()
+        output = []
         for error in sorted(self.errors):
             if len(error) == 2:
                 line = f"{error[0]} - Could not find {error[1]} in map names!"
