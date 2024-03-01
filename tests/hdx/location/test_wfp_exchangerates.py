@@ -2,10 +2,9 @@ from os import environ
 
 import pytest
 
-from src.hdx.location.wfp_exchangerates import WFPExchangeRates
-
 from hdx.location import get_int_timestamp
 from hdx.location.currency import Currency
+from hdx.location.wfp_exchangerates import WFPExchangeRates
 from hdx.utilities.dateparse import parse_date
 
 
