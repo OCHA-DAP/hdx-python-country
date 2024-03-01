@@ -28,6 +28,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade hatch
     - name: Test with hatch/pytest
+      env:
+        WFP_KEY: ${{ secrets.WFP_KEY }}
+        WFP_SECRET: ${{ secrets.WFP_SECRET }}
       run: |
         hatch run test:test
     - name: Check styling
