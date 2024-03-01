@@ -1,4 +1,5 @@
 """Currency conversion"""
+
 import logging
 from copy import copy
 from datetime import datetime, timezone

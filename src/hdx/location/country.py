@@ -1,4 +1,5 @@
 """Country location"""
+
 import copy
 import logging
 import re
@@ -131,24 +132,24 @@ class Country:
         if regionname:
             add_country_to_set("regioncodes2countries", regionid, iso3)
             cls._countriesdata["regioncodes2names"][regionid] = regionname
-            cls._countriesdata["regionnames2codes"][
-                regionname.upper()
-            ] = regionid
+            cls._countriesdata["regionnames2codes"][regionname.upper()] = (
+                regionid
+            )
         if sub_regionname:
             add_country_to_set("regioncodes2countries", sub_regionid, iso3)
-            cls._countriesdata["regioncodes2names"][
+            cls._countriesdata["regioncodes2names"][sub_regionid] = (
+                sub_regionname
+            )
+            cls._countriesdata["regionnames2codes"][sub_regionname.upper()] = (
                 sub_regionid
-            ] = sub_regionname
-            cls._countriesdata["regionnames2codes"][
-                sub_regionname.upper()
-            ] = sub_regionid
+            )
         if intermediate_regionname:
             add_country_to_set(
                 "regioncodes2countries", intermediate_regionid, iso3
             )
-            cls._countriesdata["regioncodes2names"][
-                intermediate_regionid
-            ] = intermediate_regionname
+            cls._countriesdata["regioncodes2names"][intermediate_regionid] = (
+                intermediate_regionname
+            )
             cls._countriesdata["regionnames2codes"][
                 intermediate_regionname.upper()
             ] = intermediate_regionid
@@ -179,9 +180,9 @@ class Country:
         cls._countriesdata["currencies"] = {}
 
         for key, value in cls._country_name_mappings.items():
-            cls._countriesdata["countrynames2iso3"][
-                key.upper()
-            ] = value.upper()
+            cls._countriesdata["countrynames2iso3"][key.upper()] = (
+                value.upper()
+            )
 
         for country in countries:
             iso3 = country.get("#country+code+v_iso3")

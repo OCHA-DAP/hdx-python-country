@@ -1,4 +1,5 @@
 """location Tests"""
+
 import hxl
 import pytest
 from hxl import InputOptions
