@@ -11,7 +11,7 @@ class Phonetics(pyphonetics.RefinedSoundex):
         possible_names: ListTuple,
         name: str,
         alternative_name: Optional[str] = None,
-        transform_possible_names: ListTuple[Callable] = list(),
+        transform_possible_names: ListTuple[Callable] = [],
         threshold: int = 2,
     ) -> Optional[int]:
         """

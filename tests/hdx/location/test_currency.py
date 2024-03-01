@@ -3,6 +3,7 @@ from os.path import join
 
 import pytest
 
+from hdx.location import get_int_timestamp
 from hdx.location.currency import Currency, CurrencyError
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.downloader import Download
@@ -333,7 +334,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        timestamp = get_int_timestamp(parse_date("2017-02-15"))
         assert Currency._get_adjclose(indicators, "NGN", timestamp) == 314.5
         indicators = {
             "adjclose": [{"adjclose": [33.13999938964844]}],
@@ -347,7 +348,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert Currency._get_adjclose(indicators, "COP", timestamp) is None
         indicators = {
             "adjclose": [{"adjclose": [605.5509643554688]}],
@@ -361,7 +362,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2022-04-14"))
+        timestamp = get_int_timestamp(parse_date("2022-04-14"))
         assert (
             Currency._get_adjclose(indicators, "XAF", timestamp)
             == 605.5509643554688
@@ -378,7 +379,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2022-04-15"))
+        timestamp = get_int_timestamp(parse_date("2022-04-15"))
         assert (
             Currency._get_adjclose(indicators, "XAF", timestamp)
             == 601.632568359375
@@ -395,7 +396,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        timestamp = get_int_timestamp(parse_date("2017-02-15"))
         assert Currency._get_adjclose(indicators, "XXX", timestamp) == 3.145
 
         Currency.setup(secondary_historic_url=secondary_historic_url)
@@ -411,7 +412,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        timestamp = get_int_timestamp(parse_date("2017-02-15"))
         assert Currency._get_adjclose(indicators, "NGN", timestamp) == 314.5
         indicators = {
             "adjclose": [{"adjclose": [33.13999938964844]}],
@@ -425,7 +426,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert (
             Currency._get_adjclose(indicators, "COP", timestamp)
             == 3269.199951171875
@@ -442,7 +443,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2022-04-14"))
+        timestamp = get_int_timestamp(parse_date("2022-04-14"))
         assert (
             Currency._get_adjclose(indicators, "XAF", timestamp)
             == 605.5509643554688
@@ -459,7 +460,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2022-04-15"))
+        timestamp = get_int_timestamp(parse_date("2022-04-15"))
         assert (
             Currency._get_adjclose(indicators, "XAF", timestamp)
             == 601.632568359375
@@ -476,7 +477,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2017-02-15"))
+        timestamp = get_int_timestamp(parse_date("2017-02-15"))
         assert Currency._get_adjclose(indicators, "XXX", timestamp) == 3.145
         indicators = {
             "adjclose": [{"adjclose": [33.13999938964844]}],
@@ -490,7 +491,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert Currency._get_adjclose(indicators, "COP", timestamp) == 3320.0
         indicators = {
             "adjclose": [{"adjclose": [33.13999938964844]}],
@@ -504,7 +505,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert (
             Currency._get_adjclose(indicators, "COP", timestamp)
             == 3313.999938964844
@@ -523,7 +524,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert (
             Currency._get_adjclose(indicators, "COP", timestamp)
             == 33.13999938964844
@@ -542,7 +543,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert (
             Currency._get_adjclose(indicators, "COP", timestamp)
             == 3124.504838709677
@@ -561,7 +562,7 @@ class TestCurrency:
                 }
             ],
         }
-        timestamp = Currency._get_int_timestamp(parse_date("2015-12-15"))
+        timestamp = get_int_timestamp(parse_date("2015-12-15"))
         assert Currency._get_adjclose(indicators, "COP", timestamp) == 3270
 
         Currency._no_historic = True
