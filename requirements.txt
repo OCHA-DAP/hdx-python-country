@@ -32,7 +32,7 @@ coverage[toml]==7.4.3
     # via
     #   coverage
     #   pytest-cov
-data-bridges-client @ git+ssh://git@github.com/WFP-VAM/DataBridgesAPI@dev
+data-bridges-client @ git+https://github.com/WFP-VAM/DataBridgesAPI@dev
     # via hdx-python-country (pyproject.toml)
 distlib==0.3.8
     # via virtualenv

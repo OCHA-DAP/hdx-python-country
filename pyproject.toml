@@ -50,7 +50,7 @@ Homepage = "https://github.com/OCHA-DAP/hdx-python-country"
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
 dev = ["pre-commit"]
-wfp = ["data-bridges-client@git+ssh://git@github.com/WFP-VAM/DataBridgesAPI@dev#egg=data-bridges-client"]
+wfp = ["data-bridges-client@git+https://github.com/WFP-VAM/DataBridgesAPI@dev#egg=data-bridges-client"]
 
 
 #########
