@@ -97,7 +97,7 @@ pyphonetics==0.5.3
     # via hdx-python-country (pyproject.toml)
 pyrsistent==0.20.0
     # via jsonschema
-pytest==8.0.2
+pytest==8.1.0
     # via
     #   hdx-python-country (pyproject.toml)
     #   pytest-cov
