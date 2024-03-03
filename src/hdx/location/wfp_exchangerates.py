@@ -1,3 +1,4 @@
+import logging
 from datetime import timezone
 from typing import Dict, List
 
@@ -10,6 +11,8 @@ try:
     from data_bridges_client.token import WfpApiToken
 except ImportError:
     WfpApiToken = None
+
+logger = logging.getLogger(__name__)
 
 
 class WFPExchangeRates:
@@ -91,6 +94,7 @@ class WFPExchangeRates:
         """
         historic_rates = {}
         for currency in currencies:
+            logger.info(f"Getting WFP historic rates for {currency}")
             currency_historic_rates = self.get_currency_historic_rates(
                 currency
             )
