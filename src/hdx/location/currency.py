@@ -29,7 +29,7 @@ class Currency:
     """
 
     _primary_rates_url = "https://query2.finance.yahoo.com/v8/finance/chart/{currency}=X?period1={date}&period2={date}&interval=1d&events=div%2Csplit&formatted=false&lang=en-US&region=US&corsDomain=finance.yahoo.com"
-    _secondary_rates_url = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/usd.min.json"
+    _secondary_rates_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.min.json"
     _secondary_historic_url = (
         "https://codeforiati.org/imf-exchangerates/imf_exchangerates.csv"
     )

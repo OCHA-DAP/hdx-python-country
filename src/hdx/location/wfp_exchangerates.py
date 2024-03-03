@@ -1,18 +1,15 @@
 from datetime import timezone
 from typing import Dict, List
 
-from data_bridges_client.exceptions import (
-    ApiException,
-)
-
 from . import get_int_timestamp
 from hdx.utilities.typehint import ListTuple
 
 try:
     from data_bridges_client import ApiClient, Configuration, CurrencyApi
+    from data_bridges_client.exceptions import ApiException
     from data_bridges_client.token import WfpApiToken
 except ImportError:
-    pass
+    WfpApiToken = None
 
 
 class WFPExchangeRates:
