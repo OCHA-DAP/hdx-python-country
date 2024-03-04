@@ -27,9 +27,8 @@ class WFPExchangeRates:
     def __init__(self, key: str, secret: str):
         # Configure OAuth2 access token for authorization: default
         self.token = WfpApiToken(api_key=key, api_secret=secret)
-        configuration = Configuration()
-        configuration.access_token = self.token.refresh()
-        api_client = ApiClient(configuration)
+        self.configuration = self.token.refresh_configuration()
+        api_client = ApiClient(self.configuration)
         self.api_instance = CurrencyApi(api_client)
 
     def get_currencies(self) -> List[str]:
@@ -64,7 +63,7 @@ class WFPExchangeRates:
             except ApiException as ex:
                 if ex.status not in (104, 401, 403):
                     raise
-                self.token.refresh()
+                self.configuration.access_token = self.token.refresh()
                 usdquotations = (
                     self.api_instance.currency_usd_indirect_quotation_get(
                         currency_name=currency, page=page
