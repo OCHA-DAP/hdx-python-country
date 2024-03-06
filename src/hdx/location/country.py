@@ -53,6 +53,7 @@ class Country:
         "TERR.": ["TERRITORY", "TERRITORIES"],
     }
     simplifications = [
+        "AND",
         "THE",
         "OF",
         "ISLAMIC",
