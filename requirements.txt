@@ -23,7 +23,7 @@ click==8.1.7
     # via typer
 colorama==0.4.6
     # via typer
-coverage[toml]==7.4.3
+coverage[toml]==7.4.4
     # via pytest-cov
 distlib==0.3.8
     # via virtualenv
@@ -33,7 +33,7 @@ filelock==3.13.1
     # via virtualenv
 frictionless==5.16.1
     # via hdx-python-utilities
-hdx-python-utilities==3.6.6
+hdx-python-utilities==3.6.7
     # via hdx-python-country (pyproject.toml)
 humanize==4.9.0
     # via frictionless
@@ -168,7 +168,7 @@ urllib3==2.2.1
     # via
     #   libhxl
     #   requests
-validators==0.22.0
+validators==0.23.1
     # via frictionless
 virtualenv==20.25.1
     # via pre-commit
