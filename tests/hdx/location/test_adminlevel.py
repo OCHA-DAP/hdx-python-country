@@ -34,6 +34,7 @@ class TestAdminLevel:
         assert len(adminone.get_pcode_list()) == 433
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.use_parent is False
+        assert adminone.pcode_to_iso3["YE30"] == "YEM"
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (
             "YE30",
             True,
@@ -183,6 +184,7 @@ class TestAdminLevel:
         admintwo.countries_fuzzy_try = None
         admintwo.setup_from_admin_info(config["admin_info_with_parent"])
         assert admintwo.use_parent is True
+        assert admintwo.pcode_to_parent["AF0101"] == "AF01"
         assert admintwo.get_pcode("AFG", "AF0101", logname="test") == (
             "AF0101",
             True,
@@ -423,6 +425,7 @@ class TestAdminLevel:
 
         admintwo = AdminLevel(config, admin_level=2)
         admintwo.setup_from_url(admin_url=url)
+        assert admintwo.pcode_to_parent["YE3001"] == "YE30"
         assert admintwo.get_pcode("YEM", "YE03001", logname="test") == (
             None,
             True,
