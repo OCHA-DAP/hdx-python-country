@@ -168,7 +168,7 @@ urllib3==2.2.1
     # via
     #   libhxl
     #   requests
-validators==0.23.1
+validators==0.23.2
     # via frictionless
 virtualenv==20.25.1
     # via pre-commit
