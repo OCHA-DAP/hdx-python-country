@@ -126,6 +126,13 @@ Method *setup_from_admin_info* takes key *admin_info* which is a list with
 values of the form:
 
     {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
+    {"iso3": "AFG", "pcode": "AF0101", "name": "Kabul", "parent": "AF01"}
+
+Dictionaries *pcode_to_name* and *pcode_to_iso3* are populated in the 
+AdminLevel object. *parent* is optional, but if provided enables lookup of 
+location names by both country and parent rather than just country which should
+help with any name clashes. It also results in the population of a dictionary 
+in the AdminLevel object *pcode_to_parent*.
 
 Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
 *setup_from_url* takes a URL which defaults to a resource in the global p-codes
@@ -144,6 +151,7 @@ Examples of usage:
     adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع")  # returns ("YE30", False)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", fuzzy_match=False)  # returns (None, True)
+    assert admintwo.get_pcode("AFG", "Kabul", parent="AF01") == ("AF0101", True)
 
 There is basic admin 1 p-code length conversion by default. A more advanced
 p-code length conversion can be activated by calling *load_pcode_formats*

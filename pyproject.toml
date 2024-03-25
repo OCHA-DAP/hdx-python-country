@@ -9,7 +9,7 @@ build-backend = "hatchling.build"
 [project]
 name = "hdx-python-country"
 description = "HDX Python country code and exchange rate (fx) utilities"
-authors = [{name = "Michael Rans", email = "rans@email.com"}]
+authors = [{name = "Michael Rans"}]
 license = {text = "MIT"}
 keywords = ["HDX", "location", "country", "country code", "iso 3166", "iso2", "iso3", "region", "fx", "currency", "currencies", "exchange rate", "foreign exchange"]
 classifiers = [

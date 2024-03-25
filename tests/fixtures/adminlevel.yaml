@@ -556,3 +556,8 @@ admin_fuzzy_dont:
   - "sahil"
   - "say'on"
   - "syria"
+
+admin_info_with_parent:
+  - {pcode: AF0101, name: Kabul, iso3: AFG, parent: AF01}
+  - {pcode: AF0102, name: Paghman, iso3: AFG, parent: AF01}
+  - {pcode: AF0201, name: Kabul, iso3: AFG, parent: AF02}  # testing purposes

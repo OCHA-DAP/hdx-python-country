@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import hxl
 from hxl import InputOptions
@@ -61,9 +61,12 @@ class AdminLevel:
         self.pcodes = []
         self.pcode_lengths = {}
         self.name_to_pcode = {}
+        self.name_parent_to_pcode = {}
         self.pcode_to_name = {}
         self.pcode_to_iso3 = {}
+        self.pcode_to_parent = {}
         self.pcode_formats = {}
+        self.use_parent = False
         self.zeroes = {}
         self.parent_admins = []
 
@@ -120,15 +123,55 @@ class AdminLevel:
             )
             raise
 
+    def setup_row(
+        self,
+        countryiso3: str,
+        pcode: str,
+        adm_name: str,
+        parent: Optional[str],
+    ):
+        """
+        Setup a single p-code
+
+        Args:
+            countryiso3 (str): Country
+            pcode (str): P-code
+            adm_name (str): Administrative name
+            parent (Optional[str]): Parent p-code
+
+        Returns:
+            None
+        """
+        self.pcode_lengths[countryiso3] = len(pcode)
+        self.pcodes.append(pcode)
+        self.pcode_to_name[pcode] = adm_name
+
+        name_to_pcode = self.name_to_pcode.get(countryiso3, {})
+        name_to_pcode[unidecode(adm_name).lower()] = pcode
+        self.name_to_pcode[countryiso3] = name_to_pcode
+        self.pcode_to_iso3[pcode] = countryiso3
+        self.pcode_to_iso3[pcode] = countryiso3
+
+        if self.use_parent:
+            name_parent_to_pcode = self.name_parent_to_pcode.get(
+                countryiso3, {}
+            )
+            name_to_pcode = name_parent_to_pcode.get(parent, {})
+            name_to_pcode[unidecode(adm_name).lower()] = pcode
+            name_parent_to_pcode[parent] = name_to_pcode
+            self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
+            self.pcode_to_parent[pcode] = parent
+
     def setup_from_admin_info(
         self,
         admin_info: ListTuple[Dict],
         countryiso3s: Optional[ListTuple[str]] = None,
     ) -> None:
         """
-        Setup p-codes from admin_info which is a list with values of the form:
+        Setup p-codes from admin_info which is a list with values of the form
+        below with parent optional:
         ::
-            {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
+            {"iso3": "AFG", "pcode": "AF0101", "name": "Kabul", parent: "AF01"}
         Args:
             admin_info (ListTuple[Dict]): p-code dictionary
             countryiso3s (Optional[ListTuple[str]]): Countries to read. Defaults to None (all).
@@ -140,19 +183,15 @@ class AdminLevel:
             countryiso3s = [
                 countryiso3.upper() for countryiso3 in countryiso3s
             ]
+        self.use_parent = "parent" in admin_info[0]
         for row in admin_info:
             countryiso3 = row["iso3"].upper()
             if countryiso3s and countryiso3 not in countryiso3s:
                 continue
             pcode = row.get("pcode").upper()
-            self.pcodes.append(pcode)
-            self.pcode_lengths[countryiso3] = len(pcode)
             adm_name = row["name"]
-            self.pcode_to_name[pcode] = adm_name
-            name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-            name_to_pcode[unidecode(adm_name).lower()] = pcode
-            self.name_to_pcode[countryiso3] = name_to_pcode
-            self.pcode_to_iso3[pcode] = countryiso3
+            parent = row.get("parent")
+            self.setup_row(countryiso3, pcode, adm_name, parent)
 
     def setup_from_libhxl_dataset(
         self,
@@ -176,19 +215,15 @@ class AdminLevel:
             countryiso3s = [
                 countryiso3.upper() for countryiso3 in countryiso3s
             ]
+        self.use_parent = "#adm+code+parent" in admin_info.display_tags
         for row in admin_info:
             countryiso3 = row.get("#country+code").upper()
             if countryiso3s and countryiso3 not in countryiso3s:
                 continue
             pcode = row.get("#adm+code").upper()
-            self.pcodes.append(pcode)
-            self.pcode_lengths[countryiso3] = len(pcode)
             adm_name = row.get("#adm+name")
-            self.pcode_to_name[pcode] = adm_name
-            name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-            name_to_pcode[unidecode(adm_name).lower()] = pcode
-            self.name_to_pcode[countryiso3] = name_to_pcode
-            self.pcode_to_iso3[pcode] = countryiso3
+            parent = row.get("#adm+code+parent")
+            self.setup_row(countryiso3, pcode, adm_name, parent)
 
     def setup_from_url(
         self,
@@ -304,7 +339,7 @@ class AdminLevel:
         self.errors = set()
 
     def convert_admin_pcode_length(
-        self, countryiso3: str, pcode: str, logname: Optional[str] = None
+        self, countryiso3: str, pcode: str, **kwargs: Any
     ) -> Optional[str]:
         """Standardise pcode length by country and match to an internal pcode.
         Requires that p-code formats be loaded (eg. using load_pcode_formats)
@@ -312,11 +347,14 @@ class AdminLevel:
         Args:
             countryiso3 (str): ISO3 country code
             pcode (str): P code to match
-            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
+            **kwargs:
+            parent (Optional[str]): Parent admin code
+            logname (str): Log using this identifying name. Defaults to not logging.
 
         Returns:
             Optional[str]: Matched P code or None if no match
         """
+        logname = kwargs.get("logname")
         match = self.pcode_regex.match(pcode)
         if not match:
             return None
@@ -480,18 +518,24 @@ class AdminLevel:
         return None
 
     def fuzzy_pcode(
-        self, countryiso3: str, name: str, logname: Optional[str] = None
+        self,
+        countryiso3: str,
+        name: str,
+        **kwargs: Any,
     ) -> Optional[str]:
         """Fuzzy match name to pcode
 
         Args:
             countryiso3 (str): Iso3 country code
             name (str): Name to match
-            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
+            **kwargs:
+            parent (Optional[str]): Parent admin code
+            logname (str): Log using this identifying name. Defaults to not logging.
 
         Returns:
             Optional[str]: Matched P code or None if no match
         """
+        logname = kwargs.get("logname")
         if (
             self.countries_fuzzy_try is not None
             and countryiso3 not in self.countries_fuzzy_try
@@ -499,11 +543,24 @@ class AdminLevel:
             if logname:
                 self.ignored.add((logname, countryiso3))
             return None
-        name_to_pcode = self.name_to_pcode.get(countryiso3)
-        if not name_to_pcode:
-            if logname:
-                self.errors.add((logname, countryiso3))
-            return None
+        if self.use_parent and "parent" in kwargs:
+            parent = kwargs["parent"]
+            name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3)
+            if not name_parent_to_pcode:
+                if logname:
+                    self.errors.add((logname, countryiso3))
+                return None
+            name_to_pcode = name_parent_to_pcode.get(parent)
+            if not name_to_pcode:
+                if logname:
+                    self.errors.add((logname, countryiso3, parent))
+                return None
+        else:
+            name_to_pcode = self.name_to_pcode.get(countryiso3)
+            if not name_to_pcode:
+                if logname:
+                    self.errors.add((logname, countryiso3))
+                return None
         adm_name_lookup = clean_name(name)
         adm_name_lookup2 = multiple_replace(
             adm_name_lookup, self.admin_name_replacements
@@ -591,7 +648,7 @@ class AdminLevel:
         countryiso3: str,
         name: str,
         fuzzy_match: bool = True,
-        logname: Optional[str] = None,
+        **kwargs: Any,
     ) -> Tuple[Optional[str], bool]:
         """Get pcode for a given name
 
@@ -599,7 +656,9 @@ class AdminLevel:
             countryiso3 (str): Iso3 country code
             name (str): Name to match
             fuzzy_match (bool): Whether to try fuzzy matching. Defaults to True.
-            logname (Optional[str]): Identifying name to use when logging. Defaults to None (don't log).
+            **kwargs:
+            parent (Optional[str]): Parent admin code
+            logname (str): Log using this identifying name. Defaults to not logging.
 
         Returns:
             Tuple[Optional[str], bool]: (Matched P code or None if no match, True if exact match or False if not)
@@ -614,18 +673,30 @@ class AdminLevel:
             # name looks like a p-code, but doesn't match p-codes
             # so try adjusting p-code length
             pcode = self.convert_admin_pcode_length(
-                countryiso3, pcode, logname
+                countryiso3, pcode, **kwargs
             )
             return pcode, True
         else:
-            name_to_pcode = self.name_to_pcode.get(countryiso3)
-            if name_to_pcode is not None:
-                pcode = name_to_pcode.get(name.lower())
-                if pcode:
-                    return pcode, True
+            if self.use_parent and "parent" in kwargs:
+                parent = kwargs["parent"]
+                name_parent_to_pcode = self.name_parent_to_pcode.get(
+                    countryiso3
+                )
+                if name_parent_to_pcode:
+                    name_to_pcode = name_parent_to_pcode.get(parent)
+                    if name_to_pcode is not None:
+                        pcode = name_to_pcode.get(name.lower())
+                        if pcode:
+                            return pcode, True
+            else:
+                name_to_pcode = self.name_to_pcode.get(countryiso3)
+                if name_to_pcode is not None:
+                    pcode = name_to_pcode.get(name.lower())
+                    if pcode:
+                        return pcode, True
             if not fuzzy_match:
                 return None, True
-            pcode = self.fuzzy_pcode(countryiso3, name, logname)
+            pcode = self.fuzzy_pcode(countryiso3, name, **kwargs)
             return pcode, False
 
     def output_matches(self) -> List[str]:
