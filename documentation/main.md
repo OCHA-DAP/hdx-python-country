@@ -128,10 +128,10 @@ values of the form:
     {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
     {"iso3": "AFG", "pcode": "AF0101", "name": "Kabul", "parent": "AF01"}
 
-Dictionaries *pcode_to_name* and *pcode_to_iso3* are populated in the 
-AdminLevel object. *parent* is optional, but if provided enables lookup of 
+Dictionaries *pcode_to_name* and *pcode_to_iso3* are populated in the
+AdminLevel object. *parent* is optional, but if provided enables lookup of
 location names by both country and parent rather than just country which should
-help with any name clashes. It also results in the population of a dictionary 
+help with any name clashes. It also results in the population of a dictionary
 in the AdminLevel object *pcode_to_parent*.
 
 Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
