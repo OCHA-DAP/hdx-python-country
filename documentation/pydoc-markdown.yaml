@@ -24,9 +24,9 @@ renderer:
       - title: Countries
         contents:
           - hdx.location.country.*
-      - title: Administration level one
+      - title: Administration Level
         contents:
-          - hdx.location.adminone.*
+          - hdx.location.adminlevel.*
       - title: Currencies
         contents:
           - hdx.location.currency.*
