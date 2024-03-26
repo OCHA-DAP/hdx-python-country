@@ -9,7 +9,7 @@ renderer:
   output_directory: docs
   mkdocs_config:
     site_name: HDX Python Country
-    theme: mkdocs-material
+    theme: material
     repo_url: "https://github.com/OCHA-DAP/hdx-python-country"
   markdown:
     source_linker:
