@@ -39,7 +39,7 @@ humanize==4.9.0
     # via frictionless
 identify==2.5.35
     # via pre-commit
-idna==3.6
+idna==3.7
     # via requests
 ijson==3.2.3
     # via hdx-python-utilities
