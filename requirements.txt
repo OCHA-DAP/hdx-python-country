@@ -119,7 +119,7 @@ pyyaml==6.0.1
     #   tableschema-to-template
 ratelimit==2.2.1
     # via hdx-python-utilities
-requests==2.31.0
+requests==2.32.0
     # via
     #   frictionless
     #   libhxl
