@@ -155,6 +155,11 @@ class TestAdminLevel:
             "test - Could not find ABC in map names!",
             "test - NER: Could not find ABCDEFGH in map names!",
         ]
+        output = adminone.output_admin_name_mappings()
+        assert len(output) == 62
+        assert output[0] == "Nord-Ouest: North West (HT09)"
+        assert output[31] == "Juba Dhexe: Middle Juba (SO27)"
+        assert output[61] == "CU Niamey: Niamey (NER008)"
 
     def test_adminlevel_fuzzy(self, config):
         adminone = AdminLevel(config)
@@ -231,7 +236,7 @@ class TestAdminLevel:
         adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
-        assert len(adminone.get_pcode_list()) == 2506
+        assert len(adminone.get_pcode_list()) == 2509
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (
             "YE30",
