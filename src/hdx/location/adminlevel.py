@@ -663,9 +663,24 @@ class AdminLevel:
         Returns:
             Tuple[Optional[str], bool]: (Matched P code or None if no match, True if exact match or False if not)
         """
-        pcode = self.admin_name_mappings.get(name)
+        if self.use_parent:
+            parent = kwargs.get("parent")
+        else:
+            parent = None
+        if parent:
+            pcode = self.admin_name_mappings.get(f"{parent}|{name}")
+            if pcode is None:
+                pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
+        else:
+            pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
+        if pcode is None:
+            pcode = self.admin_name_mappings.get(name)
         if pcode and self.pcode_to_iso3[pcode] == countryiso3:
-            return pcode, True
+            if parent:
+                if self.pcode_to_parent[pcode] == parent:
+                    return pcode, True
+            else:
+                return pcode, True
         if self.looks_like_pcode(name):
             pcode = name.upper()
             if pcode in self.pcodes:  # name is a p-code
@@ -677,8 +692,7 @@ class AdminLevel:
             )
             return pcode, True
         else:
-            if self.use_parent and "parent" in kwargs:
-                parent = kwargs["parent"]
+            if parent:
                 name_parent_to_pcode = self.name_parent_to_pcode.get(
                     countryiso3
                 )

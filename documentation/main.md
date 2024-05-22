@@ -113,10 +113,16 @@ The administration level mappings takes input configuration dictionary,
 
 *admin_config* can have the following optional keys:
 
-*countries_fuzzy_try* are countries (iso3 codes) for which to try fuzzy matching. Default is all countries.
-*admin_name_mappings* is a dictionary of mappings from name to pcode (for where fuzzy matching fails)
-*admin_name_replacements* is a dictionary of textual replacements to try when fuzzy matching
-*admin_fuzzy_dont* is a list of names for which fuzzy matching should not be tried
+*countries_fuzzy_try* are countries (iso3 codes) for which to try fuzzy 
+matching. Default is all countries.
+*admin_name_mappings* is a dictionary of mappings from name to pcode. These can
+be global or they can be restricted by country or parent (if the AdminLevel 
+object has been set up with parents). Keys take the form "MAPPING", 
+"AFG|MAPPING" or "AF01|MAPPING".
+*admin_name_replacements* is a dictionary of textual replacements to try when 
+fuzzy matching
+*admin_fuzzy_dont* is a list of names for which fuzzy matching should not be 
+tried
 
 Once an AdminLevel object is constructed, one of three setup methods must be
 called: *setup_from_admin_info*, *setup_from_libhxl_dataset* or

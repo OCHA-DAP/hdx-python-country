@@ -15,6 +15,10 @@ class TestAdminLevel:
         return load_yaml(join("tests", "fixtures", "adminlevel.yaml"))
 
     @pytest.fixture(scope="function")
+    def config_parent(self):
+        return load_yaml(join("tests", "fixtures", "adminlevelparent.yaml"))
+
+    @pytest.fixture(scope="function")
     def url(self):
         return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/main/tests/fixtures/global_pcodes_adm_1_2.csv"
 
@@ -184,10 +188,10 @@ class TestAdminLevel:
             "test - YEM: Matching (fuzzy) Al Dhale'e / الضالع to Ad Dali on map",
         ]
 
-    def test_adminlevel_parent(self, config):
-        admintwo = AdminLevel(config)
+    def test_adminlevel_parent(self, config_parent):
+        admintwo = AdminLevel(config_parent)
         admintwo.countries_fuzzy_try = None
-        admintwo.setup_from_admin_info(config["admin_info_with_parent"])
+        admintwo.setup_from_admin_info(config_parent["admin_info_with_parent"])
         assert admintwo.use_parent is True
         assert admintwo.pcode_to_parent["AF0101"] == "AF01"
         assert admintwo.get_pcode("AFG", "AF0101", logname="test") == (
@@ -221,6 +225,39 @@ class TestAdminLevel:
         ) == ("AF0201", False)
         assert admintwo.get_pcode(
             "ABC", "Kabull", parent="AF02", logname="test"
+        ) == (None, False)
+
+        assert admintwo.get_pcode("AFG", "MyMapping", logname="test") == (
+            "AF0301",
+            True,
+        )
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping", parent="AF03", logname="test"
+        ) == ("AF0301", True)
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping", parent="AF04", logname="test"
+        ) == (None, False)
+
+        assert admintwo.get_pcode("AFG", "MyMapping2", logname="test") == (
+            "AF0401",
+            True,
+        )
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping2", parent="AF04", logname="test"
+        ) == ("AF0401", True)
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping2", parent="AF05", logname="test"
+        ) == (None, False)
+
+        assert admintwo.get_pcode("AFG", "MyMapping3", logname="test") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping3", parent="AF05", logname="test"
+        ) == ("AF0501", True)
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping3", parent="AF04", logname="test"
         ) == (None, False)
 
     def test_adminlevel_with_url(self, config, url):
