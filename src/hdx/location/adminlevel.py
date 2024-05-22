@@ -643,6 +643,27 @@ class AdminLevel:
                 )
         return pcode
 
+    def get_name_mapped_pcode(self, countryiso3: str, name: str, parent: Optional[str]) -> Optional[str]:
+        """Get pcode from admin name mappings
+
+        Args:
+            countryiso3 (str): Iso3 country code
+            name (str): Name to match
+            parent (Optional[str]): Parent admin code
+
+        Returns:
+            Optional[str]: P code match from admin name mappings or None if no match
+        """
+        if parent:
+            pcode = self.admin_name_mappings.get(f"{parent}|{name}")
+            if pcode is None:
+                pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
+        else:
+            pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
+        if pcode is None:
+            pcode = self.admin_name_mappings.get(name)
+        return pcode
+
     def get_pcode(
         self,
         countryiso3: str,
@@ -667,14 +688,7 @@ class AdminLevel:
             parent = kwargs.get("parent")
         else:
             parent = None
-        if parent:
-            pcode = self.admin_name_mappings.get(f"{parent}|{name}")
-            if pcode is None:
-                pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
-        else:
-            pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
-        if pcode is None:
-            pcode = self.admin_name_mappings.get(name)
+        pcode = self.get_name_mapped_pcode(countryiso3, name, parent)
         if pcode and self.pcode_to_iso3[pcode] == countryiso3:
             if parent:
                 if self.pcode_to_parent[pcode] == parent:
@@ -767,6 +781,19 @@ class AdminLevel:
         output = []
         for name, pcode in self.admin_name_mappings.items():
             line = f"{name}: {self.pcode_to_name[pcode]} ({pcode})"
+            logger.info(line)
+            output.append(line)
+        return output
+
+    def output_admin_name_replacements(self) -> List[str]:
+        """Output log of name replacements
+
+        Returns:
+            List[str]: List of name replacements
+        """
+        output = []
+        for name, replacement in self.admin_name_replacements.items():
+            line = f"{name}: {replacement}"
             logger.info(line)
             output.append(line)
         return output
