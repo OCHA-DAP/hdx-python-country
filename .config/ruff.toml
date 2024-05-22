@@ -12,6 +12,5 @@ ignore = [
     "E501" # Line too long
 ]
 
-
 [lint.isort]
 known-local-folder = ["hdx"]

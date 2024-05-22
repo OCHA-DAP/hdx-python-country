@@ -743,3 +743,16 @@ class AdminLevel:
             logger.error(line)
             output.append(line)
         return output
+
+    def output_admin_name_mappings(self) -> List[str]:
+        """Output log of name mappings
+
+        Returns:
+            List[str]: List of mappings
+        """
+        output = []
+        for name, pcode in self.admin_name_mappings.items():
+            line = f"{name}: {self.pcode_to_name[pcode]} ({pcode})"
+            logger.info(line)
+            output.append(line)
+        return output
