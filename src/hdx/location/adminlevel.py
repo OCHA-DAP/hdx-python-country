@@ -306,7 +306,7 @@ class AdminLevel:
         """Get admin level for country
 
         Args:
-            countryiso3 (str): Iso3 country code
+            countryiso3 (str): ISO3 country code
 
         Returns:
             int: Admin level
@@ -320,7 +320,7 @@ class AdminLevel:
         """Get pcode length for country
 
         Args:
-            countryiso3 (str): Iso3 country code
+            countryiso3 (str): ISO3 country code
 
         Returns:
             Optional[int]: Country's pcode length or None
@@ -517,6 +517,41 @@ class AdminLevel:
             return pcode
         return None
 
+    def get_admin_name_replacements(
+        self, countryiso3: str, parent: Optional[str]
+    ) -> Dict[str, str]:
+        """Get relevant admin name replacements from admin name replacements
+        which is a dictionary of mappings from string to string replacement.
+        These can be global or they can be restricted by
+        country or parent (if the AdminLevel object has been set up with
+        parents). Keys take the form "STRING_TO_REPLACE",
+        "AFG|STRING_TO_REPLACE" or "AF01|STRING_TO_REPLACE".
+
+        Args:
+            countryiso3 (str): ISO3 country code
+            parent (Optional[str]): Parent admin code
+
+        Returns:
+            Dict[str, str]: Relevant admin name replacements
+        """
+        relevant_name_replacements = {}
+        for key, value in self.admin_name_replacements.items():
+            if "|" not in key:
+                if key not in relevant_name_replacements:
+                    relevant_name_replacements[key] = value
+                continue
+            prefix, name = key.split("|")
+            if parent:
+                if prefix == parent:
+                    if name not in relevant_name_replacements:
+                        relevant_name_replacements[name] = value
+                    continue
+            if prefix == countryiso3:
+                if name not in relevant_name_replacements:
+                    relevant_name_replacements[name] = value
+                continue
+        return relevant_name_replacements
+
     def fuzzy_pcode(
         self,
         countryiso3: str,
@@ -526,7 +561,7 @@ class AdminLevel:
         """Fuzzy match name to pcode
 
         Args:
-            countryiso3 (str): Iso3 country code
+            countryiso3 (str): ISO3 country code
             name (str): Name to match
             **kwargs:
             parent (Optional[str]): Parent admin code
@@ -543,8 +578,17 @@ class AdminLevel:
             if logname:
                 self.ignored.add((logname, countryiso3))
             return None
-        if self.use_parent and "parent" in kwargs:
-            parent = kwargs["parent"]
+        if self.use_parent:
+            parent = kwargs.get("parent")
+        else:
+            parent = None
+        if parent is None:
+            name_to_pcode = self.name_to_pcode.get(countryiso3)
+            if not name_to_pcode:
+                if logname:
+                    self.errors.add((logname, countryiso3))
+                return None
+        else:
             name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3)
             if not name_parent_to_pcode:
                 if logname:
@@ -555,15 +599,10 @@ class AdminLevel:
                 if logname:
                     self.errors.add((logname, countryiso3, parent))
                 return None
-        else:
-            name_to_pcode = self.name_to_pcode.get(countryiso3)
-            if not name_to_pcode:
-                if logname:
-                    self.errors.add((logname, countryiso3))
-                return None
         adm_name_lookup = clean_name(name)
         adm_name_lookup2 = multiple_replace(
-            adm_name_lookup, self.admin_name_replacements
+            adm_name_lookup,
+            self.get_admin_name_replacements(countryiso3, parent),
         )
         pcode = name_to_pcode.get(
             adm_name_lookup, name_to_pcode.get(adm_name_lookup2)
@@ -643,11 +682,17 @@ class AdminLevel:
                 )
         return pcode
 
-    def get_name_mapped_pcode(self, countryiso3: str, name: str, parent: Optional[str]) -> Optional[str]:
-        """Get pcode from admin name mappings
+    def get_name_mapped_pcode(
+        self, countryiso3: str, name: str, parent: Optional[str]
+    ) -> Optional[str]:
+        """Get pcode from admin name mappings which is a dictionary of mappings
+        from name to pcode. These can be global or they can be restricted by
+        country or parent (if the AdminLevel object has been set up with
+        parents). Keys take the form "MAPPING", "AFG|MAPPING" or
+        "AF01|MAPPING".
 
         Args:
-            countryiso3 (str): Iso3 country code
+            countryiso3 (str): ISO3 country code
             name (str): Name to match
             parent (Optional[str]): Parent admin code
 
@@ -674,7 +719,7 @@ class AdminLevel:
         """Get pcode for a given name
 
         Args:
-            countryiso3 (str): Iso3 country code
+            countryiso3 (str): ISO3 country code
             name (str): Name to match
             fuzzy_match (bool): Whether to try fuzzy matching. Defaults to True.
             **kwargs:
