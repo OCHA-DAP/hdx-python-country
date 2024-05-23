@@ -1,0 +1,25 @@
+admin_info_with_parent:
+  - {pcode: AF0101, name: Kabul, iso3: AFG, parent: AF01}
+  - {pcode: AF0102, name: Paghman, iso3: AFG, parent: AF01}
+  - {pcode: AF0201, name: Kabul, iso3: AFG, parent: AF02}  # testing purposes
+  - {pcode: AF0301, name: Charikar, iso3: AFG, parent: AF03}
+  - {pcode: AF0401, name: Maydan Shahr, iso3: AFG, parent: AF04}
+  - {pcode: AF0501, name: Pul-e-Alam, iso3: AFG, parent: AF05}
+  - {pcode: AF0501, name: Pul-e-Alam, iso3: AFG, parent: AF05}
+  - {pcode: CD2013, name: Mbanza-Ngungu, iso3: COD, parent: CD20}
+  - {pcode: CD3102, name: Kenge, iso3: COD, parent: CD31}
+  - {pcode: MW305, name: Blantyre, iso3: MWI, parent: MW3}
+
+admin_name_mappings:
+  "MyMapping": "AF0301"
+  "AFG|MyMapping2": "AF0401"
+  "AF05|MyMapping3": "AF0501"
+
+admin_name_replacements:
+  " city": ""
+
+alt1_admin_name_replacements:
+  "COD| city": ""
+
+alt2_admin_name_replacements:
+  "CD20| city": ""
