@@ -23,7 +23,7 @@ class Phonetics:
             name (str): Name to match
             alternative_name (str): Alternative name to match. Defaults to None.
             transform_possible_names (ListTuple[Callable]): Functions to transform possible names.
-            threshold (float): Match threshold. Defaults to 67.
+            threshold (float): Match threshold. Defaults to 53.
 
         Returns:
             Optional[int]: Index of matching name from possible names or None
