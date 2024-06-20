@@ -182,6 +182,10 @@ class TestAdminLevel:
     def test_adminlevel_fuzzy(self, config):
         adminone = AdminLevel(config)
         adminone.setup_from_admin_info(config["admin_info"])
+        assert adminone.get_pcode("YEM", "Al_Dhale'a", logname="test") == (
+            "YE30",
+            False,
+        )
         assert adminone.get_pcode("YEM", "Al Dali", logname="test") == (
             "YE30",
             False,
@@ -204,6 +208,7 @@ class TestAdminLevel:
         assert output == [
             "test - YEM: Matching (fuzzy) Al Dali to Ad Dali on map",
             "test - YEM: Matching (fuzzy) Al Dhale'e / الضالع to Ad Dali on map",
+            "test - YEM: Matching (fuzzy) Al_Dhale'a to Ad Dali on map",
         ]
 
     def test_adminlevel_parent(self, config_parent):

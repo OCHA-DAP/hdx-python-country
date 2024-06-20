@@ -643,13 +643,17 @@ class AdminLevel:
             map_names = list(name_to_pcode.keys())
 
             def al_transform_1(name):
-                if name[:3] == "al ":
+                prefix = name[:3]
+                if prefix == "al ":
                     return f"ad {name[3:]}"
+                elif prefix == "ad ":
+                    return f"al {name[3:]}"
                 else:
                     return None
 
             def al_transform_2(name):
-                if name[:3] == "al ":
+                prefix = name[:3]
+                if prefix == "al " or prefix == "ad ":
                     return name[3:]
                 else:
                     return None
