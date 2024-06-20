@@ -716,6 +716,7 @@ class AdminLevel:
         countryiso3: str,
         name: str,
         fuzzy_match: bool = True,
+        fuzzy_length: int = 4,
         **kwargs: Any,
     ) -> Tuple[Optional[str], bool]:
         """Get pcode for a given name
@@ -724,6 +725,7 @@ class AdminLevel:
             countryiso3 (str): ISO3 country code
             name (str): Name to match
             fuzzy_match (bool): Whether to try fuzzy matching. Defaults to True.
+            fuzzy_length (int): Minimum length for fuzzy matching. Defaults to 4.
             **kwargs:
             parent (Optional[str]): Parent admin code
             logname (str): Log using this identifying name. Defaults to not logging.
@@ -769,7 +771,7 @@ class AdminLevel:
                     pcode = name_to_pcode.get(name.lower())
                     if pcode:
                         return pcode, True
-            if not fuzzy_match or len(name) < 4:
+            if not fuzzy_match or len(name) < fuzzy_length:
                 return None, True
             pcode = self.fuzzy_pcode(countryiso3, name, **kwargs)
             return pcode, False

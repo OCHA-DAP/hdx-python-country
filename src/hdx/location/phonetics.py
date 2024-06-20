@@ -12,7 +12,7 @@ class Phonetics:
         name: str,
         alternative_name: Optional[str] = None,
         transform_possible_names: ListTuple[Callable] = [],
-        threshold: float = 53,
+        threshold: float = 60,
     ) -> Optional[int]:
         """
         Match name to one of the given possible names. Returns None if no match
@@ -23,12 +23,12 @@ class Phonetics:
             name (str): Name to match
             alternative_name (str): Alternative name to match. Defaults to None.
             transform_possible_names (ListTuple[Callable]): Functions to transform possible names.
-            threshold (float): Match threshold. Defaults to 53.
+            threshold (float): Match threshold. Value is 0-100. Defaults to 60.
 
         Returns:
             Optional[int]: Index of matching name from possible names or None
         """
-        max_similarity = None
+        max_similarity = 0
         matching_index = None
 
         transform_possible_names.insert(0, lambda x: x)
@@ -37,7 +37,7 @@ class Phonetics:
             nonlocal max_similarity, matching_index  # noqa: E999
 
             similarity = fuzz.token_sort_ratio(name, possible_name)
-            if max_similarity is None or similarity > max_similarity:
+            if similarity > max_similarity:
                 max_similarity = similarity
                 matching_index = i
 
@@ -51,6 +51,6 @@ class Phonetics:
                 check_name(name, transformed_possible_name)
                 if alternative_name:
                     check_name(alternative_name, transformed_possible_name)
-        if max_similarity is None or max_similarity < threshold:
+        if max_similarity < threshold:
             return None
         return matching_index
