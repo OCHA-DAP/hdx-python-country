@@ -192,6 +192,10 @@ class TestAdminLevel:
             "YE30",
             False,
         )
+        assert adminone.get_pcode("AFG", "Sar-E-Pul", logname="test") == (
+            "AF22",
+            False,
+        )
         assert adminone.get_pcode("SOM", "Bay", logname="test") == (
             "SO24",
             True,
@@ -463,7 +467,7 @@ class TestAdminLevel:
         )
         assert adminone.get_pcode("YEM", "Ad Dali", logname="test") == (
             "YE30",
-            False,
+            True,
         )
         assert adminone.get_pcode("YEM", "Ad Dal", logname="test") == (
             "YE30",
@@ -506,7 +510,6 @@ class TestAdminLevel:
             "test - NGA: Matching (pcode length conversion) NG015 to Federal Capital Territory on map",
             "test - UKR: Matching (substring) Chernihiv Oblast to Chernihivska on map",
             "test - YEM: Matching (substring) Ad Dal to Ad Dali' on map",
-            "test - YEM: Matching (substring) Ad Dali to Ad Dali' on map",
             "test - YEM: Matching (pcode length conversion) YE30 to Ad Dali' on map",
         ]
         output = adminone.output_ignored()

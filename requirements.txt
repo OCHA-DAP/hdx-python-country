@@ -24,7 +24,7 @@ distlib==0.3.8
     # via virtualenv
 et-xmlfile==1.1.0
     # via openpyxl
-filelock==3.15.1
+filelock==3.15.3
     # via virtualenv
 frictionless==5.17.0
     # via hdx-python-utilities
@@ -60,7 +60,7 @@ loguru==0.7.2
     # via hdx-python-utilities
 markdown-it-py==3.0.0
     # via rich
-marko==2.1.0
+marko==2.1.1
     # via frictionless
 markupsafe==2.1.5
     # via jinja2

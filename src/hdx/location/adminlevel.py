@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Optional, Tuple
 import hxl
 from hxl import InputOptions
 from hxl.input import HXLIOException
-from unidecode import unidecode
 
 from hdx.location.country import Country
 from hdx.location.names import clean_name
@@ -147,7 +146,7 @@ class AdminLevel:
         self.pcode_to_name[pcode] = adm_name
 
         name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-        name_to_pcode[unidecode(adm_name).lower()] = pcode
+        name_to_pcode[clean_name(adm_name)] = pcode
         self.name_to_pcode[countryiso3] = name_to_pcode
         self.pcode_to_iso3[pcode] = countryiso3
         self.pcode_to_iso3[pcode] = countryiso3
@@ -157,7 +156,7 @@ class AdminLevel:
                 countryiso3, {}
             )
             name_to_pcode = name_parent_to_pcode.get(parent, {})
-            name_to_pcode[unidecode(adm_name).lower()] = pcode
+            name_to_pcode[clean_name(adm_name)] = pcode
             name_parent_to_pcode[parent] = name_to_pcode
             self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
             self.pcode_to_parent[pcode] = parent
@@ -642,7 +641,6 @@ class AdminLevel:
                     break
         if not pcode:
             map_names = list(name_to_pcode.keys())
-            lower_mapnames = [x.lower() for x in map_names]
 
             def al_transform_1(name):
                 if name[:3] == "al ":
@@ -657,7 +655,7 @@ class AdminLevel:
                     return None
 
             matching_index = self.phonetics.match(
-                lower_mapnames,
+                map_names,
                 adm_name_lookup,
                 alternative_name=adm_name_lookup2,
                 transform_possible_names=[al_transform_1, al_transform_2],
