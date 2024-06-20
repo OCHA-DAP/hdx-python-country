@@ -196,6 +196,10 @@ class TestAdminLevel:
             "YE30",
             False,
         )
+        assert adminone.get_pcode("YEM", "Ad Jauf", logname="test") == (
+            "YE16",
+            False,
+        )
         assert adminone.get_pcode("AFG", "Sar-E-Pul", logname="test") == (
             "AF22",
             False,
@@ -206,6 +210,7 @@ class TestAdminLevel:
         )
         output = adminone.output_matches()
         assert output == [
+            "test - YEM: Matching (fuzzy) Ad Jauf to Al Jawf on map",
             "test - YEM: Matching (fuzzy) Al Dali to Ad Dali on map",
             "test - YEM: Matching (fuzzy) Al Dhale'e / الضالع to Ad Dali on map",
             "test - YEM: Matching (fuzzy) Al_Dhale'a to Ad Dali on map",
