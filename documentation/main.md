@@ -120,8 +120,8 @@ be global or they can be restricted by country or parent (if the AdminLevel
 object has been set up with parents). Keys take the form "MAPPING",
 "AFG|MAPPING" or "AF01|MAPPING".
 *admin_name_replacements* is a dictionary of textual replacements to try when
-fuzzy matching. It maps from string to string replacement. The replacements can 
-be global or they can be restricted by country or parent (if the AdminLevel 
+fuzzy matching. It maps from string to string replacement. The replacements can
+be global or they can be restricted by country or parent (if the AdminLevel
 object has been set up with parents). Keys take the form "STRING_TO_REPLACE",
 "AFG|STRING_TO_REPLACE" or "AF01|STRING_TO_REPLACE".
 *admin_fuzzy_dont* is a list of names for which fuzzy matching should not be

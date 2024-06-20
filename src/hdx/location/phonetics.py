@@ -1,18 +1,18 @@
 from typing import Callable, Optional
 
-import pyphonetics
+from rapidfuzz import fuzz
 
 from hdx.utilities.typehint import ListTuple
 
 
-class Phonetics(pyphonetics.RefinedSoundex):
+class Phonetics:
     def match(
         self,
         possible_names: ListTuple,
         name: str,
         alternative_name: Optional[str] = None,
         transform_possible_names: ListTuple[Callable] = [],
-        threshold: int = 2,
+        threshold: float = 60,
     ) -> Optional[int]:
         """
         Match name to one of the given possible names. Returns None if no match
@@ -23,22 +23,22 @@ class Phonetics(pyphonetics.RefinedSoundex):
             name (str): Name to match
             alternative_name (str): Alternative name to match. Defaults to None.
             transform_possible_names (ListTuple[Callable]): Functions to transform possible names.
-            threshold: Match threshold. Defaults to 2.
+            threshold (float): Match threshold. Value is 0-100. Defaults to 60.
 
         Returns:
             Optional[int]: Index of matching name from possible names or None
         """
-        mindistance = None
+        max_similarity = 0
         matching_index = None
 
         transform_possible_names.insert(0, lambda x: x)
 
         def check_name(name, possible_name):
-            nonlocal mindistance, matching_index  # noqa: E999
+            nonlocal max_similarity, matching_index  # noqa: E999
 
-            distance = self.distance(name, possible_name)
-            if mindistance is None or distance < mindistance:
-                mindistance = distance
+            similarity = fuzz.token_sort_ratio(name, possible_name)
+            if similarity > max_similarity:
+                max_similarity = similarity
                 matching_index = i
 
         for i, possible_name in enumerate(possible_names):
@@ -51,6 +51,6 @@ class Phonetics(pyphonetics.RefinedSoundex):
                 check_name(name, transformed_possible_name)
                 if alternative_name:
                     check_name(alternative_name, transformed_possible_name)
-        if mindistance is None or mindistance > threshold:
+        if max_similarity < threshold:
             return None
         return matching_index

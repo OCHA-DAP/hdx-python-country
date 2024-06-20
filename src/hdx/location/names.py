@@ -3,7 +3,7 @@ import unicodedata
 
 from unidecode import unidecode
 
-non_ascii = "([^\x00-\x7f])+"
+non_ascii = r"([^\x00-\x7f])+"
 
 
 def clean_name(name: str) -> str:
@@ -25,5 +25,7 @@ def clean_name(name: str) -> str:
     )
     # Remove all non-ASCII characters
     clean_name = re.sub(non_ascii, " ", clean_name)
+    clean_name = clean_name.replace("'", "")
+    clean_name = re.sub(r"[\W_]", " ", clean_name)
     clean_name = unidecode(clean_name)
     return clean_name.strip().lower()

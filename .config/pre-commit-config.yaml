@@ -1,14 +1,14 @@
 default_language_version:
-    python: python3.11
+    python: python3.12
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-ast
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.4.8
     hooks:
       # Run the linter.
       - id: ruff
@@ -17,7 +17,7 @@ repos:
       - id: ruff-format
         args: [--config, .config/ruff.toml]
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.1.45
+    rev: 0.2.10
     hooks:
       # Run the pip compile
       - id: pip-compile
