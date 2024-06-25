@@ -25,7 +25,7 @@ def clean_name(name: str) -> str:
     )
     # Remove all non-ASCII characters
     clean_name = re.sub(non_ascii, " ", clean_name)
-    clean_name = clean_name.replace("'", "")
-    clean_name = re.sub(r"[\W_]", " ", clean_name)
+    clean_name = re.sub(r"'+", "", clean_name)
+    clean_name = re.sub(r"[\W_]+", " ", clean_name)
     clean_name = unidecode(clean_name)
     return clean_name.strip().lower()
