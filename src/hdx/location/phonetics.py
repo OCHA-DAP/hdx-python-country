@@ -11,12 +11,12 @@ class Phonetics:
     Phonetic matching class.
 
     Args:
-        threshold (float): Match threshold. Value is 0-100. Defaults to 60.
+        threshold (float): Match threshold. Value is 0-100. Defaults to 55.
         try_remove_spaces (bool): Whether to also try removing spaces. Defaults to True.
     """
 
     def __init__(
-        self, threshold: float = 60, try_remove_spaces: bool = True
+        self, threshold: float = 55, try_remove_spaces: bool = True
     ) -> None:
         self.threshold = threshold
         self.try_remove_spaces = try_remove_spaces
