@@ -6,6 +6,7 @@ admin_info_with_parent:
   - {pcode: AF0401, name: Maydan Shahr, iso3: AFG, parent: AF04}
   - {pcode: AF0501, name: Pul-e-Alam, iso3: AFG, parent: AF05}
   - {pcode: AF0501, name: Pul-e-Alam, iso3: AFG, parent: AF05}
+  - {pcode: AF1111, name: Qara Bagh, iso3: AFG, parent: AF11}
   - {pcode: CD2013, name: Mbanza-Ngungu, iso3: COD, parent: CD20}
   - {pcode: CD3102, name: Kenge, iso3: COD, parent: CD31}
   - {pcode: MW305, name: Blantyre, iso3: MWI, parent: MW3}

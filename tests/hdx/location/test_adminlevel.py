@@ -220,6 +220,9 @@ class TestAdminLevel:
         admintwo = AdminLevel(config_parent)
         admintwo.countries_fuzzy_try = None
         admintwo.setup_from_admin_info(config_parent["admin_info_with_parent"])
+        assert admintwo.get_pcode(
+            "AFG", "Qarabagh", parent="AF11", logname="test"
+        ) == ("AF1111", False)
         assert admintwo.use_parent is True
         assert admintwo.pcode_to_parent["AF0101"] == "AF01"
         assert admintwo.get_pcode("AFG", "AF0101", logname="test") == (
@@ -251,6 +254,9 @@ class TestAdminLevel:
         assert admintwo.get_pcode(
             "AFG", "Kabull", parent="AF02", logname="test"
         ) == ("AF0201", False)
+        assert admintwo.get_pcode(
+            "AFG", "Qara Bagh", parent="AF11", logname="test"
+        ) == ("AF1111", True)
         assert admintwo.get_pcode(
             "ABC", "Kabull", parent="AF02", logname="test"
         ) == (None, False)
