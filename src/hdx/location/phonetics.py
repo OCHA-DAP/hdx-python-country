@@ -59,7 +59,7 @@ class Phonetics:
             no_whitespace = remove_whitespace(name)
             if no_whitespace != name:
                 names_to_match.append(no_whitespace)
-        if alternative_name != name:
+        if alternative_name and alternative_name != name:
             names_to_match.append(alternative_name)
             if self.try_remove_spaces:
                 no_whitespace = remove_whitespace(alternative_name)
