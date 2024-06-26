@@ -434,7 +434,6 @@ admin_info:
   - {pcode: XYZ123456, name: Random, iso3: XYZ}
 
 countries_fuzzy_try:
-  - AFG
   - NER
   - NGA
   - UKR
