@@ -31,11 +31,40 @@ def clean_name(name: str) -> str:
         str: Name without accented characters
     """
     # Replace all non-ASCII characters with equivalent if available or remove
-    clean_name = "".join(
-        c
-        for c in unicodedata.normalize("NFD", name)
-        if unicodedata.category(c) != "Mn"
-    )
-    clean_name = "".join(x for x in clean_name if x in string.printable)
-    clean_name = clean_name.translate(replacement_mapping)
-    return clean_name.strip()
+    chars = []
+    space = False
+    for x in unicodedata.normalize("NFD", name):
+        match ord(x):
+            case num if num < 32:
+                continue
+            case num if 32 <= num < 39:
+                if space:
+                    continue
+                chars.append(" ")
+                space = True
+            case 39:
+                continue
+            case num if 39 <= num < 65:
+                if space:
+                    continue
+                chars.append(" ")
+                space = True
+            case num if 65 <= num < 91:
+                chars.append(chr(num + 32))
+                space = False
+            case num if 91 <= num < 97:
+                if space:
+                    continue
+                chars.append(" ")
+                space = True
+            case num if 97 <= num < 123:
+                chars.append(x)
+                space = False
+            case num if 123 <= num < 127:
+                if space:
+                    continue
+                chars.append(" ")
+                space = True
+            case num if num >= 127:
+                continue
+    return "".join(chars).strip()
