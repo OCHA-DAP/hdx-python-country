@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import hxl
 from hxl import InputOptions
 from hxl.input import HXLIOException
+from unidecode import unidecode
 
 from hdx.location.country import Country
 from hdx.location.names import clean_name
@@ -146,7 +147,7 @@ class AdminLevel:
         self.pcode_to_name[pcode] = adm_name
 
         name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-        name_to_pcode[clean_name(adm_name)] = pcode
+        name_to_pcode[unidecode(adm_name).lower()] = pcode
         self.name_to_pcode[countryiso3] = name_to_pcode
         self.pcode_to_iso3[pcode] = countryiso3
         self.pcode_to_iso3[pcode] = countryiso3
@@ -156,7 +157,7 @@ class AdminLevel:
                 countryiso3, {}
             )
             name_to_pcode = name_parent_to_pcode.get(parent, {})
-            name_to_pcode[clean_name(adm_name)] = pcode
+            name_to_pcode[unidecode(adm_name).lower()] = pcode
             name_parent_to_pcode[parent] = name_to_pcode
             self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
             self.pcode_to_parent[pcode] = parent
@@ -641,25 +642,22 @@ class AdminLevel:
                     break
         if not pcode:
             map_names = list(name_to_pcode.keys())
+            lower_mapnames = [x.lower() for x in map_names]
 
             def al_transform_1(name):
-                prefix = name[:3]
-                if prefix == "al ":
+                if name[:3] == "al ":
                     return f"ad {name[3:]}"
-                elif prefix == "ad ":
-                    return f"al {name[3:]}"
                 else:
                     return None
 
             def al_transform_2(name):
-                prefix = name[:3]
-                if prefix == "al " or prefix == "ad ":
+                if name[:3] == "al ":
                     return name[3:]
                 else:
                     return None
 
             matching_index = self.phonetics.match(
-                map_names,
+                lower_mapnames,
                 adm_name_lookup,
                 alternative_name=adm_name_lookup2,
                 transform_possible_names=[al_transform_1, al_transform_2],
@@ -716,7 +714,6 @@ class AdminLevel:
         countryiso3: str,
         name: str,
         fuzzy_match: bool = True,
-        fuzzy_length: int = 4,
         **kwargs: Any,
     ) -> Tuple[Optional[str], bool]:
         """Get pcode for a given name
@@ -725,7 +722,6 @@ class AdminLevel:
             countryiso3 (str): ISO3 country code
             name (str): Name to match
             fuzzy_match (bool): Whether to try fuzzy matching. Defaults to True.
-            fuzzy_length (int): Minimum length for fuzzy matching. Defaults to 4.
             **kwargs:
             parent (Optional[str]): Parent admin code
             logname (str): Log using this identifying name. Defaults to not logging.
@@ -771,7 +767,7 @@ class AdminLevel:
                     pcode = name_to_pcode.get(name.lower())
                     if pcode:
                         return pcode, True
-            if not fuzzy_match or len(name) < fuzzy_length:
+            if not fuzzy_match:
                 return None, True
             pcode = self.fuzzy_pcode(countryiso3, name, **kwargs)
             return pcode, False
