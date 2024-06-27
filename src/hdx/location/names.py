@@ -18,6 +18,8 @@ def make_replace_mapping():
 
 replacement_mapping = make_replace_mapping()
 
+lowercase_space = string.ascii_lowercase + " '"
+
 
 def clean_name(name: str) -> str:
     """
@@ -31,15 +33,7 @@ def clean_name(name: str) -> str:
         str: Name without accented characters
     """
     # Replace all non-ASCII characters with equivalent if available or remove
-    chars = []
-    for x in unicodedata.normalize("NFD", name):
-        ordch = ord(x)
-        if 97 <= ordch < 123:
-            chars.append(x)
-        elif 65 <= ordch < 91:
-            chars.append(chr(ordch + 32))
-        elif ordch < 32 or ordch >= 127:
-            continue
-        else:
-            chars.append(x)
-    return "".join(chars).strip()
+    clean_name = unicodedata.normalize("NFD", name)
+    clean_name = clean_name.translate(replacement_mapping)
+    clean_name = "".join(x for x in clean_name if x in lowercase_space)
+    return clean_name.strip()
