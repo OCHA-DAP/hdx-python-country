@@ -38,6 +38,8 @@ def clean_name(name: str) -> str:
             chars.append(x)
         elif 65 <= ordch < 91:
             chars.append(chr(ordch + 32))
-        else:
+        elif ordch < 32 or ordch >= 127:
             continue
+        else:
+            chars.append(x)
     return "".join(chars).strip()
