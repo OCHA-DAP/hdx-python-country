@@ -18,7 +18,7 @@ def make_replace_mapping():
 
 replacement_mapping = make_replace_mapping()
 
-lowercase_space = string.printable
+lowercase_space = string.ascii_lowercase + " '&/"
 
 
 def clean_name(name: str) -> str:
