@@ -18,7 +18,7 @@ def make_replace_mapping():
 
 replacement_mapping = make_replace_mapping()
 
-lowercase_space = string.ascii_lowercase + " '&/.,()-\";:" + string.digits + string.whitespace
+lowercase_space = string.ascii_lowercase + string.punctuation + string.digits + string.whitespace
 
 
 def clean_name(name: str) -> str:
