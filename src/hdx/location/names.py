@@ -21,7 +21,7 @@ replacement_mapping = make_replace_mapping()
 lowercase_space = string.ascii_lowercase + string.punctuation + string.digits + " "
 
 
-map_to_space = {9, 10, 11, 12, 13, 32, 47}
+map_to_space = {9, 10, 11, 12, 13, 32, 45, 47, 95}
 
 
 def clean_name(name: str) -> str:
