@@ -32,35 +32,12 @@ def clean_name(name: str) -> str:
     """
     # Replace all non-ASCII characters with equivalent if available or remove
     chars = []
-#    space = False
     for x in unicodedata.normalize("NFD", name):
-        match ord(x):
-            case num if 97 <= num < 123:
-                chars.append(x)
-#                space = False
-            case num if 65 <= num < 91:
-                chars.append(chr(num + 32))
-#                space = False
-            # case num if 32 <= num < 39:
-            #     if space:
-            #         continue
-            #     chars.append(" ")
-            #     space = True
-            # case num if 39 <= num < 65:
-            #     if space:
-            #         continue
-            #     chars.append(" ")
-            #     space = True
-            # case num if 91 <= num < 97:
-            #     if space:
-            #         continue
-            #     chars.append(" ")
-            #     space = True
-            # case num if 123 <= num < 127:
-            #     if space:
-            #         continue
-            #     chars.append(" ")
-            #     space = True
-            case _:
-                continue
+        ordch = ord(x)
+        if 97 <= ordch < 123:
+            chars.append(x)
+        elif 65 <= ordch < 91:
+            chars.append(chr(ordch + 32))
+        else:
+            continue
     return "".join(chars).strip()
