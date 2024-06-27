@@ -8,8 +8,8 @@ def make_replace_mapping():
     #    punctuation = string.punctuation.replace("'", "")
     #    chars_to_replace.append(punctuation)
     #    replacement_chars.append(" " * len(punctuation))
-    #    chars_to_replace.append(string.whitespace)
-    #    replacement_chars.append(" " * len(string.whitespace))
+    chars_to_replace.append(string.whitespace)
+    replacement_chars.append(" " * len(string.whitespace))
 
     chars_to_replace = "".join(chars_to_replace)
     replacement_chars = "".join(replacement_chars)
@@ -18,7 +18,7 @@ def make_replace_mapping():
 
 replacement_mapping = make_replace_mapping()
 
-lowercase_space = string.ascii_lowercase + string.punctuation + string.digits + string.whitespace
+lowercase_space = string.ascii_lowercase + string.punctuation + string.digits + " "
 
 
 def clean_name(name: str) -> str:
