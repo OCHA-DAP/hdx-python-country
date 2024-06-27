@@ -21,7 +21,7 @@ replacement_mapping = make_replace_mapping()
 lowercase_space = string.ascii_lowercase + string.punctuation + string.digits + " "
 
 
-whitespace_chars = {9, 10, 11, 12, 13, 32}
+map_to_space = {9, 10, 11, 12, 13, 32, 47}
 
 
 def clean_name(name: str) -> str:
@@ -46,7 +46,7 @@ def clean_name(name: str) -> str:
             case num if 65 <= num < 91:
                 chars.append(chr(num + 32))
                 space = False
-            case num if num in whitespace_chars:
+            case num if num in map_to_space:
                 if space:
                     continue
                 chars.append(" ")
