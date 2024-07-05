@@ -770,7 +770,7 @@ class AdminLevel:
                     pcode = name_to_pcode.get(name.lower())
                     if pcode:
                         return pcode, True
-            if not fuzzy_match or len(name) < fuzzy_length:
+            if not fuzzy_match:  # or len(name) < fuzzy_length:
                 return None, True
             pcode = self.fuzzy_pcode(countryiso3, name, **kwargs)
             return pcode, False
