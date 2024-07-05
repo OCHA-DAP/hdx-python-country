@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import hxl
 from hxl import InputOptions
 from hxl.input import HXLIOException
+from unidecode import unidecode
 
 from hdx.location.country import Country
 from hdx.location.phonetics import Phonetics
@@ -145,7 +146,7 @@ class AdminLevel:
         self.pcode_to_name[pcode] = adm_name
 
         name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-        name_to_pcode[normalise(adm_name)] = pcode
+        name_to_pcode[unidecode(adm_name).lower()] = pcode
         self.name_to_pcode[countryiso3] = name_to_pcode
         self.pcode_to_iso3[pcode] = countryiso3
         self.pcode_to_iso3[pcode] = countryiso3
@@ -155,7 +156,7 @@ class AdminLevel:
                 countryiso3, {}
             )
             name_to_pcode = name_parent_to_pcode.get(parent, {})
-            name_to_pcode[normalise(adm_name)] = pcode
+            name_to_pcode[unidecode(adm_name).lower()] = pcode
             name_parent_to_pcode[parent] = name_to_pcode
             self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
             self.pcode_to_parent[pcode] = parent
