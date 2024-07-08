@@ -144,8 +144,9 @@ class AdminLevel:
         self.pcodes.append(pcode)
         self.pcode_to_name[pcode] = adm_name
 
+        adm_name = normalise(adm_name)
         name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-        name_to_pcode[normalise(adm_name)] = pcode
+        name_to_pcode[adm_name] = pcode
         self.name_to_pcode[countryiso3] = name_to_pcode
         self.pcode_to_iso3[pcode] = countryiso3
         self.pcode_to_iso3[pcode] = countryiso3
@@ -155,7 +156,7 @@ class AdminLevel:
                 countryiso3, {}
             )
             name_to_pcode = name_parent_to_pcode.get(parent, {})
-            name_to_pcode[normalise(adm_name)] = pcode
+            name_to_pcode[adm_name] = pcode
             name_parent_to_pcode[parent] = name_to_pcode
             self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
             self.pcode_to_parent[pcode] = parent
@@ -554,6 +555,7 @@ class AdminLevel:
         self,
         countryiso3: str,
         name: str,
+        normalised_name: str,
         **kwargs: Any,
     ) -> Optional[str]:
         """Fuzzy match name to pcode
@@ -561,6 +563,7 @@ class AdminLevel:
         Args:
             countryiso3 (str): ISO3 country code
             name (str): Name to match
+            normalised_name (str): Normalised name
             **kwargs:
             parent (Optional[str]): Parent admin code
             logname (str): Log using this identifying name. Defaults to not logging.
@@ -597,13 +600,12 @@ class AdminLevel:
                 if logname:
                     self.errors.add((logname, countryiso3, parent))
                 return None
-        adm_name_lookup = normalise(name)
-        adm_name_lookup2 = multiple_replace(
-            adm_name_lookup,
+        alt_normalised_name = multiple_replace(
+            normalised_name,
             self.get_admin_name_replacements(countryiso3, parent),
         )
         pcode = name_to_pcode.get(
-            adm_name_lookup, name_to_pcode.get(adm_name_lookup2)
+            normalised_name, name_to_pcode.get(alt_normalised_name)
         )
         if not pcode and name.lower() in self.admin_fuzzy_dont:
             if logname:
@@ -611,7 +613,7 @@ class AdminLevel:
             return None
         if not pcode:
             for map_name in name_to_pcode:
-                if adm_name_lookup in map_name:
+                if normalised_name in map_name:
                     pcode = name_to_pcode[map_name]
                     if logname:
                         self.matches.add(
@@ -625,7 +627,7 @@ class AdminLevel:
                         )
                     break
             for map_name in name_to_pcode:
-                if adm_name_lookup2 in map_name:
+                if alt_normalised_name in map_name:
                     pcode = name_to_pcode[map_name]
                     if logname:
                         self.matches.add(
@@ -659,8 +661,8 @@ class AdminLevel:
 
             matching_index = self.phonetics.match(
                 map_names,
-                adm_name_lookup,
-                alternative_name=adm_name_lookup2,
+                normalised_name,
+                alternative_name=alt_normalised_name,
                 transform_possible_names=[al_transform_1, al_transform_2],
             )
 
@@ -754,6 +756,7 @@ class AdminLevel:
             )
             return pcode, True
         else:
+            normalised_name = normalise(name)
             if parent:
                 name_parent_to_pcode = self.name_parent_to_pcode.get(
                     countryiso3
@@ -761,18 +764,20 @@ class AdminLevel:
                 if name_parent_to_pcode:
                     name_to_pcode = name_parent_to_pcode.get(parent)
                     if name_to_pcode is not None:
-                        pcode = name_to_pcode.get(name.lower())
+                        pcode = name_to_pcode.get(normalised_name)
                         if pcode:
                             return pcode, True
             else:
                 name_to_pcode = self.name_to_pcode.get(countryiso3)
                 if name_to_pcode is not None:
-                    pcode = name_to_pcode.get(name.lower())
+                    pcode = name_to_pcode.get(normalised_name)
                     if pcode:
                         return pcode, True
-            if not fuzzy_match or len(name) < fuzzy_length:
+            if not fuzzy_match or len(normalised_name) < fuzzy_length:
                 return None, True
-            pcode = self.fuzzy_pcode(countryiso3, name, **kwargs)
+            pcode = self.fuzzy_pcode(
+                countryiso3, name, normalised_name, **kwargs
+            )
             return pcode, False
 
     def output_matches(self) -> List[str]:

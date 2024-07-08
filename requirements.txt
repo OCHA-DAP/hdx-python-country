@@ -32,7 +32,7 @@ hdx-python-utilities==3.7.2
     # via hdx-python-country (pyproject.toml)
 humanize==4.9.0
     # via frictionless
-identify==2.5.36
+identify==2.6.0
     # via pre-commit
 idna==3.7
     # via requests
