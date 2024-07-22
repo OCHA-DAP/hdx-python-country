@@ -18,7 +18,7 @@ charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via typer
-coverage==7.5.4
+coverage==7.6.0
     # via pytest-cov
 distlib==0.3.8
     # via virtualenv
@@ -30,7 +30,7 @@ frictionless==5.17.0
     # via hdx-python-utilities
 hdx-python-utilities==3.7.2
     # via hdx-python-country (pyproject.toml)
-humanize==4.9.0
+humanize==4.10.0
     # via frictionless
 identify==2.6.0
     # via pre-commit
@@ -48,7 +48,7 @@ jsonlines==4.0.0
     # via hdx-python-utilities
 jsonpath-ng==1.6.1
     # via libhxl
-jsonschema==4.22.0
+jsonschema==4.23.0
     # via
     #   frictionless
     #   tableschema-to-template
@@ -92,7 +92,7 @@ pygments==2.18.0
     # via rich
 pyphonetics==0.5.3
     # via hdx-python-country (pyproject.toml)
-pytest==8.2.2
+pytest==8.3.1
     # via
     #   hdx-python-country (pyproject.toml)
     #   pytest-cov
@@ -129,7 +129,7 @@ rfc3986==2.0.0
     # via frictionless
 rich==13.7.1
     # via typer
-rpds-py==0.18.1
+rpds-py==0.19.0
     # via
     #   jsonschema
     #   referencing
@@ -147,7 +147,7 @@ six==1.16.0
     #   python-dateutil
 stringcase==1.2.0
     # via frictionless
-structlog==24.2.0
+structlog==24.4.0
     # via libhxl
 tableschema-to-template==0.0.13
     # via hdx-python-utilities
@@ -171,7 +171,7 @@ urllib3==2.2.2
     # via
     #   libhxl
     #   requests
-validators==0.30.0
+validators==0.33.0
     # via frictionless
 virtualenv==20.26.3
     # via pre-commit
