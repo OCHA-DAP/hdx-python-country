@@ -125,7 +125,7 @@ class AdminLevel:
         self,
         countryiso3: str,
         pcode: str,
-        adm_name: str,
+        adm_name: Optional[str],
         parent: Optional[str],
     ):
         """
@@ -134,7 +134,7 @@ class AdminLevel:
         Args:
             countryiso3 (str): Country
             pcode (str): P-code
-            adm_name (str): Administrative name
+            adm_name (Optional[str]): Administrative name (which can be None)
             parent (Optional[str]): Parent p-code
 
         Returns:
@@ -142,14 +142,20 @@ class AdminLevel:
         """
         self.pcode_lengths[countryiso3] = len(pcode)
         self.pcodes.append(pcode)
+        if adm_name is None:
+            adm_name = ""
         self.pcode_to_name[pcode] = adm_name
+        self.pcode_to_iso3[pcode] = countryiso3
+        if not adm_name:
+            logger.error(
+                f"Admin name is blank for pcode {pcode} of {countryiso3}!"
+            )
+            return
 
         adm_name = normalise(adm_name)
         name_to_pcode = self.name_to_pcode.get(countryiso3, {})
         name_to_pcode[adm_name] = pcode
         self.name_to_pcode[countryiso3] = name_to_pcode
-        self.pcode_to_iso3[pcode] = countryiso3
-        self.pcode_to_iso3[pcode] = countryiso3
 
         if self.use_parent:
             name_parent_to_pcode = self.name_parent_to_pcode.get(
