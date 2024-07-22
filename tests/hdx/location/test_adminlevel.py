@@ -47,6 +47,10 @@ class TestAdminLevel:
             "YE30",
             True,
         )
+        assert adminone.get_pcode("YEM", "YEM3000", logname="test") == (
+            None,
+            True,
+        )
         assert adminone.get_pcode("YEM", "YEM030", logname="test") == (
             "YE30",
             True,
