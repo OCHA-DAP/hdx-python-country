@@ -147,6 +147,9 @@ class AdminLevel:
         self.pcode_to_name[pcode] = adm_name
         self.pcode_to_iso3[pcode] = countryiso3
         if not adm_name:
+            logger.error(
+                f"Admin name is blank for pcode {pcode} of {countryiso3}!"
+            )
             return
 
         adm_name = normalise(adm_name)
