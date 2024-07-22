@@ -20,11 +20,11 @@ class TestAdminLevel:
 
     @pytest.fixture(scope="function")
     def url(self):
-        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/main/tests/fixtures/global_pcodes_adm_1_2.csv"
+        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/blank_adm_name/tests/fixtures/global_pcodes_adm_1_2.csv"
 
     @pytest.fixture(scope="function")
     def formats_url(self):
-        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/main/tests/fixtures/global_pcode_lengths.csv"
+        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/blank_adm_name/tests/fixtures/global_pcode_lengths.csv"
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
@@ -550,19 +550,19 @@ class TestAdminLevel:
             "NG015",
             True,
         )
-        assert adminone.get_pcode("NER", "NER004", logname="test") == (
-            "NER004",
+        assert adminone.get_pcode("NER", "NE004", logname="test") == (
+            "NE004",
             True,
         )
         assert adminone.get_pcode("NER", "NE04", logname="test") == (
-            "NER004",
+            "NE004",
             True,
         )
-        assert adminone.get_pcode("NER", "NE004", logname="test") == (
-            "NER004",
+        assert adminone.get_pcode("NER", "NER004", logname="test") == (
+            "NE004",
             True,
         )
-        assert adminone.get_pcode("ABC", "NE004", logname="test") == (
+        assert adminone.get_pcode("ABC", "NER004", logname="test") == (
             None,
             True,
         )
@@ -642,11 +642,11 @@ class TestAdminLevel:
             True,
         )
         assert admintwo.get_pcode("NER", "NER004009", logname="test") == (
-            "NER004009",
+            "NE004009",
             True,
         )
         assert admintwo.get_pcode("NER", "NE04009", logname="test") == (
-            "NER004009",
+            "NE004009",
             True,
         )
         # Algorithm inserts 0 to make NER000409 and hence fails (it has no
@@ -687,7 +687,7 @@ class TestAdminLevel:
         # is not a valid admin1 (NER000) so the algorithm tries adding
         # the 0 prefix at the admin2 level instead and hence succeeds
         assert admintwo.get_pcode("NER", "NE00409", logname="test") == (
-            "NER004009",
+            "NE004009",
             True,
         )
         # we don't use the parent because it could have a pcode length issue
@@ -695,7 +695,7 @@ class TestAdminLevel:
         assert admintwo.get_pcode(
             "NER", "NE00409", parent="blah", logname="test"
         ) == (
-            "NER004009",
+            "NE004009",
             True,
         )
         # The lookup in admin1 reveals that removing the 0 prefix from the
@@ -713,5 +713,13 @@ class TestAdminLevel:
         )
         assert admintwo.get_pcode("NGA", "NG1501", logname="test") == (
             "NG015001",
+            True,
+        )
+        assert admintwo.get_pcode("JAM", "JM10001", logname="test") == (
+            "JM10001",
+            True,
+        )
+        assert admintwo.get_pcode("JAM", "JAM10001", logname="test") == (
+            "JM10001",
             True,
         )
