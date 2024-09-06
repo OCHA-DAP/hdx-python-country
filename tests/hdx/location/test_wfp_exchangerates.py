@@ -26,7 +26,7 @@ if WfpApiToken is not None:
 
         def test_get_currencies(self, wfp_fx):
             currencies = wfp_fx.get_currencies()
-            assert len(currencies) == 126
+            assert len(currencies) == 127
 
         def test_get_historic_rates(self, wfp_fx, currency, date):
             assert (
