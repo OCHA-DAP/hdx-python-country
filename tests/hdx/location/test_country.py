@@ -207,7 +207,7 @@ class TestCountry:
             "#country+formal+i_en+name+v_unterm": "",
             "#country+name+preferred": "Taiwan (Province of China)",
             "#country+name+short+v_reliefweb": "",
-            "#country+regex": ".*taiwan|.*taipei|.*formosa|^(?!.*\\bdem)(?!.*\\bpe)(?!.*\\bdr)(^rep.*).*\\bchina.*(?!.*\\bdem.*)(?!\\bpe.*)(?!.*\\bdr.*).*|^ROC$|^taiwan r\\.?o\\.?c\\.?$",
+            "#country+regex": "taiwan|taipei|formosa|^(?!.*peo)(?=.*rep).*china",
             "#currency+code": "TWD",
             "#date+start": "1974-01-01",
             "#geo+admin_level": "0",
@@ -373,7 +373,7 @@ class TestCountry:
             "#country+formal+i_en+name+v_unterm": "the Independent State of Samoa",
             "#country+name+preferred": "Samoa",
             "#country+name+short+v_reliefweb": "",
-            "#country+regex": "^(?!.*amer.*)samoa|(\\bindep.*samoa)|^west.*samoa",
+            "#country+regex": "^(?!.*amer).*samoa",
             "#currency+code": "WST",
             "#date+start": "1998-02-05",
             "#geo+admin_level": "0",
@@ -690,6 +690,14 @@ class TestCountry:
             Country.get_countries_in_region(
                 "NOTEXIST", exception=LocationError
             )
+
+    def test_use_live_default(self):
+        Country.set_use_live_default(True)
+        assert Country._use_live is True
+        Country.set_use_live_default(False)
+        assert Country._use_live is False
+        Country.set_use_live_default(None)
+        assert Country._use_live is True
 
     def test_ocha_feed_file_working(self):
         countries = hxl.data(
