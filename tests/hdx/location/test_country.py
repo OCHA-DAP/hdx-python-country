@@ -691,6 +691,14 @@ class TestCountry:
                 "NOTEXIST", exception=LocationError
             )
 
+    def test_use_live_default(self):
+        Country.set_use_live_default(True)
+        assert Country._use_live is True
+        Country.set_use_live_default(False)
+        assert Country._use_live is False
+        Country.set_use_live_default(None)
+        assert Country._use_live is True
+
     def test_ocha_feed_file_working(self):
         countries = hxl.data(
             script_dir_plus_file("Countries_UZB_Deleted.csv", TestCountry),
