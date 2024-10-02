@@ -5,6 +5,7 @@ from os.path import join
 import pytest
 
 from hdx.location.adminlevel import AdminLevel
+from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.downloader import Download
 from hdx.utilities.loader import load_yaml
 from hdx.utilities.path import temp_dir
@@ -374,9 +375,11 @@ class TestAdminLevel:
         ) == (None, False)
 
     def test_adminlevel_with_url(self, config, url, fixtures_dir):
-        adminone = AdminLevel(config)
+        adminone = AdminLevel(config, admin_level_overrides={"YEM": 5})
+        assert adminone.get_admin_level("YEM") == 5
         with pytest.raises(FileNotFoundError):
             adminone.setup_from_url("fake_url")
+        adminone = AdminLevel(config)
         AdminLevel.set_default_admin_url()
         assert AdminLevel._admin_url == AdminLevel._admin_url_default
         AdminLevel.set_default_admin_url(url)
@@ -396,9 +399,22 @@ class TestAdminLevel:
                     fixtures_dir,
                     tempdir,
                     save=False,
+                    use_saved=False,
+                )
+                adminone = AdminLevel(config, retriever=retriever)
+                with pytest.raises(DownloadError):
+                    adminone.setup_from_url("fake_url")
+                retriever = Retrieve(
+                    downloader,
+                    tempdir,
+                    fixtures_dir,
+                    tempdir,
+                    save=False,
                     use_saved=True,
                 )
                 adminone = AdminLevel(config, retriever=retriever)
+                with pytest.raises(FileNotFoundError):
+                    adminone.setup_from_url("fake_url")
                 adminone.setup_from_url(countryiso3s=("YEM",))
                 assert len(adminone.get_pcode_list()) == 22
 

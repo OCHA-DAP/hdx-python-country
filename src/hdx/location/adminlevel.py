@@ -141,7 +141,7 @@ class AdminLevel:
                 url_to_use,
                 InputOptions(InputOptions(allow_local=True, encoding="utf-8")),
             )
-        except HXLIOException:
+        except (FileNotFoundError, HXLIOException):
             logger.exception(
                 f"Setup of libhxl Dataset object with {url} failed!"
             )
