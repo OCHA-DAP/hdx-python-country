@@ -8,7 +8,9 @@ from hxl.input import HXLIOException
 
 from hdx.location.country import Country
 from hdx.location.phonetics import Phonetics
+from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.dictandlist import dict_of_sets_add
+from hdx.utilities.retriever import Retrieve
 from hdx.utilities.text import multiple_replace, normalise
 from hdx.utilities.typehint import ListTuple
 
@@ -30,10 +32,20 @@ class AdminLevel:
     admin_fuzzy_dont is a list of names for which fuzzy matching should not be
     tried
 
+    The admin_level_overrides parameter allows manually overriding the returned
+    admin level for given countries. It is a dictionary with iso3s as keys and
+    admin level numbers as values.
+
+    The retriever parameter accepts an object of type Retrieve (or inherited
+    classes). It is used to allow either that admin data from urls is saved
+    to files or to enable already saved files to be used instead of downloading
+    from urls.
+
     Args:
         admin_config (Dict): Configuration dictionary. Defaults to {}.
         admin_level (int): Admin level. Defaults to 1.
         admin_level_overrides (Dict): Countries at other admin levels.
+        retriever (Optional[Retrieve]): Retriever object to use for loading/saving files. Defaults to None.
     """
 
     pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d+)$")
@@ -47,9 +59,11 @@ class AdminLevel:
         admin_config: Dict = {},
         admin_level: int = 1,
         admin_level_overrides: Dict = {},
+        retriever: Optional[Retrieve] = None,
     ) -> None:
         self.admin_level = admin_level
         self.admin_level_overrides = admin_level_overrides
+        self.retriever: Optional[Retrieve] = retriever
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
         self.admin_name_mappings = admin_config.get("admin_name_mappings", {})
         self.admin_name_replacements = admin_config.get(
@@ -101,23 +115,35 @@ class AdminLevel:
             admin_url = cls._admin_url_default
         cls._admin_url = admin_url
 
-    @classmethod
-    def get_libhxl_dataset(cls, admin_url: str = _admin_url) -> hxl.Dataset:
+    def get_libhxl_dataset(self, url: str = _admin_url) -> hxl.Dataset:
         """
         Get libhxl Dataset object given a URL which defaults to global p-codes
         dataset on HDX.
 
         Args:
-            admin_url (str): URL from which to load data. Defaults to global p-codes dataset.
+            admin_url (str): URL from which to load data.
 
         Returns:
             None
         """
+        if self.retriever:
+            try:
+                url_to_use = self.retriever.download_file(url)
+            except DownloadError:
+                logger.exception(
+                    f"Setup of libhxl Dataset object with {url} failed!"
+                )
+                raise
+        else:
+            url_to_use = url
         try:
-            return hxl.data(admin_url, InputOptions(encoding="utf-8"))
-        except HXLIOException:
+            return hxl.data(
+                url_to_use,
+                InputOptions(InputOptions(allow_local=True, encoding="utf-8")),
+            )
+        except (FileNotFoundError, HXLIOException):
             logger.exception(
-                f"Setup of libhxl Dataset object with {admin_url} failed!"
+                f"Setup of libhxl Dataset object with {url} failed!"
             )
             raise
 
