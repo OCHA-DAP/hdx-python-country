@@ -3,28 +3,34 @@
 from os.path import join
 
 import pytest
-from hxl.input import HXLIOException
 
 from hdx.location.adminlevel import AdminLevel
+from hdx.utilities.downloader import Download
 from hdx.utilities.loader import load_yaml
+from hdx.utilities.path import temp_dir
+from hdx.utilities.retriever import Retrieve
 
 
 class TestAdminLevel:
-    @pytest.fixture(scope="function")
-    def config(self):
-        return load_yaml(join("tests", "fixtures", "adminlevel.yaml"))
+    @pytest.fixture(scope="class")
+    def fixtures_dir(self):
+        return join("tests", "fixtures")
 
     @pytest.fixture(scope="function")
-    def config_parent(self):
-        return load_yaml(join("tests", "fixtures", "adminlevelparent.yaml"))
+    def config(self, fixtures_dir):
+        return load_yaml(join(fixtures_dir, "adminlevel.yaml"))
 
     @pytest.fixture(scope="function")
-    def url(self):
-        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/blank_adm_name/tests/fixtures/global_pcodes_adm_1_2.csv"
+    def config_parent(self, fixtures_dir):
+        return load_yaml(join(fixtures_dir, "adminlevelparent.yaml"))
 
     @pytest.fixture(scope="function")
-    def formats_url(self):
-        return "https://raw.githubusercontent.com/OCHA-DAP/hdx-python-country/blank_adm_name/tests/fixtures/global_pcode_lengths.csv"
+    def url(self, fixtures_dir):
+        return join(fixtures_dir, "download-global-pcodes-adm-1-2.csv")
+
+    @pytest.fixture(scope="function")
+    def formats_url(self, fixtures_dir):
+        return join(fixtures_dir, "download-global-pcode-lengths.csv")
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
@@ -367,9 +373,9 @@ class TestAdminLevel:
             "MWI", "Blantyre city", parent="MW3", logname="test"
         ) == (None, False)
 
-    def test_adminlevel_with_url(self, config, url):
+    def test_adminlevel_with_url(self, config, url, fixtures_dir):
         adminone = AdminLevel(config)
-        with pytest.raises(HXLIOException):
+        with pytest.raises(FileNotFoundError):
             adminone.setup_from_url("fake_url")
         AdminLevel.set_default_admin_url()
         assert AdminLevel._admin_url == AdminLevel._admin_url_default
@@ -377,6 +383,25 @@ class TestAdminLevel:
         assert AdminLevel._admin_url == url
         adminone.setup_from_url(countryiso3s=("YEM",))
         assert len(adminone.get_pcode_list()) == 22
+
+        with temp_dir(
+            "TestAdminLevelRetriever",
+            delete_on_success=True,
+            delete_on_failure=False,
+        ) as tempdir:
+            with Download(user_agent="test") as downloader:
+                retriever = Retrieve(
+                    downloader,
+                    tempdir,
+                    fixtures_dir,
+                    tempdir,
+                    save=False,
+                    use_saved=True,
+                )
+                adminone = AdminLevel(config, retriever=retriever)
+                adminone.setup_from_url(countryiso3s=("YEM",))
+                assert len(adminone.get_pcode_list()) == 22
+
         adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
