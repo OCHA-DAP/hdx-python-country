@@ -32,6 +32,15 @@ class AdminLevel:
     admin_fuzzy_dont is a list of names for which fuzzy matching should not be
     tried
 
+    The admin_level_overrides parameter allows manually overriding the returned
+    admin level for given countries. It is a dictionary with iso3s as keys and
+    admin level numbers as values.
+
+    The retriever parameter accepts an object of type Retrieve (or inherited
+    classes). It is used to allow either that admin data from urls is saved
+    to files or to enable already saved files to be used instead of downloading
+    from urls.
+
     Args:
         admin_config (Dict): Configuration dictionary. Defaults to {}.
         admin_level (int): Admin level. Defaults to 1.
