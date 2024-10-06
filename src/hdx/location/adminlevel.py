@@ -115,20 +115,24 @@ class AdminLevel:
             admin_url = cls._admin_url_default
         cls._admin_url = admin_url
 
-    def get_libhxl_dataset(self, url: str = _admin_url) -> hxl.Dataset:
+    @staticmethod
+    def get_libhxl_dataset(
+        url: str = _admin_url, retriever: Optional[Retrieve] = None
+    ) -> hxl.Dataset:
         """
         Get libhxl Dataset object given a URL which defaults to global p-codes
         dataset on HDX.
 
         Args:
-            admin_url (str): URL from which to load data.
+            url (str): URL from which to load data. Defaults to internal admin url.
+            retriever (Optional[Retrieve]): Retriever object to use for loading file. Defaults to None.
 
         Returns:
-            None
+            hxl.Dataset: HXL Dataset object
         """
-        if self.retriever:
+        if retriever:
             try:
-                url_to_use = self.retriever.download_file(url)
+                url_to_use = retriever.download_file(url)
             except DownloadError:
                 logger.exception(
                     f"Setup of libhxl Dataset object with {url} failed!"
@@ -271,7 +275,7 @@ class AdminLevel:
         Returns:
             None
         """
-        admin_info = self.get_libhxl_dataset(admin_url)
+        admin_info = self.get_libhxl_dataset(admin_url, self.retriever)
         self.setup_from_libhxl_dataset(admin_info, countryiso3s)
 
     def load_pcode_formats(self, formats_url: str = _formats_url) -> None:
@@ -284,7 +288,7 @@ class AdminLevel:
         Returns:
             None
         """
-        formats_info = self.get_libhxl_dataset(formats_url)
+        formats_info = self.get_libhxl_dataset(formats_url, self.retriever)
         for row in formats_info:
             pcode_format = [int(row.get("#country+len"))]
             for admin_no in range(1, 4):
