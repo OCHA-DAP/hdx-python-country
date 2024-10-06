@@ -130,6 +130,10 @@ object has been set up with parents). Keys take the form "STRING_TO_REPLACE",
 *admin_fuzzy_dont* is a list of names for which fuzzy matching should not be
 tried
 
+A Retrieve object can be passed in the *retriever* parameter that enables
+saving data downloaded to a file or loading previously saved data depending
+on how the Retrieve object is configured.
+
 Once an AdminLevel object is constructed, one of three setup methods must be
 called: *setup_from_admin_info*, *setup_from_libhxl_dataset* or
 *setup_from_url*.

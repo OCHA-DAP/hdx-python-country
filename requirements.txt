@@ -30,7 +30,7 @@ frictionless==5.18.0
     # via hdx-python-utilities
 hdx-python-utilities==3.7.4
     # via hdx-python-country (pyproject.toml)
-humanize==4.10.0
+humanize==4.11.0
     # via frictionless
 identify==2.6.1
     # via pre-commit
@@ -82,7 +82,7 @@ ply==3.11
     # via
     #   jsonpath-ng
     #   libhxl
-pre-commit==3.8.0
+pre-commit==4.0.0
     # via hdx-python-country (pyproject.toml)
 pydantic==2.9.2
     # via frictionless
@@ -127,7 +127,7 @@ requests-file==2.1.0
     # via hdx-python-utilities
 rfc3986==2.0.0
     # via frictionless
-rich==13.9.1
+rich==13.9.2
     # via typer
 rpds-py==0.20.0
     # via
@@ -139,7 +139,7 @@ ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
 shellingham==1.5.4
     # via typer
-simpleeval==0.9.13
+simpleeval==1.0.0
     # via frictionless
 six==1.16.0
     # via
