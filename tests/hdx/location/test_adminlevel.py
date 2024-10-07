@@ -381,9 +381,9 @@ class TestAdminLevel:
             adminone.setup_from_url("fake_url")
         adminone = AdminLevel(config)
         AdminLevel.set_default_admin_url()
-        assert AdminLevel._admin_url == AdminLevel._admin_url_default
+        assert AdminLevel.admin_url == AdminLevel._admin_url_default
         AdminLevel.set_default_admin_url(url)
-        assert AdminLevel._admin_url == url
+        assert AdminLevel.admin_url == url
         adminone.setup_from_url(countryiso3s=("YEM",))
         assert len(adminone.get_pcode_list()) == 22
 
