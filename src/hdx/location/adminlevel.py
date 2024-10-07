@@ -50,9 +50,9 @@ class AdminLevel:
 
     pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d+)$")
     _admin_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
-    _admin_url = _admin_url_default
+    admin_url = _admin_url_default
     _formats_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f1161807-dab4-4331-b7b0-4e5dac56e0e4/download/global_pcode_lengths.csv"
-    _formats_url = _formats_url_default
+    formats_url = _formats_url_default
 
     def __init__(
         self,
@@ -113,11 +113,11 @@ class AdminLevel:
         """
         if admin_url is None:
             admin_url = cls._admin_url_default
-        cls._admin_url = admin_url
+        cls.admin_url = admin_url
 
     @staticmethod
     def get_libhxl_dataset(
-        url: str = _admin_url, retriever: Optional[Retrieve] = None
+        url: str = admin_url, retriever: Optional[Retrieve] = None
     ) -> hxl.Dataset:
         """
         Get libhxl Dataset object given a URL which defaults to global p-codes
@@ -262,7 +262,7 @@ class AdminLevel:
 
     def setup_from_url(
         self,
-        admin_url: str = _admin_url,
+        admin_url: str = admin_url,
         countryiso3s: Optional[ListTuple[str]] = None,
     ) -> None:
         """
@@ -304,7 +304,7 @@ class AdminLevel:
             for x in re.finditer("0", pcode):
                 dict_of_sets_add(self.zeroes, countryiso3, x.start())
 
-    def load_pcode_formats(self, formats_url: str = _formats_url) -> None:
+    def load_pcode_formats(self, formats_url: str = formats_url) -> None:
         """
         Load p-code formats from a URL. Defaults to global p-codes dataset on HDX.
 
