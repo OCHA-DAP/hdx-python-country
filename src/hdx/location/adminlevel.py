@@ -51,6 +51,7 @@ class AdminLevel:
     pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d+)$")
     _admin_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f65bc260-4d8b-416f-ac07-f2433b4d5142/download/global_pcodes_adm_1_2.csv"
     admin_url = _admin_url_default
+    admin_all_pcodes_url = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/793e66fe-4cdb-4076-b037-fb8c053239e2/download/global_pcodes.csv"
     _formats_url_default = "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f/resource/f1161807-dab4-4331-b7b0-4e5dac56e0e4/download/global_pcode_lengths.csv"
     formats_url = _formats_url_default
 
