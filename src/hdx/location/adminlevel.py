@@ -274,18 +274,19 @@ class AdminLevel:
         admin_info = self.get_libhxl_dataset(admin_url)
         self.setup_from_libhxl_dataset(admin_info, countryiso3s)
 
-    def load_pcode_formats(self, formats_url: str = _formats_url) -> None:
+    def load_pcode_formats_from_libhxl_dataset(
+        self, libhxl_dataset: hxl.Dataset
+    ) -> None:
         """
-        Load p-code formats from a URL. Defaults to global p-codes dataset on HDX.
+        Load p-code formats from a libhxl Dataset object.
 
         Args:
-            formats_url (str): URL from which to load data. Defaults to global p-codes dataset.
+            libhxl_dataset (hxl.Dataset): Dataset object from libhxl library
 
         Returns:
             None
         """
-        formats_info = self.get_libhxl_dataset(formats_url)
-        for row in formats_info:
+        for row in libhxl_dataset:
             pcode_format = [int(row.get("#country+len"))]
             for admin_no in range(1, 4):
                 length = row.get(f"#adm{admin_no}+len")
@@ -298,6 +299,19 @@ class AdminLevel:
             countryiso3 = self.pcode_to_iso3[pcode]
             for x in re.finditer("0", pcode):
                 dict_of_sets_add(self.zeroes, countryiso3, x.start())
+
+    def load_pcode_formats(self, formats_url: str = _formats_url) -> None:
+        """
+        Load p-code formats from a URL. Defaults to global p-codes dataset on HDX.
+
+        Args:
+            formats_url (str): URL from which to load data. Defaults to global p-codes dataset.
+
+        Returns:
+            None
+        """
+        formats_info = self.get_libhxl_dataset(formats_url)
+        self.load_pcode_formats_from_libhxl_dataset(formats_info)
 
     def set_parent_admins(self, parent_admins: List[List]) -> None:
         """
