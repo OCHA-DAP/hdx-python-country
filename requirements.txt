@@ -14,13 +14,13 @@ cfgv==3.4.0
     # via pre-commit
 chardet==5.2.0
     # via frictionless
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via requests
 click==8.1.7
     # via typer
-coverage==7.6.1
+coverage==7.6.3
     # via pytest-cov
-distlib==0.3.8
+distlib==0.3.9
     # via virtualenv
 et-xmlfile==1.1.0
     # via openpyxl
@@ -40,19 +40,19 @@ ijson==3.3.0
     # via hdx-python-utilities
 iniconfig==2.0.0
     # via pytest
-isodate==0.6.1
+isodate==0.7.2
     # via frictionless
 jinja2==3.1.4
     # via frictionless
 jsonlines==4.0.0
     # via hdx-python-utilities
-jsonpath-ng==1.6.1
+jsonpath-ng==1.7.0
     # via libhxl
 jsonschema==4.23.0
     # via
     #   frictionless
     #   tableschema-to-template
-jsonschema-specifications==2023.12.1
+jsonschema-specifications==2024.10.1
     # via jsonschema
 libhxl==5.2.1
     # via hdx-python-country (pyproject.toml)
@@ -62,7 +62,7 @@ markdown-it-py==3.0.0
     # via rich
 marko==2.1.2
     # via frictionless
-markupsafe==2.1.5
+markupsafe==3.0.1
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
@@ -82,7 +82,7 @@ ply==3.11
     # via
     #   jsonpath-ng
     #   libhxl
-pre-commit==4.0.0
+pre-commit==4.0.1
     # via hdx-python-country (pyproject.toml)
 pydantic==2.9.2
     # via frictionless
@@ -142,9 +142,7 @@ shellingham==1.5.4
 simpleeval==1.0.0
     # via frictionless
 six==1.16.0
-    # via
-    #   isodate
-    #   python-dateutil
+    # via python-dateutil
 stringcase==1.2.0
     # via frictionless
 structlog==24.4.0
