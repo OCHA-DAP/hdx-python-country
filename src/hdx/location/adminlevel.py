@@ -602,6 +602,31 @@ class AdminLevel:
                 continue
         return relevant_name_replacements
 
+    def get_admin_fuzzy_dont(self, countryiso3: str) -> List[str]:
+        """Get relevant admin names that should not be fuzzy matched from
+        admin fuzzy dont which is a list of strings. These can be global
+        or they can be restricted by country. Keys take the form
+        "DONT_MATCH" or "AFG|DONT_MATCH".
+
+        Args:
+            countryiso3 (str): ISO3 country code
+
+        Returns:
+            List[str]: Relevant admin names that should not be fuzzy matched
+        """
+        relevant_admin_fuzzy_dont = []
+        for value in self.admin_fuzzy_dont:
+            if "|" not in value:
+                if value not in relevant_admin_fuzzy_dont:
+                    relevant_admin_fuzzy_dont.append(value)
+                continue
+            prefix, name = value.split("|")
+            if prefix == countryiso3:
+                if name not in relevant_admin_fuzzy_dont:
+                    relevant_admin_fuzzy_dont.append(name)
+                continue
+        return relevant_admin_fuzzy_dont
+
     def fuzzy_pcode(
         self,
         countryiso3: str,
@@ -658,7 +683,9 @@ class AdminLevel:
         pcode = name_to_pcode.get(
             normalised_name, name_to_pcode.get(alt_normalised_name)
         )
-        if not pcode and name.lower() in self.admin_fuzzy_dont:
+        if not pcode and name.lower() in self.get_admin_fuzzy_dont(
+            countryiso3
+        ):
             if logname:
                 self.ignored.add((logname, countryiso3, name))
             return None
