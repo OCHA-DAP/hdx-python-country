@@ -516,7 +516,7 @@ admin_name_replacements:
   " oblast": ""
 
 admin_fuzzy_dont:
-  - "nord"
+  - "YEM|nord"
   - "north"
   - "sud"
   - "south"
