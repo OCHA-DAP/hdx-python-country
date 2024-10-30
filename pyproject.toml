@@ -35,7 +35,7 @@ requires-python = ">=3.8"
 
 dependencies = [
     "hdx-python-utilities>=3.7.4",
-    "libhxl>=5.2.1",
+    "libhxl>=5.2.2",
     "pyphonetics",
 ]
 dynamic = ["version"]
@@ -50,15 +50,11 @@ Homepage = "https://github.com/OCHA-DAP/hdx-python-country"
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
 dev = ["pre-commit"]
-#wfp = ["data-bridges-client@git+https://github.com/WFP-VAM/DataBridgesAPI@dev#egg=data-bridges-client"]
 
 
 #########
 # Hatch #
 #########
-
-#[tool.hatch.metadata]
-#allow-direct-references = true
 
 # Build
 
@@ -91,6 +87,9 @@ run = """
        --cov --cov-config=.config/coveragerc --no-cov-on-fail \
        --cov-report=lcov --cov-report=term-missing
        """
+
+[tool.hatch.envs.hatch-static-analysis]
+dependencies = ["ruff==0.7.0"]
 
 [tool.hatch.envs.hatch-static-analysis.scripts]
 format-check = ["ruff format --config .config/ruff.toml --check --diff {args:.}",]
