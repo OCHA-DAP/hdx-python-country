@@ -4,6 +4,7 @@ import pytest
 
 from hdx.location import get_int_timestamp
 from hdx.location.currency import Currency
+from hdx.location.wfp_api import WFPAPI
 from hdx.location.wfp_exchangerates import WFPExchangeRates
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.downloader import Download
@@ -43,9 +44,10 @@ class TestWFPExchangeRates:
                     save=False,
                     use_saved=True,
                 )
-
-                wfp_fx = WFPExchangeRates(downloader, retriever)
-                retry_params = wfp_fx.wfpapi.get_retry_params()
+                wfp_api = WFPAPI(downloader, retriever)
+                wfp_api.update_retry_params(attempts=5, wait=5)
+                wfp_fx = WFPExchangeRates(wfp_api)
+                retry_params = wfp_fx.wfp_api.get_retry_params()
                 assert retry_params["attempts"] == 5
                 assert retry_params["wait"] == 5
                 currencies = wfp_fx.get_currencies()

@@ -4,27 +4,20 @@ from typing import Dict, List
 from . import get_int_timestamp
 from .wfp_api import WFPAPI
 from hdx.utilities.dateparse import parse_date
-from hdx.utilities.downloader import Download
-from hdx.utilities.retriever import Retrieve
 from hdx.utilities.typehint import ListTuple
 
 logger = logging.getLogger(__name__)
 
 
 class WFPExchangeRates:
-    """Obtain WFP official exchange rates. It needs a token_downloader that has
-    been configured with WFP basic authentication credentials and a retriever
-    that will configured by this class with the bearer token obtained from the
-    token_downloader.
+    """Obtain WFP official exchange rates. It needs a WFP API object.
 
     Args:
-        token_downloader (Download): Download object with WFP basic authentication
-        retriever (Retrieve): Retrieve object for interacting with WFP API
+        wfp_api (WFPAPI): WFPAPI object
     """
 
-    def __init__(self, token_downloader: Download, retriever: Retrieve):
-        self.wfpapi = WFPAPI(token_downloader, retriever)
-        self.wfpapi.update_retry_params(attempts=5, wait=5)
+    def __init__(self, wfp_api: WFPAPI):
+        self.wfp_api = wfp_api
 
     def get_currencies(self) -> List[str]:
         """Get list of currencies in WFP API
@@ -33,7 +26,7 @@ class WFPExchangeRates:
             List[str]: List of currencies in WFP API
         """
         currencies = []
-        for currency in self.wfpapi.get_items("Currency/List"):
+        for currency in self.wfp_api.get_items("Currency/List"):
             currencies.append(currency["name"])
         return currencies
 
@@ -46,7 +39,7 @@ class WFPExchangeRates:
         Returns:
             Dict[int, float]: Mapping from timestamp to rate
         """
-        quotes = self.wfpapi.get_items(
+        quotes = self.wfp_api.get_items(
             "Currency/UsdIndirectQuotation",
             parameters={"currencyName": currency},
         )
