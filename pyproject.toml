@@ -37,6 +37,7 @@ dependencies = [
     "hdx-python-utilities>=3.7.4",
     "libhxl>=5.2.2",
     "pyphonetics",
+    "tenacity",
 ]
 dynamic = ["version"]
 

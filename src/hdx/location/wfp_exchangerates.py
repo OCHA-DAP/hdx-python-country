@@ -24,6 +24,7 @@ class WFPExchangeRates:
 
     def __init__(self, token_downloader: Download, retriever: Retrieve):
         self.wfpapi = WFPAPI(token_downloader, retriever)
+        self.wfpapi.update_retry_params(attempts=5, wait=5)
 
     def get_currencies(self) -> List[str]:
         """Get list of currencies in WFP API

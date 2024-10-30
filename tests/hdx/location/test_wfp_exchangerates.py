@@ -45,6 +45,9 @@ class TestWFPExchangeRates:
                 )
 
                 wfp_fx = WFPExchangeRates(downloader, retriever)
+                retry_params = wfp_fx.wfpapi.get_retry_params()
+                assert retry_params["attempts"] == 5
+                assert retry_params["wait"] == 5
                 currencies = wfp_fx.get_currencies()
                 assert len(currencies) == 127
 

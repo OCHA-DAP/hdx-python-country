@@ -1,8 +1,19 @@
+import logging
 from typing import Any, Dict, List, Optional
+
+from tenacity import (
+    Retrying,
+    after_log,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_fixed,
+)
 
 from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.downloader import Download
 from hdx.utilities.retriever import Retrieve
+
+logger = logging.getLogger(__name__)
 
 
 class WFPAPI:
@@ -19,10 +30,27 @@ class WFPAPI:
     token_url = "https://api.wfp.org/token"
     base_url = "https://api.wfp.org/vam-data-bridges/5.0.0/"
     scope = "vamdatabridges_commodities-list_get vamdatabridges_commodityunits-list_get vamdatabridges_marketprices-alps_get vamdatabridges_commodities-categories-list_get vamdatabridges_commodityunits-conversion-list_get vamdatabridges_marketprices-priceweekly_get vamdatabridges_markets-geojsonlist_get vamdatabridges_marketprices-pricemonthly_get vamdatabridges_markets-list_get vamdatabridges_currency-list_get vamdatabridges_currency-usdindirectquotation_get"
+    default_retry_params = {
+        "retry": retry_if_exception_type(DownloadError),
+        "after": after_log(logger, logging.INFO),
+    }
 
-    def __init__(self, token_downloader: Download, retriever: Retrieve):
+    def __init__(
+        self,
+        token_downloader: Download,
+        retriever: Retrieve,
+    ):
         self.token_downloader = token_downloader
         self.retriever = retriever
+        self.retry_params = {"attempts": 1, "wait": 1}
+
+    def get_retry_params(self) -> Dict:
+        return self.retry_params
+
+    def update_retry_params(self, attempts: int, wait: int) -> Dict:
+        self.retry_params["attempts"] = attempts
+        self.retry_params["wait"] = wait
+        return self.retry_params
 
     def refresh_token(self) -> None:
         self.token_downloader.download(
@@ -54,19 +82,31 @@ class WFPAPI:
         Returns:
             Any: The data from the JSON file
         """
-        try:
-            results = self.retriever.download_json(
-                url, filename, log, False, parameters=parameters
-            )
-        except DownloadError:
-            response = self.retriever.downloader.response
-            if response and response.status_code not in (104, 401, 403):
-                raise
-            self.refresh_token()
-            results = self.retriever.download_json(
-                url, filename, log, False, parameters=parameters
-            )
-        return results
+        retryer = Retrying(
+            retry=self.default_retry_params["retry"],
+            after=self.default_retry_params["after"],
+            stop=stop_after_attempt(self.retry_params["attempts"]),
+            wait=wait_fixed(self.retry_params["wait"]),
+        )
+        for attempt in retryer:
+            with attempt:
+                try:
+                    results = self.retriever.download_json(
+                        url, filename, log, False, parameters=parameters
+                    )
+                except DownloadError:
+                    response = self.retriever.downloader.response
+                    if response and response.status_code not in (
+                        104,
+                        401,
+                        403,
+                    ):
+                        raise
+                    self.refresh_token()
+                    results = self.retriever.download_json(
+                        url, filename, log, False, parameters=parameters
+                    )
+                return results
 
     def get_items(
         self,
