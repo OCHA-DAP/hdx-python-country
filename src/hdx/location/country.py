@@ -74,7 +74,11 @@ class Country:
     _countriesdata = None
     _ochaurl_default = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
     _ochaurl = _ochaurl_default
-    _ochapath = None
+    _ochapath_default = script_dir_plus_file(
+        "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
+        CountryError,
+    )
+    _ochapath = _ochapath_default
     _country_name_overrides = {}
     _country_name_mappings = {}
 
@@ -239,14 +243,8 @@ class Country:
                         "Download from OCHA feed failed! Falling back to stored file."
                     )
             if countries is None:
-                file_path = script_dir_plus_file(
-                    "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
-                    CountryError,
-                )
-                if cls._ochapath:
-                    file_path = cls._ochapath
                 countries = hxl.data(
-                    file_path,
+                    cls._ochapath,
                     InputOptions(allow_local=True, encoding="utf-8"),
                 )
             cls.set_countriesdata(countries)
@@ -269,7 +267,7 @@ class Country:
         cls._use_live = use_live
 
     @classmethod
-    def set_ocha_url(cls, url: Optional[str] = None) -> None:
+    def set_ocha_url(cls, url: str = None) -> None:
         """
         Set OCHA url from which to retrieve countries data
 
@@ -294,8 +292,8 @@ class Country:
         Returns:
             None
         """
-        if path and not os.path.exists(path):
-            path = None
+        if not path or (path and not os.path.exists(path)):
+            path = cls._ochapath_default
         cls._ochapath = path
 
     @classmethod
