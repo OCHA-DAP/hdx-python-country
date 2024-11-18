@@ -2,6 +2,7 @@
 
 import copy
 import logging
+import os.path
 import re
 from string import punctuation
 from typing import Dict, List, Optional, Tuple, Union
@@ -73,6 +74,7 @@ class Country:
     _countriesdata = None
     _ochaurl_default = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
     _ochaurl = _ochaurl_default
+    _ochapath = None
     _country_name_overrides = {}
     _country_name_mappings = {}
 
@@ -237,11 +239,14 @@ class Country:
                         "Download from OCHA feed failed! Falling back to stored file."
                     )
             if countries is None:
+                file_path = script_dir_plus_file(
+                    "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
+                    CountryError,
+                )
+                if cls._ochapath:
+                    file_path = cls._ochapath
                 countries = hxl.data(
-                    script_dir_plus_file(
-                        "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
-                        Country,
-                    ),
+                    file_path,
                     InputOptions(allow_local=True, encoding="utf-8"),
                 )
             cls.set_countriesdata(countries)
@@ -277,6 +282,21 @@ class Country:
         if url is None:
             url = cls._ochaurl_default
         cls._ochaurl = url
+
+    @classmethod
+    def set_ocha_path(cls, path: Optional[str] = None) -> None:
+        """
+        Set local path from which to retrieve OCHA countries data
+
+        Args:
+            path (Optional[str]): Local path from which to retrieve countries data. Defaults to None.
+
+        Returns:
+            None
+        """
+        if path and not os.path.exists(path):
+            path = None
+        cls._ochapath = path
 
     @classmethod
     def set_country_name_overrides(cls, country_name_overrides: Dict) -> None:

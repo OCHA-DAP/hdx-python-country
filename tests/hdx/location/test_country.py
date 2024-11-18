@@ -716,3 +716,19 @@ class TestCountry:
         Country.set_ocha_url("NOTEXIST")
         Country._countriesdata = None
         assert Country.get_iso3_from_iso2("AF") == "AFG"
+
+    def test_ocha_feed_local_file_working(self):
+        Country._countriesdata = None
+        Country.set_ocha_path(
+            script_dir_plus_file("Countries_UZB_Deleted.csv", TestCountry)
+        )
+        assert (
+            Country.get_iso3_country_code("UZBEKISTAN", use_live=False) is None
+        )
+
+        Country._countriesdata = None
+        Country.set_ocha_path()
+        assert (
+            Country.get_iso3_country_code("UZBEKISTAN", use_live=False)
+            == "UZB"
+        )
