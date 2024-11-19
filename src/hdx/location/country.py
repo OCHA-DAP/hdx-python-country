@@ -212,7 +212,7 @@ class Country:
     @classmethod
     def countriesdata(
         cls,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         country_name_overrides: Dict = None,
         country_name_mappings: Dict = None,
     ) -> List[Dict[str, Dict]]:
@@ -227,6 +227,8 @@ class Country:
         Returns:
             List[Dict[str,Dict]]: Countries dictionaries
         """
+        if use_live is None:
+            use_live = cls._use_live
         if cls._countriesdata is None:
             countries = None
             if country_name_overrides is not None:
@@ -326,7 +328,7 @@ class Country:
     def get_country_info_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[Dict[str, str]]:
         """Get country information from ISO3 code
@@ -352,7 +354,7 @@ class Country:
     def get_country_name_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
         formal: bool = False,
     ) -> Optional[str]:
@@ -389,7 +391,7 @@ class Country:
     def get_currency_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[int]:
         """Get currency code from ISO3 code
@@ -415,7 +417,7 @@ class Country:
     def get_iso2_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[str]:
         """Get ISO2 from ISO3 code
@@ -441,7 +443,7 @@ class Country:
     def get_iso3_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[str]:
         """Get ISO3 from ISO2 code
@@ -467,7 +469,7 @@ class Country:
     def get_country_info_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[Dict[str, str]]:
         """Get country name from ISO2 code
@@ -493,7 +495,7 @@ class Country:
     def get_country_name_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
         formal: bool = False,
     ) -> Optional[str]:
@@ -521,7 +523,7 @@ class Country:
     def get_currency_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[str]:
         """Get currency from ISO2 code
@@ -547,7 +549,7 @@ class Country:
     def get_m49_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[int]:
         """Get M49 from ISO3 code
@@ -573,7 +575,7 @@ class Country:
     def get_iso3_from_m49(
         cls,
         m49: int,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[str]:
         """Get ISO3 from M49 code
@@ -599,7 +601,7 @@ class Country:
     def get_country_info_from_m49(
         cls,
         m49: int,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[Dict[str, str]]:
         """Get country name from M49 code
@@ -623,7 +625,7 @@ class Country:
     def get_country_name_from_m49(
         cls,
         m49: int,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
         formal: bool = False,
     ) -> Optional[str]:
@@ -651,7 +653,7 @@ class Country:
     def get_currency_from_m49(
         cls,
         m49: int,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[str]:
         """Get currency from M49 code
@@ -754,7 +756,7 @@ class Country:
     def get_iso3_country_code(
         cls,
         country: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> Optional[str]:
         """Get ISO3 code for cls. Only exact matches or None are returned.
@@ -814,7 +816,7 @@ class Country:
     def get_iso3_country_code_fuzzy(
         cls,
         country: str,
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
         min_chars: int = 5,
     ) -> Tuple[Optional[str], bool]:
@@ -904,7 +906,7 @@ class Country:
     def get_countries_in_region(
         cls,
         region: Union[int, str],
-        use_live: bool = _use_live,
+        use_live: bool = None,
         exception: Optional[ExceptionUpperBound] = None,
     ) -> List[str]:
         """Get countries (ISO3 codes) in region
