@@ -696,6 +696,11 @@ class TestCountry:
         assert Country._use_live is True
         Country.set_use_live_default(False)
         assert Country._use_live is False
+        # We should now be able to load from local data without setting use_live=False
+        Country.set_ocha_path(
+            script_dir_plus_file("Countries_UZB_Deleted.csv", TestCountry)
+        )
+        assert Country.get_iso3_country_code("UZBEKISTAN") is None
         Country.set_use_live_default(None)
         assert Country._use_live is True
 
