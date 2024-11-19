@@ -12,8 +12,17 @@ class LocationError(Exception):
     pass
 
 
-# Note that the Country class is set up in __init__.py
 class TestCountry:
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self):
+        Country.set_use_live_default(False)
+        Country.set_ocha_url()
+        Country.set_ocha_path()
+        Country.countriesdata(
+            country_name_overrides={"PSE": "oPt"},
+            country_name_mappings={"Congo DR": "COD"},
+        )
+
     def test_get_country_name_from_iso3(self):
         assert Country.get_country_name_from_iso3("jpn") == "Japan"
         assert Country.get_country_name_from_iso3("awe") is None
