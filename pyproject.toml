@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">=3.8"
 
 dependencies = [
-    "hdx-python-utilities@git+ssh://git@github.com/OCHA-DAP/hdx-python-utilities@error_handler#egg=hdx-python-utilities",
+    "hdx-python-utilities@git+https://git@github.com/OCHA-DAP/hdx-python-utilities@error_handler#egg=hdx-python-utilities",
     "libhxl>=5.2.2",
     "tenacity",
 ]
@@ -63,6 +63,9 @@ packages = ["src/hdx"]
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/hdx/location/_version.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 # Versioning
 

@@ -28,7 +28,7 @@ filelock==3.16.1
     # via virtualenv
 frictionless==5.18.0
     # via hdx-python-utilities
-hdx-python-utilities @ git+ssh://git@github.com/OCHA-DAP/hdx-python-utilities@24cc45f37f07beccb8180513653fd2b31e546db5#egg=hdx-python-utilities
+hdx-python-utilities @ git+ssh://git@github.com/OCHA-DAP/hdx-python-utilities@aa1f6fbfea94091aa21fd8288a5728725bfb592c#egg=hdx-python-utilities
     # via hdx-python-country (pyproject.toml)
 humanize==4.11.0
     # via frictionless
