@@ -9,7 +9,7 @@ from hxl.input import HXLIOException
 from hdx.location.country import Country
 from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.dictandlist import dict_of_sets_add
-from hdx.utilities.matching import multiple_replace, Phonetics
+from hdx.utilities.matching import Phonetics, multiple_replace
 from hdx.utilities.retriever import Retrieve
 from hdx.utilities.text import normalise
 from hdx.utilities.typehint import ListTuple
