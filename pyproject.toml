@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">=3.8"
 
 dependencies = [
-    "hdx-python-utilities@git+https://git@github.com/OCHA-DAP/hdx-python-utilities@error_handler#egg=hdx-python-utilities",
+    "hdx-python-utilities>=3.8.0",
     "libhxl>=5.2.2",
     "tenacity",
 ]
