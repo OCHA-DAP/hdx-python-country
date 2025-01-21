@@ -87,21 +87,24 @@ The usage of the country mappings functionality is best illustrated by some exam
 
     Country.get_country_info_from_iso2("jp")
     # Returns dictionary with HXL hashtags as keys. For more on HXL, see http://hxlstandard.org/
-    # {"#country+alt+i_ar+name+v_unterm": "اليابان", "#country+alt+i_en+name+v_unterm": "Japan",
-    # "#country+alt+i_es+name+v_unterm": "Japón (el)", "#country+alt+i_fr+name+v_unterm": "Japon (le)",
-    # "#country+alt+i_ru+name+v_unterm": "Япония", "#country+alt+i_zh+name+v_unterm": "日本",
-    # "#country+alt+name+v_dgacm"": "", "#country+alt+name+v_fts": "",
-    # "#country+alt+name+v_hrinfo_country": "", "#country+alt+name+v_iso": "",
-    # "#country+alt+name+v_m49": "", "#country+alt+name+v_reliefweb": "",
+    # {"#country+alt+i_ar+name+v_m49": "اليابان", "#country+alt+i_ar+name+v_unterm": "اليابان",
+    # "#country+alt+i_en+name+v_m49": "Japan", "#country+alt+i_en+name+v_unterm": "Japan",
+    # "#country+alt+i_es+name+v_m49": "Japón", "#country+alt+i_es+name+v_unterm": "Japón",
+    # "#country+alt+i_fr+name+v_m49": "Japon", "#country+alt+i_fr+name+v_unterm": "Japon",
+    # "#country+alt+i_ru+name+v_m49": "Япония", "#country+alt+i_ru+name+v_unterm": "Япония",
+    # "#country+alt+i_zh+name+v_m49": "日本", "#country+alt+i_zh+name+v_unterm": "日本",
+    # "#country+alt+name+v_dgacm": "", "#country+alt+name+v_fts": "",
+    # "#country+alt+name+v_iso": "", "#country+alt+name+v_reliefweb": "",
     # "#country+code+num+v_m49": "392", "#country+code+v_fts": "112",
-    # "#country+code+v_hrinfo_country": "292", "#country+code+v_iso2": "JP",
-    # "#country+code+v_iso3": "JPN", "#country+code+v_reliefweb": "128",
-    # "#country+formal+i_en+name+v_unterm": "Japan", "#country+name+preferred": "Japan",
-    # "#country+name+short+v_reliefweb": "", "#country+regex": "japan", "#date+start": "1974-01-01",
-    # "#geo+admin_level": "0", "#geo+lat": "37.63209801", "#geo+lon": "138.0812256", "#meta+id": "112",
-    # "#region+code+intermediate": "", "#region+code+main": "142", "#region+code+sub": "30",
-    # "#region+intermediate+name+preferred": "", "#region+main+name+preferred": "Asia",
-    # "#region+name+preferred+sub": "Eastern Asia"}
+    # "#country+code+v_iso2": "JP", "#country+code+v_iso3": "JPN",
+    # "#country+code+v_reliefweb": "128", "#country+formal+i_en+name+v_unterm": "Japan",
+    # "#country+name+preferred": "Japan", "#country+name+short+v_reliefweb": "",
+    # "#country+regex": "japan", "#currency+code": "JPY", "#date+start": "1974-01-01",
+    # "#geo+admin_level": "0", "#geo+lat": "37.63209801", "#geo+lon": "138.0812256",
+    # "#indicator+incomelevel": "High", "#meta+bool+deprecated": "N", "#meta+bool+independent": "Y",
+    # "#meta+id": "112", "#region+code+intermediate": "", "#region+code+main": "142",
+    # "#region+code+sub": "30", "#region+intermediate+name+preferred": "",
+    # "#region+main+name+preferred": "Asia", "#region+name+preferred+sub": "Eastern Asia"}
     Country.get_countries_in_region("Channel Islands")
     # ["GGY", "JEY"]
     len(Country.get_countries_in_region("Africa"))
