@@ -96,3 +96,6 @@ ENV/
 
 # hatch-vcs
 _version.py
+
+# Mac files
+.DS_Store

@@ -101,10 +101,11 @@ The usage of the country mappings functionality is best illustrated by some exam
     # "#country+name+preferred": "Japan", "#country+name+short+v_reliefweb": "",
     # "#country+regex": "japan", "#currency+code": "JPY", "#date+start": "1974-01-01",
     # "#geo+admin_level": "0", "#geo+lat": "37.63209801", "#geo+lon": "138.0812256",
-    # "#indicator+incomelevel": "High", "#meta+bool+deprecated": "N", "#meta+bool+independent": "Y",
-    # "#meta+id": "112", "#region+code+intermediate": "", "#region+code+main": "142",
-    # "#region+code+sub": "30", "#region+intermediate+name+preferred": "",
-    # "#region+main+name+preferred": "Asia", "#region+name+preferred+sub": "Eastern Asia"}
+    # "#indicator+bool+hrp": "", "#indicator+bool+gho": "", "#indicator+incomelevel": "High",
+    # "#meta+bool+deprecated": "N", "#meta+bool+independent": "Y", "#meta+id": "112",
+    # "#region+code+intermediate": "", "#region+code+main": "142", "#region+code+sub": "30",
+    # "#region+intermediate+name+preferred": "", "#region+main+name+preferred": "Asia",
+    # "#region+name+preferred+sub": "Eastern Asia"}
     Country.get_countries_in_region("Channel Islands")
     # ["GGY", "JEY"]
     len(Country.get_countries_in_region("Africa"))
