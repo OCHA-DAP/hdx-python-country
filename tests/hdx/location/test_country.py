@@ -742,6 +742,18 @@ class TestCountry:
                 "NOTEXIST", exception=LocationError
             )
 
+    def test_get_hrp_status_from_iso3(self):
+        assert Country.get_hrp_status_from_iso3("jpn") is False
+        assert Country.get_hrp_status_from_iso3("AFG") is True
+        assert Country.get_hrp_status_from_iso3("Ago") is False
+        assert Country.get_hrp_status_from_iso3("abc") is None
+
+    def test_get_gho_status_from_iso3(self):
+        assert Country.get_gho_status_from_iso3("jpn") is False
+        assert Country.get_gho_status_from_iso3("AFG") is True
+        assert Country.get_gho_status_from_iso3("Ago") is True
+        assert Country.get_gho_status_from_iso3("abc") is None
+
     def test_use_live_default(self):
         Country.set_use_live_default(True)
         assert Country._use_live is True
