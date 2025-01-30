@@ -100,6 +100,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "44.16506495",
             "#geo+lon": "17.79105724",
+            "#indicator+bool+gho": "",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -143,6 +145,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
+            "#indicator+bool+gho": "Y",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -193,6 +197,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "37.63209801",
             "#geo+lon": "138.0812256",
+            "#indicator+bool+gho": "",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "High",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -236,6 +242,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "23.74652012",
             "#geo+lon": "120.9621301",
+            "#indicator+bool+gho": "",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "High",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "N",
@@ -280,6 +288,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
+            "#indicator+bool+gho": "Y",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -369,6 +379,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "33.83147477",
             "#geo+lon": "66.02621828",
+            "#indicator+bool+gho": "Y",
+            "#indicator+bool+hrp": "Y",
             "#indicator+incomelevel": "Low",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -411,6 +423,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "-13.16992041",
             "#geo+lon": "-173.5139768",
+            "#indicator+bool+gho": "",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "Lower middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -454,6 +468,8 @@ class TestCountry:
             "#geo+admin_level": "0",
             "#geo+lat": "31.99084142",
             "#geo+lon": "35.30744047",
+            "#indicator+bool+gho": "Y",
+            "#indicator+bool+hrp": "",
             "#indicator+incomelevel": "Upper middle",
             "#meta+bool+deprecated": "N",
             "#meta+bool+independent": "Y",
@@ -725,6 +741,18 @@ class TestCountry:
             Country.get_countries_in_region(
                 "NOTEXIST", exception=LocationError
             )
+
+    def test_get_hrp_status_from_iso3(self):
+        assert Country.get_hrp_status_from_iso3("jpn") is False
+        assert Country.get_hrp_status_from_iso3("AFG") is True
+        assert Country.get_hrp_status_from_iso3("Ago") is False
+        assert Country.get_hrp_status_from_iso3("abc") is None
+
+    def test_get_gho_status_from_iso3(self):
+        assert Country.get_gho_status_from_iso3("jpn") is False
+        assert Country.get_gho_status_from_iso3("AFG") is True
+        assert Country.get_gho_status_from_iso3("Ago") is True
+        assert Country.get_gho_status_from_iso3("abc") is None
 
     def test_use_live_default(self):
         Country.set_use_live_default(True)

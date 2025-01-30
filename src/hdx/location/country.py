@@ -932,3 +932,61 @@ class Country:
         if exception is not None:
             raise exception
         return []
+
+    @classmethod
+    def get_hrp_status_from_iso3(
+        cls,
+        iso3: str,
+        use_live: bool = None,
+        exception: Optional[ExceptionUpperBound] = None,
+    ) -> Optional[int]:
+        """Get HRP status from ISO3 code
+
+        Args:
+            iso3 (str): ISO3 code for which to get M49 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[bool]: Has HRP (true or false)
+        """
+        countryinfo = cls.get_country_info_from_iso3(
+            iso3, use_live=use_live, exception=exception
+        )
+        if countryinfo is not None:
+            hrp = countryinfo.get("#indicator+bool+hrp")
+            if hrp is not None:
+                if hrp == "":
+                    return False
+                if hrp == "Y":
+                    return True
+        return None
+
+    @classmethod
+    def get_gho_status_from_iso3(
+        cls,
+        iso3: str,
+        use_live: bool = None,
+        exception: Optional[ExceptionUpperBound] = None,
+    ) -> Optional[int]:
+        """Get GHO status from ISO3 code
+
+        Args:
+            iso3 (str): ISO3 code for which to get M49 code
+            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
+            exception (Optional[ExceptionUpperBound]): An exception to raise if country not found. Defaults to None.
+
+        Returns:
+            Optional[bool]: In GHO (true or false)
+        """
+        countryinfo = cls.get_country_info_from_iso3(
+            iso3, use_live=use_live, exception=exception
+        )
+        if countryinfo is not None:
+            gho = countryinfo.get("#indicator+bool+gho")
+            if gho is not None:
+                if gho == "":
+                    return False
+                if gho == "Y":
+                    return True
+        return None
