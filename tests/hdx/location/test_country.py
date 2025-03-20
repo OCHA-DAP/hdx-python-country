@@ -46,10 +46,7 @@ class TestCountry:
             Country.get_country_name_from_iso3("vEn", formal=True)
             == "the Bolivarian Republic of Venezuela"
         )
-        assert (
-            Country.get_country_name_from_iso3("TWN")
-            == "Taiwan (Province of China)"
-        )
+        assert Country.get_country_name_from_iso3("TWN") == "Taiwan (Province of China)"
         assert (
             Country.get_country_name_from_iso3("TWN", formal=True)
             == "Taiwan (Province of China)"
@@ -320,10 +317,7 @@ class TestCountry:
             Country.get_country_name_from_iso2("VE", formal=True)
             == "the Bolivarian Republic of Venezuela"
         )
-        assert (
-            Country.get_country_name_from_iso2("TW")
-            == "Taiwan (Province of China)"
-        )
+        assert Country.get_country_name_from_iso2("TW") == "Taiwan (Province of China)"
         assert Country.get_country_name_from_iso2("PS") == "oPt"
 
     def test_get_currency_from_iso2(self):
@@ -507,9 +501,7 @@ class TestCountry:
 
     def test_expand_countryname_abbrevs(self):
         assert Country.expand_countryname_abbrevs("jpn") == ["JPN"]
-        assert Country.expand_countryname_abbrevs(
-            "Haha Dem. Fed. Republic"
-        ) == [
+        assert Country.expand_countryname_abbrevs("Haha Dem. Fed. Republic") == [
             "HAHA DEMOCRATIC FED. REPUBLIC",
             "HAHA DEMOCRATIC FEDERATION REPUBLIC",
             "HAHA DEMOCRATIC FEDERAL REPUBLIC",
@@ -522,9 +514,7 @@ class TestCountry:
             "TANZANIA",
             ["UNITED", "REP", "OF"],
         )
-        assert Country.simplify_countryname(
-            "Micronesia (Federated States of)"
-        ) == (
+        assert Country.simplify_countryname("Micronesia (Federated States of)") == (
             "MICRONESIA",
             ["FEDERATED", "STATES", "OF"],
         )
@@ -547,35 +537,24 @@ class TestCountry:
         assert Country.get_iso3_country_code("Dem. Rep. of the Congo") == "COD"
         assert Country.get_iso3_country_code("Russian Fed.") == "RUS"
         assert Country.get_iso3_country_code("中国") == "CHN"
+        assert Country.get_iso3_country_code("المملكة العربية السعودية") == "SAU"
         assert (
-            Country.get_iso3_country_code("المملكة العربية السعودية") == "SAU"
-        )
-        assert (
-            Country.get_iso3_country_code("Micronesia (Federated States of)")
-            == "FSM"
+            Country.get_iso3_country_code("Micronesia (Federated States of)") == "FSM"
         )
         assert Country.get_iso3_country_code("Iran (Islamic Rep. of)") == "IRN"
-        assert (
-            Country.get_iso3_country_code("United Rep. of Tanzania") == "TZA"
-        )
+        assert Country.get_iso3_country_code("United Rep. of Tanzania") == "TZA"
         assert Country.get_iso3_country_code("Syrian Arab Rep.") == "SYR"
         assert Country.get_iso3_country_code("Central African Rep.") == "CAF"
         assert Country.get_iso3_country_code("Rep. of Korea") == "KOR"
-        assert (
-            Country.get_iso3_country_code("St. Pierre and Miquelon") == "SPM"
-        )
+        assert Country.get_iso3_country_code("St. Pierre and Miquelon") == "SPM"
         assert Country.get_iso3_country_code("Christmas Isl.") == "CXR"
         assert Country.get_iso3_country_code("Cayman Isl.") == "CYM"
         assert Country.get_iso3_country_code("jp") == "JPN"
-        assert (
-            Country.get_iso3_country_code("Taiwan (Province of China)")
-            == "TWN"
-        )
+        assert Country.get_iso3_country_code("Taiwan (Province of China)") == "TWN"
         assert Country.get_iso3_country_code("Congo DR") == "COD"
         assert Country.get_iso3_country_code("oPt") == "PSE"
         assert (
-            Country.get_iso3_country_code("Lao People's Democratic Republic")
-            == "LAO"
+            Country.get_iso3_country_code("Lao People's Democratic Republic") == "LAO"
         )
         assert Country.get_iso3_country_code_fuzzy("jpn") == ("JPN", True)
         assert Country.get_iso3_country_code_fuzzy("ZWE") == ("ZWE", True)
@@ -589,9 +568,7 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy("abc") == (None, False)
         assert Country.get_iso3_country_code_fuzzy("-") == (None, False)
         with pytest.raises(LocationError):
-            Country.get_iso3_country_code_fuzzy(
-                "abcde", exception=LocationError
-            )
+            Country.get_iso3_country_code_fuzzy("abcde", exception=LocationError)
         assert Country.get_iso3_country_code_fuzzy("United Kingdom") == (
             "GBR",
             True,
@@ -603,9 +580,7 @@ class TestCountry:
             "USA",
             True,
         )
-        assert Country.get_iso3_country_code_fuzzy(
-            "united states of america"
-        ) == (
+        assert Country.get_iso3_country_code_fuzzy("united states of america") == (
             "USA",
             True,
         )
@@ -646,9 +621,7 @@ class TestCountry:
             "COD",
             False,
         )
-        assert Country.get_iso3_country_code_fuzzy(
-            "Congo, Democratic Republic"
-        ) == (
+        assert Country.get_iso3_country_code_fuzzy("Congo, Democratic Republic") == (
             "COD",
             False,
         )
@@ -656,9 +629,7 @@ class TestCountry:
             "COG",
             False,
         )
-        assert Country.get_iso3_country_code_fuzzy(
-            "Republic of the Congo"
-        ) == (
+        assert Country.get_iso3_country_code_fuzzy("Republic of the Congo") == (
             "COG",
             False,
         )
@@ -738,9 +709,7 @@ class TestCountry:
         ]
         assert len(Country.get_countries_in_region("NOTEXIST")) == 0
         with pytest.raises(LocationError):
-            Country.get_countries_in_region(
-                "NOTEXIST", exception=LocationError
-            )
+            Country.get_countries_in_region("NOTEXIST", exception=LocationError)
 
     def test_get_hrp_status_from_iso3(self):
         assert Country.get_hrp_status_from_iso3("jpn") is False
@@ -781,9 +750,7 @@ class TestCountry:
         assert Country.get_iso3_country_code("south sudan") == "SSD"
         Country.set_ocha_url()
         Country._countriesdata = None
-        assert (
-            Country.get_iso3_country_code("UZBEKISTAN", use_live=True) == "UZB"
-        )
+        assert Country.get_iso3_country_code("UZBEKISTAN", use_live=True) == "UZB"
         assert Country.get_iso3_country_code_fuzzy("Laos") == ("LAO", False)
         Country.set_ocha_url("NOTEXIST")
         Country._countriesdata = None
@@ -794,13 +761,8 @@ class TestCountry:
         Country.set_ocha_path(
             script_dir_plus_file("Countries_UZB_Deleted.csv", TestCountry)
         )
-        assert (
-            Country.get_iso3_country_code("UZBEKISTAN", use_live=False) is None
-        )
+        assert Country.get_iso3_country_code("UZBEKISTAN", use_live=False) is None
 
         Country._countriesdata = None
         Country.set_ocha_path()
-        assert (
-            Country.get_iso3_country_code("UZBEKISTAN", use_live=False)
-            == "UZB"
-        )
+        assert Country.get_iso3_country_code("UZBEKISTAN", use_live=False) == "UZB"

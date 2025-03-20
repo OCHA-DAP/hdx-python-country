@@ -129,9 +129,7 @@ class Currency:
                 currency = row["Currency"]
                 date = get_int_timestamp(parse_date(row["Date"]))
                 rate = float(row["Rate"])
-                dict_of_dicts_add(
-                    cls._secondary_historic, currency, date, rate
-                )
+                dict_of_dicts_add(cls._secondary_historic, currency, date, rate)
         except (DownloadError, OSError):
             logger.exception("Error getting secondary historic rates!")
             cls._secondary_historic = "FAIL"
@@ -157,9 +155,7 @@ class Currency:
         if downloader is None:
             downloader = cls._retriever
         try:
-            chart = downloader.download_json(url, log_level=cls._log_level)[
-                "chart"
-            ]
+            chart = downloader.download_json(url, log_level=cls._log_level)["chart"]
             if chart["error"] is not None:
                 return None
             return chart["result"][0]
@@ -222,9 +218,7 @@ class Currency:
         if cls._no_historic:
             secondary_fx_rate = None
         else:
-            secondary_fx_rate = cls._get_secondary_historic_rate(
-                currency, timestamp
-            )
+            secondary_fx_rate = cls._get_secondary_historic_rate(currency, timestamp)
         if not secondary_fx_rate:
             # compare with high and low to reveal errors from Yahoo feed
             if high and low:
@@ -330,9 +324,7 @@ class Currency:
         raise CurrencyError(f"Failed to get rate for currency {currency}!")
 
     @classmethod
-    def get_current_value_in_usd(
-        cls, value: Union[int, float], currency: str
-    ) -> float:
+    def get_current_value_in_usd(cls, value: Union[int, float], currency: str) -> float:
         """
         Get the current USD value of the value in local currency
 
@@ -479,15 +471,11 @@ class Currency:
                 return fx_rate
         fx_rate = cls._get_primary_rate(currency, timestamp)
         if fx_rate is not None:
-            dict_of_dicts_add(
-                cls._cached_historic_rates, currency, timestamp, fx_rate
-            )
+            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
             return fx_rate
         fx_rate = cls._get_secondary_historic_rate(currency, timestamp)
         if fx_rate is not None:
-            dict_of_dicts_add(
-                cls._cached_historic_rates, currency, timestamp, fx_rate
-            )
+            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
             return fx_rate
         if cls._fallback_to_current:
             fx_rate = cls.get_current_rate(currency)
@@ -527,9 +515,7 @@ class Currency:
         currency = currency.upper()
         if currency == "USD":
             return value
-        fx_rate = cls.get_historic_rate(
-            currency, date, ignore_timeinfo=ignore_timeinfo
-        )
+        fx_rate = cls.get_historic_rate(currency, date, ignore_timeinfo=ignore_timeinfo)
         return value / fx_rate
 
     @classmethod
@@ -559,7 +545,5 @@ class Currency:
         currency = currency.upper()
         if currency == "USD":
             return usdvalue
-        fx_rate = cls.get_historic_rate(
-            currency, date, ignore_timeinfo=ignore_timeinfo
-        )
+        fx_rate = cls.get_historic_rate(currency, date, ignore_timeinfo=ignore_timeinfo)
         return usdvalue * fx_rate

@@ -74,13 +74,8 @@ class TestCurrency:
             fallback_current_to_static=True,
             no_historic=True,
         )
-        assert (
-            Currency.get_current_value_in_usd(10, "gbp") == 12.076629158709528
-        )
-        assert (
-            Currency.get_current_value_in_currency(10, "gbp")
-            == 8.280456299999999
-        )
+        assert Currency.get_current_value_in_usd(10, "gbp") == 12.076629158709528
+        assert Currency.get_current_value_in_currency(10, "gbp") == 8.280456299999999
         with pytest.raises(CurrencyError):
             Currency.get_current_value_in_usd(10, "XYZ")
         with pytest.raises(CurrencyError):
@@ -139,9 +134,7 @@ class TestCurrency:
         assert rate2xdr != 1
         assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.1
 
-    def test_get_current_value_in_usd_fixednnow(
-        self, retrievers, secondary_rates_url
-    ):
+    def test_get_current_value_in_usd_fixednnow(self, retrievers, secondary_rates_url):
         date = parse_date("2020-02-20")
         Currency.setup(
             no_historic=True,
@@ -155,9 +148,7 @@ class TestCurrency:
         # falls back to secondary current rates
         assert Currency.get_current_rate("xdr") == 0.76479065
 
-    def test_get_historic_value_in_usd(
-        self, retrievers, secondary_historic_url
-    ):
+    def test_get_historic_value_in_usd(self, retrievers, secondary_historic_url):
         Currency._no_historic = False
         Currency.setup(secondary_historic_url=secondary_historic_url)
         date = parse_date("2020-02-20")
@@ -182,10 +173,7 @@ class TestCurrency:
             )
             == 0.76910001039505
         )
-        assert (
-            Currency.get_historic_value_in_usd(10, "gbp", date)
-            == 12.928247799964508
-        )
+        assert Currency.get_historic_value_in_usd(10, "gbp", date) == 12.928247799964508
         assert (
             Currency.get_historic_value_in_currency(10, "gbp", date)
             == 7.735000252723694
@@ -212,10 +200,7 @@ class TestCurrency:
             fallback_historic_to_current=True,
             fallback_current_to_static=True,
         )
-        assert (
-            Currency.get_historic_value_in_usd(10, "gbp", date)
-            == 12.076629158709528
-        )
+        assert Currency.get_historic_value_in_usd(10, "gbp", date) == 12.076629158709528
         Currency.setup(
             retriever=retriever,
             secondary_historic_url=secondary_historic_url,
@@ -255,10 +240,7 @@ class TestCurrency:
         Currency.setup(secondary_historic_url="fail")
         # Without the checking against high and low returned by Yahoo API, this
         # returned 3.140000104904175
-        assert (
-            Currency.get_historic_rate("NGN", parse_date("2017-02-15"))
-            == 314.5
-        )
+        assert Currency.get_historic_rate("NGN", parse_date("2017-02-15")) == 314.5
         # Without the checking against high and low returned by Yahoo API, this
         # returned 0.10000000149011612
         assert (
@@ -283,17 +265,12 @@ class TestCurrency:
             == 601.632568359375
         )
 
-    def test_broken_rates_with_secondary(
-        self, retrievers, secondary_historic_url
-    ):
+    def test_broken_rates_with_secondary(self, retrievers, secondary_historic_url):
         Currency._no_historic = False
         Currency.setup(secondary_historic_url=secondary_historic_url)
         # Without the checking against secondary historic rate, this
         # returned 3.140000104904175
-        assert (
-            Currency.get_historic_rate("NGN", parse_date("2017-02-15"))
-            == 314.5
-        )
+        assert Currency.get_historic_rate("NGN", parse_date("2017-02-15")) == 314.5
         # Without the checking against secondary historic rate, this
         # returned 0.10000000149011612
         assert (
@@ -364,10 +341,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2022-04-14"))
-        assert (
-            Currency._get_adjclose(indicators, "XAF", timestamp)
-            == 605.5509643554688
-        )
+        assert Currency._get_adjclose(indicators, "XAF", timestamp) == 605.5509643554688
         indicators = {
             "adjclose": [{"adjclose": [601.632568359375]}],
             "quote": [
@@ -381,10 +355,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2022-04-15"))
-        assert (
-            Currency._get_adjclose(indicators, "XAF", timestamp)
-            == 601.632568359375
-        )
+        assert Currency._get_adjclose(indicators, "XAF", timestamp) == 601.632568359375
         indicators = {
             "adjclose": [{"adjclose": [314.0000104904175]}],
             "quote": [
@@ -428,10 +399,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2015-12-15"))
-        assert (
-            Currency._get_adjclose(indicators, "COP", timestamp)
-            == 3269.199951171875
-        )
+        assert Currency._get_adjclose(indicators, "COP", timestamp) == 3269.199951171875
         indicators = {
             "adjclose": [{"adjclose": [605.5509643554688]}],
             "quote": [
@@ -445,10 +413,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2022-04-14"))
-        assert (
-            Currency._get_adjclose(indicators, "XAF", timestamp)
-            == 605.5509643554688
-        )
+        assert Currency._get_adjclose(indicators, "XAF", timestamp) == 605.5509643554688
         indicators = {
             "adjclose": [{"adjclose": [601.632568359375]}],
             "quote": [
@@ -462,10 +427,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2022-04-15"))
-        assert (
-            Currency._get_adjclose(indicators, "XAF", timestamp)
-            == 601.632568359375
-        )
+        assert Currency._get_adjclose(indicators, "XAF", timestamp) == 601.632568359375
         indicators = {
             "adjclose": [{"adjclose": [314.0000104904175]}],
             "quote": [
@@ -507,10 +469,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2015-12-15"))
-        assert (
-            Currency._get_adjclose(indicators, "COP", timestamp)
-            == 3313.999938964844
-        )
+        assert Currency._get_adjclose(indicators, "COP", timestamp) == 3313.999938964844
         # Everything is wacky but the values are in the same order of magnitude
         # as each other so adjclose is assumed to be ok
         indicators = {
@@ -526,10 +485,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2015-12-15"))
-        assert (
-            Currency._get_adjclose(indicators, "COP", timestamp)
-            == 33.13999938964844
-        )
+        assert Currency._get_adjclose(indicators, "COP", timestamp) == 33.13999938964844
         # Everything is wacky and the values are not in the same order of
         # magnitude as each other so secondary historic rate is returned
         indicators = {
@@ -545,10 +501,7 @@ class TestCurrency:
             ],
         }
         timestamp = get_int_timestamp(parse_date("2015-12-15"))
-        assert (
-            Currency._get_adjclose(indicators, "COP", timestamp)
-            == 3124.504838709677
-        )
+        assert Currency._get_adjclose(indicators, "COP", timestamp) == 3124.504838709677
         # Everything is wacky but adjclose is in the same order of
         # magnitude as the secondary historic rate so return adjclose
         indicators = {

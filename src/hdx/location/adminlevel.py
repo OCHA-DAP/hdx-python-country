@@ -67,9 +67,7 @@ class AdminLevel:
         self.retriever: Optional[Retrieve] = retriever
         self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
         self.admin_name_mappings = admin_config.get("admin_name_mappings", {})
-        self.admin_name_replacements = admin_config.get(
-            "admin_name_replacements", {}
-        )
+        self.admin_name_replacements = admin_config.get("admin_name_replacements", {})
         self.admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", list())
         self.pcodes = []
         self.pcode_lengths = {}
@@ -135,9 +133,7 @@ class AdminLevel:
             try:
                 url_to_use = retriever.download_file(url)
             except DownloadError:
-                logger.exception(
-                    f"Setup of libhxl Dataset object with {url} failed!"
-                )
+                logger.exception(f"Setup of libhxl Dataset object with {url} failed!")
                 raise
         else:
             url_to_use = url
@@ -147,9 +143,7 @@ class AdminLevel:
                 InputOptions(InputOptions(allow_local=True, encoding="utf-8")),
             )
         except (FileNotFoundError, HXLIOException):
-            logger.exception(
-                f"Setup of libhxl Dataset object with {url} failed!"
-            )
+            logger.exception(f"Setup of libhxl Dataset object with {url} failed!")
             raise
 
     def setup_row(
@@ -178,9 +172,7 @@ class AdminLevel:
         self.pcode_to_name[pcode] = adm_name
         self.pcode_to_iso3[pcode] = countryiso3
         if not adm_name:
-            logger.error(
-                f"Admin name is blank for pcode {pcode} of {countryiso3}!"
-            )
+            logger.error(f"Admin name is blank for pcode {pcode} of {countryiso3}!")
             return
 
         adm_name = normalise(adm_name)
@@ -189,9 +181,7 @@ class AdminLevel:
         self.name_to_pcode[countryiso3] = name_to_pcode
 
         if self.use_parent:
-            name_parent_to_pcode = self.name_parent_to_pcode.get(
-                countryiso3, {}
-            )
+            name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3, {})
             name_to_pcode = name_parent_to_pcode.get(parent, {})
             name_to_pcode[adm_name] = pcode
             name_parent_to_pcode[parent] = name_to_pcode
@@ -216,9 +206,7 @@ class AdminLevel:
             None
         """
         if countryiso3s:
-            countryiso3s = [
-                countryiso3.upper() for countryiso3 in countryiso3s
-            ]
+            countryiso3s = [countryiso3.upper() for countryiso3 in countryiso3s]
         self.use_parent = "parent" in admin_info[0]
         for row in admin_info:
             countryiso3 = row["iso3"].upper()
@@ -244,13 +232,9 @@ class AdminLevel:
         Returns:
             None
         """
-        admin_info = libhxl_dataset.with_rows(
-            f"#geo+admin_level={self.admin_level}"
-        )
+        admin_info = libhxl_dataset.with_rows(f"#geo+admin_level={self.admin_level}")
         if countryiso3s:
-            countryiso3s = [
-                countryiso3.upper() for countryiso3 in countryiso3s
-            ]
+            countryiso3s = [countryiso3.upper() for countryiso3 in countryiso3s]
         self.use_parent = "#adm+code+parent" in admin_info.display_tags
         for row in admin_info:
             countryiso3 = row.get("#country+code").upper()
@@ -411,9 +395,7 @@ class AdminLevel:
         pcode_format = self.pcode_formats.get(countryiso3)
         if not pcode_format:
             if self.get_admin_level(countryiso3) == 1:
-                return self.convert_admin1_pcode_length(
-                    countryiso3, pcode, logname
-                )
+                return self.convert_admin1_pcode_length(countryiso3, pcode, logname)
             return None
         countryiso, digits = match.groups()
         countryiso_length = len(countryiso)
@@ -465,15 +447,10 @@ class AdminLevel:
                 if admin_length > 2 and pos in self.zeroes[countryiso3]:
                     pcode_part = f"0{pcode_part}"
                     if self.parent_admins and admin_no < self.admin_level:
-                        parent_pcode = [
-                            pcode_parts[i] for i in range(admin_no)
-                        ]
+                        parent_pcode = [pcode_parts[i] for i in range(admin_no)]
                         parent_pcode.append(pcode_part[:admin_length])
                         parent_pcode = "".join(parent_pcode)
-                        if (
-                            parent_pcode
-                            not in self.parent_admins[admin_no - 1]
-                        ):
+                        if parent_pcode not in self.parent_admins[admin_no - 1]:
                             pcode_part = pcode_part[1:]
                         else:
                             admin_changes.append(str(admin_no))
@@ -483,15 +460,10 @@ class AdminLevel:
                 if admin_length <= 2 and pcode_part[0] == "0":
                     pcode_part = pcode_part[1:]
                     if self.parent_admins and admin_no < self.admin_level:
-                        parent_pcode = [
-                            pcode_parts[i] for i in range(admin_no)
-                        ]
+                        parent_pcode = [pcode_parts[i] for i in range(admin_no)]
                         parent_pcode.append(pcode_part[:admin_length])
                         parent_pcode = "".join(parent_pcode)
-                        if (
-                            parent_pcode
-                            not in self.parent_admins[admin_no - 1]
-                        ):
+                        if parent_pcode not in self.parent_admins[admin_no - 1]:
                             pcode_part = f"0{pcode_part}"
                         else:
                             admin_changes.append(str(admin_no))
@@ -533,11 +505,7 @@ class AdminLevel:
         country_pcodelength = self.pcode_lengths.get(countryiso3)
         if not country_pcodelength:
             return None
-        if (
-            pcode_length == country_pcodelength
-            or pcode_length < 4
-            or pcode_length > 6
-        ):
+        if pcode_length == country_pcodelength or pcode_length < 4 or pcode_length > 6:
             return None
         if country_pcodelength == 4:
             pcode = f"{Country.get_iso2_from_iso3(pcode[:3])}{pcode[-2:]}"
@@ -690,9 +658,7 @@ class AdminLevel:
         pcode = name_to_pcode.get(
             normalised_name, name_to_pcode.get(alt_normalised_name)
         )
-        if not pcode and name.lower() in self.get_admin_fuzzy_dont(
-            countryiso3, parent
-        ):
+        if not pcode and name.lower() in self.get_admin_fuzzy_dont(countryiso3, parent):
             if logname:
                 self.ignored.add((logname, countryiso3, name))
             return None
@@ -836,16 +802,12 @@ class AdminLevel:
                 return name, True
             # name looks like a p-code, but doesn't match p-codes
             # so try adjusting p-code length
-            pcode = self.convert_admin_pcode_length(
-                countryiso3, pcode, **kwargs
-            )
+            pcode = self.convert_admin_pcode_length(countryiso3, pcode, **kwargs)
             return pcode, True
         else:
             normalised_name = normalise(name)
             if parent:
-                name_parent_to_pcode = self.name_parent_to_pcode.get(
-                    countryiso3
-                )
+                name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3)
                 if name_parent_to_pcode:
                     name_to_pcode = name_parent_to_pcode.get(parent)
                     if name_to_pcode is not None:
@@ -860,9 +822,7 @@ class AdminLevel:
                         return pcode, True
             if not fuzzy_match or len(normalised_name) < fuzzy_length:
                 return None, True
-            pcode = self.fuzzy_pcode(
-                countryiso3, name, normalised_name, **kwargs
-            )
+            pcode = self.fuzzy_pcode(countryiso3, name, normalised_name, **kwargs)
             return pcode, False
 
     def output_matches(self) -> List[str]:
@@ -905,7 +865,9 @@ class AdminLevel:
             if len(error) == 2:
                 line = f"{error[0]} - Could not find {error[1]} in map names!"
             else:
-                line = f"{error[0]} - {error[1]}: Could not find {error[2]} in map names!"
+                line = (
+                    f"{error[0]} - {error[1]}: Could not find {error[2]} in map names!"
+                )
             logger.error(line)
             output.append(line)
         return output
