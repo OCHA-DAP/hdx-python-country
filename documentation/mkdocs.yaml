@@ -1,0 +1,17 @@
+site_name: HDX Python Country
+repo_url: https://github.com/OCHA-DAP/hdx-python-country/
+repo_name: OCHA-DAP/hdx-python-country
+docs_dir: .
+site_dir: ../site
+theme:
+  name: material
+  highlightjs: true
+plugins:
+  - search
+  - mkapi
+nav:
+  - Home: index.md
+  - API Documentation:
+    - Countries: $src/hdx.location.country.*
+    - Administration Level: $src/hdx.location.adminlevel.*
+    - Currencies: $src/hdx.location.currency.*

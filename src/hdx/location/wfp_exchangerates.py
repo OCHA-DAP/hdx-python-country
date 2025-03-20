@@ -19,11 +19,24 @@ class WFPExchangeRates:
     def __init__(self, wfp_api: WFPAPI):
         self.wfp_api = wfp_api
 
-    def get_currencies(self) -> List[str]:
-        """Get list of currencies in WFP API
+    def get_currencies_info(self) -> List[Dict]:
+        """Get list of currency codes and names from WFP API
 
         Returns:
-            List[str]: List of currencies in WFP API
+            List[Dict]: List of currency codes and names in WFP API
+        """
+        currencies = []
+        for currency in self.wfp_api.get_items("Currency/List"):
+            currencies.append(
+                {"code": currency["name"], "name": currency["extendedName"]}
+            )
+        return currencies
+
+    def get_currencies(self) -> List[str]:
+        """Get list of currency codes in WFP API
+
+        Returns:
+            List[str]: List of currency codes in WFP API
         """
         currencies = []
         for currency in self.wfp_api.get_items("Currency/List"):
@@ -52,9 +65,7 @@ class WFPExchangeRates:
             historic_rates[timestamp] = quote["value"]
         return historic_rates
 
-    def get_historic_rates(
-        self, currencies: ListTuple[str]
-    ) -> Dict[str, Dict]:
+    def get_historic_rates(self, currencies: ListTuple[str]) -> Dict[str, Dict]:
         """Get historic rates for a list of currencies from WFP API
 
         Args:
@@ -66,8 +77,6 @@ class WFPExchangeRates:
         historic_rates = {}
         for currency in currencies:
             logger.info(f"Getting WFP historic rates for {currency}")
-            currency_historic_rates = self.get_currency_historic_rates(
-                currency
-            )
+            currency_historic_rates = self.get_currency_historic_rates(currency)
             historic_rates[currency.upper()] = currency_historic_rates
         return historic_rates

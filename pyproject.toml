@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">=3.8"
 
 dependencies = [
-    "hdx-python-utilities>=3.8.0",
+    "hdx-python-utilities>=3.8.5",
     "libhxl>=5.2.2",
     "tenacity",
 ]
@@ -50,7 +50,7 @@ Homepage = "https://github.com/OCHA-DAP/hdx-python-country"
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
 dev = ["pre-commit"]
-
+docs = ["mkapi"]
 
 #########
 # Hatch #
@@ -92,7 +92,7 @@ run = """
        """
 
 [tool.hatch.envs.hatch-static-analysis]
-dependencies = ["ruff==0.8.6"]
+dependencies = ["ruff==0.9.10"]
 
 [tool.hatch.envs.hatch-static-analysis.scripts]
 format-check = ["ruff format --config .config/ruff.toml --check --diff {args:.}",]

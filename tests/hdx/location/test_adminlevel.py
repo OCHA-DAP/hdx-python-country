@@ -35,9 +35,7 @@ class TestAdminLevel:
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)
-        adminone.setup_from_admin_info(
-            config["admin_info"], countryiso3s=("yem",)
-        )
+        adminone.setup_from_admin_info(config["admin_info"], countryiso3s=("yem",))
         assert len(adminone.get_pcode_list()) == 22
         adminone = AdminLevel(config)
         adminone.setup_from_admin_info(config["admin_info"])
@@ -131,9 +129,7 @@ class TestAdminLevel:
             "NG015",
             True,
         )
-        assert adminone.get_pcode(
-            "UKR", "Chernihiv Oblast", logname="test"
-        ) == (
+        assert adminone.get_pcode("UKR", "Chernihiv Oblast", logname="test") == (
             "UA74",
             False,
         )
@@ -201,9 +197,7 @@ class TestAdminLevel:
             "YE30",
             False,
         )
-        assert adminone.get_pcode(
-            "YEM", "Al Dhale'e / الضالع", logname="test"
-        ) == (
+        assert adminone.get_pcode("YEM", "Al Dhale'e / الضالع", logname="test") == (
             "YE30",
             False,
         )
@@ -228,34 +222,42 @@ class TestAdminLevel:
             "AF0101",
             True,
         )
-        assert admintwo.get_pcode(
-            "AFG", "AF0101", parent="blah", logname="test"
-        ) == ("AF0101", True)
+        assert admintwo.get_pcode("AFG", "AF0101", parent="blah", logname="test") == (
+            "AF0101",
+            True,
+        )
         assert admintwo.get_pcode("AFG", "Kabul", logname="test") == (
             "AF0201",
             True,
         )
-        assert admintwo.get_pcode(
-            "AFG", "Kabul", parent="AF01", logname="test"
-        ) == ("AF0101", True)
-        assert admintwo.get_pcode(
-            "AFG", "Kabul", parent="blah", logname="test"
-        ) == (None, False)
-        assert admintwo.get_pcode(
-            "AFG", "Kabul", parent="AF02", logname="test"
-        ) == ("AF0201", True)
-        assert admintwo.get_pcode(
-            "AFG", "Kabull", parent="AF01", logname="test"
-        ) == ("AF0101", False)
-        assert admintwo.get_pcode(
-            "AFG", "Kabull", parent="blah", logname="test"
-        ) == (None, False)
-        assert admintwo.get_pcode(
-            "AFG", "Kabull", parent="AF02", logname="test"
-        ) == ("AF0201", False)
-        assert admintwo.get_pcode(
-            "ABC", "Kabull", parent="AF02", logname="test"
-        ) == (None, False)
+        assert admintwo.get_pcode("AFG", "Kabul", parent="AF01", logname="test") == (
+            "AF0101",
+            True,
+        )
+        assert admintwo.get_pcode("AFG", "Kabul", parent="blah", logname="test") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode("AFG", "Kabul", parent="AF02", logname="test") == (
+            "AF0201",
+            True,
+        )
+        assert admintwo.get_pcode("AFG", "Kabull", parent="AF01", logname="test") == (
+            "AF0101",
+            False,
+        )
+        assert admintwo.get_pcode("AFG", "Kabull", parent="blah", logname="test") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode("AFG", "Kabull", parent="AF02", logname="test") == (
+            "AF0201",
+            False,
+        )
+        assert admintwo.get_pcode("ABC", "Kabull", parent="AF02", logname="test") == (
+            None,
+            False,
+        )
 
         output = admintwo.output_admin_name_mappings()
         assert output == [
@@ -298,9 +300,10 @@ class TestAdminLevel:
 
         output = admintwo.output_admin_name_replacements()
         assert output == [" city: "]
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", logname="test"
-        ) == ("CD2013", False)
+        assert admintwo.get_pcode("COD", "Mbanza-Ngungu city", logname="test") == (
+            "CD2013",
+            False,
+        )
         assert admintwo.get_pcode(
             "COD", "Mbanza-Ngungu city", parent="CD20", logname="test"
         ) == ("CD2013", False)
@@ -316,14 +319,13 @@ class TestAdminLevel:
             False,
         )
 
-        admintwo.admin_name_replacements = config_parent[
-            "alt1_admin_name_replacements"
-        ]
+        admintwo.admin_name_replacements = config_parent["alt1_admin_name_replacements"]
         output = admintwo.output_admin_name_replacements()
         assert output == ["COD| city: "]
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", logname="test"
-        ) == ("CD2013", False)
+        assert admintwo.get_pcode("COD", "Mbanza-Ngungu city", logname="test") == (
+            "CD2013",
+            False,
+        )
         assert admintwo.get_pcode(
             "COD", "Mbanza-Ngungu city", parent="CD20", logname="test"
         ) == ("CD2013", False)
@@ -345,14 +347,13 @@ class TestAdminLevel:
             "MWI", "Blantyre city", parent="MW3", logname="test"
         ) == (None, False)
 
-        admintwo.admin_name_replacements = config_parent[
-            "alt2_admin_name_replacements"
-        ]
+        admintwo.admin_name_replacements = config_parent["alt2_admin_name_replacements"]
         output = admintwo.output_admin_name_replacements()
         assert output == ["CD20| city: "]
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", logname="test"
-        ) == (None, False)
+        assert admintwo.get_pcode("COD", "Mbanza-Ngungu city", logname="test") == (
+            None,
+            False,
+        )
         assert admintwo.get_pcode(
             "COD", "Mbanza-Ngungu city", parent="CD20", logname="test"
         ) == ("CD2013", False)
@@ -421,22 +422,18 @@ class TestAdminLevel:
         adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
-        assert len(adminone.get_pcode_list()) == 2543
+        assert len(adminone.get_pcode_list()) == 2455
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (
             "YE30",
             True,
         )
-        assert adminone.get_pcode(
-            "YEM", "YE30", parent="YEM", logname="test"
-        ) == (
+        assert adminone.get_pcode("YEM", "YE30", parent="YEM", logname="test") == (
             "YE30",
             True,
         )
         # Exact match of p-code so doesn't need parent
-        assert adminone.get_pcode(
-            "YEM", "YE30", parent="Blah1", logname="test"
-        ) == (
+        assert adminone.get_pcode("YEM", "YE30", parent="Blah1", logname="test") == (
             "YE30",
             True,
         )
@@ -513,16 +510,12 @@ class TestAdminLevel:
             "YE30",
             False,
         )
-        assert adminone.get_pcode(
-            "YEM", "Ad Dal", parent="YEM", logname="test"
-        ) == (
+        assert adminone.get_pcode("YEM", "Ad Dal", parent="YEM", logname="test") == (
             "YE30",
             False,
         )
         # Invalid parent means fuzzy matching won't match
-        assert adminone.get_pcode(
-            "YEM", "Ad Dal", parent="Blah2", logname="test"
-        ) == (
+        assert adminone.get_pcode("YEM", "Ad Dal", parent="Blah2", logname="test") == (
             None,
             False,
         )
@@ -534,9 +527,7 @@ class TestAdminLevel:
             "NG015",
             True,
         )
-        assert adminone.get_pcode(
-            "UKR", "Chernihiv Oblast", logname="test"
-        ) == (
+        assert adminone.get_pcode("UKR", "Chernihiv Oblast", logname="test") == (
             "UA74",
             False,
         )
@@ -629,9 +620,7 @@ class TestAdminLevel:
             "YE3001",
             True,
         )
-        assert admintwo.get_pcode(
-            "YEM", "YEM3001", parent="Blah", logname="test"
-        ) == (
+        assert admintwo.get_pcode("YEM", "YEM3001", parent="Blah", logname="test") == (
             "YE3001",
             True,
         )
@@ -720,9 +709,7 @@ class TestAdminLevel:
             None,
             True,
         )
-        assert admintwo.get_pcode(
-            "NER", "NE00409", parent="blah", logname="test"
-        ) == (
+        assert admintwo.get_pcode("NER", "NE00409", parent="blah", logname="test") == (
             None,
             True,
         )
@@ -737,9 +724,7 @@ class TestAdminLevel:
         )
         # we don't use the parent because it could have a pcode length issue
         # itself
-        assert admintwo.get_pcode(
-            "NER", "NE00409", parent="blah", logname="test"
-        ) == (
+        assert admintwo.get_pcode("NER", "NE00409", parent="blah", logname="test") == (
             "NE004009",
             True,
         )

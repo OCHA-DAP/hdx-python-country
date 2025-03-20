@@ -50,13 +50,12 @@ class TestWFPExchangeRates:
                 retry_params = wfp_fx.wfp_api.get_retry_params()
                 assert retry_params["attempts"] == 5
                 assert retry_params["wait"] == 5
+                currenciesinfo = wfp_fx.get_currencies_info()
+                assert len(currenciesinfo) == 127
                 currencies = wfp_fx.get_currencies()
                 assert len(currencies) == 127
 
-                assert (
-                    Currency.get_historic_rate(currency, date)
-                    == 76.80000305175781
-                )
+                assert Currency.get_historic_rate(currency, date) == 76.80000305175781
                 timestamp = get_int_timestamp(date)
                 historic_rates = wfp_fx.get_currency_historic_rates(currency)
                 assert historic_rates[timestamp] == 77.01
