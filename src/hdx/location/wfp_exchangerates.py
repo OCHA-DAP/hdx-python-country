@@ -30,9 +30,7 @@ class WFPExchangeRates:
             currency_name = currency["extendedName"]
             if currency_name:
                 currency_name = currency_name.strip()
-            currencies.append(
-                {"code": currency["name"], "name": currency_name}
-            )
+            currencies.append({"code": currency["name"], "name": currency_name})
         return currencies
 
     def get_currencies(self) -> List[str]:
