@@ -27,8 +27,11 @@ class WFPExchangeRates:
         """
         currencies = []
         for currency in self.wfp_api.get_items("Currency/List"):
+            currency_name = currency["extendedName"]
+            if currency_name:
+                currency_name = currency_name.strip()
             currencies.append(
-                {"code": currency["name"], "name": currency["extendedName"]}
+                {"code": currency["name"], "name": currency_name}
             )
         return currencies
 
