@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List
 
-from . import get_int_timestamp
+from .int_timestamp import get_int_timestamp
 from .wfp_api import WFPAPI
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.typehint import ListTuple
