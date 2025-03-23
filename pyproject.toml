@@ -86,16 +86,10 @@ python = ["3.12"]
 
 [tool.hatch.envs.hatch-test.scripts]
 run = """
-       pytest -c .config/pytest.ini --rootdir=. --junitxml=test-results.xml \
-       --cov --cov-config=.config/coveragerc --no-cov-on-fail \
+       pytest --rootdir=. --junitxml=test-results.xml --cov --no-cov-on-fail \
        --cov-report=lcov --cov-report=term-missing
        """
 
 [tool.hatch.envs.hatch-static-analysis]
+config-path = "none"
 dependencies = ["ruff==0.9.10"]
-
-[tool.hatch.envs.hatch-static-analysis.scripts]
-format-check = ["ruff format --config .config/ruff.toml --check --diff {args:.}",]
-format-fix = ["ruff format --config .config/ruff.toml {args:.}",]
-lint-check = ["ruff check --config .config/ruff.toml {args:.}",]
-lint-fix = ["ruff check --config .config/ruff.toml --fix {args:.}",]
