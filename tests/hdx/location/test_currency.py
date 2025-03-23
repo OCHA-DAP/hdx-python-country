@@ -4,8 +4,8 @@ from os.path import join
 
 import pytest
 
-from hdx.location import get_int_timestamp
 from hdx.location.currency import Currency, CurrencyError
+from hdx.location.int_timestamp import get_int_timestamp
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import get_temp_dir

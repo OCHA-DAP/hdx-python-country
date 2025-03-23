@@ -2,8 +2,8 @@ from os.path import join
 
 import pytest
 
-from hdx.location import get_int_timestamp
 from hdx.location.currency import Currency
+from hdx.location.int_timestamp import get_int_timestamp
 from hdx.location.wfp_api import WFPAPI
 from hdx.location.wfp_exchangerates import WFPExchangeRates
 from hdx.utilities.dateparse import parse_date

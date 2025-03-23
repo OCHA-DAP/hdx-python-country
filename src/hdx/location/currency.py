@@ -5,7 +5,7 @@ from copy import copy
 from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
-from . import get_int_timestamp
+from .int_timestamp import get_int_timestamp
 from hdx.utilities.dateparse import (
     now_utc,
     parse_date,
@@ -318,7 +318,7 @@ class Currency:
             return fx_rate
         fx_rate = cls._get_secondary_current_rate(currency)
         if fx_rate is not None:
-            logger.warning(f"Using secondary current rate for {currency}!")
+            logger.debug(f"Using secondary current rate for {currency}!")
             cls._cached_current_rates[currency] = fx_rate
             return fx_rate
         raise CurrencyError(f"Failed to get rate for currency {currency}!")
@@ -480,7 +480,7 @@ class Currency:
         if cls._fallback_to_current:
             fx_rate = cls.get_current_rate(currency)
             if fx_rate:
-                logger.warning(
+                logger.debug(
                     f"Falling back to current rate for currency {currency} on date {date.isoformat()}!"
                 )
             return fx_rate
