@@ -81,7 +81,7 @@ class Currency:
             log_level (int): Level at which to log messages. Defaults to logging.DEBUG.
             current_rates_cache (Dict): Pre-populate current rates cache with given values. Defaults to {"USD": 1}.
             historic_rates_cache (Dict): Pre-populate historic rates cache with given values. Defaults to {}.
-            secondary_historic_first (bool): Use secondary historic first. Defaults to False.
+            use_secondary_historic (bool): Use secondary historic first. Defaults to False.
 
         Returns:
             None
