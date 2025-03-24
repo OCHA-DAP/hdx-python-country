@@ -15,23 +15,19 @@ from hdx.utilities.useragent import UserAgent
 
 class TestCurrency:
     @pytest.fixture(scope="class")
-    def fixtures(self):
-        return join("tests", "fixtures")
+    def secondary_rates_url(self, fixtures_dir):
+        return join(fixtures_dir, "secondary_rates.json")
 
     @pytest.fixture(scope="class")
-    def secondary_rates_url(self, fixtures):
-        return join(fixtures, "secondary_rates.json")
-
-    @pytest.fixture(scope="class")
-    def secondary_historic_url(self, fixtures):
-        return join(fixtures, "secondary_historic_rates.csv")
+    def secondary_historic_url(self, fixtures_dir):
+        return join(fixtures_dir, "secondary_historic_rates.csv")
 
     @pytest.fixture(scope="class", autouse=True)
-    def retrievers(self, fixtures):
+    def retrievers(self, fixtures_dir):
         name = "hdx-python-country-rates"
         UserAgent.set_global(name)
         downloader = Download()
-        fallback_dir = fixtures
+        fallback_dir = fixtures_dir
         temp_dir = get_temp_dir(name)
         retriever = Retrieve(
             downloader,
@@ -52,7 +48,9 @@ class TestCurrency:
         yield retriever, retriever_broken
         UserAgent.clear_global()
 
-    def test_get_current_value_in_usd(self, retrievers, secondary_rates_url):
+    def test_get_current_value_in_usd(
+        self, reset_currency, retrievers, secondary_rates_url
+    ):
         Currency.setup(no_historic=True)
         assert Currency.get_current_value_in_usd(10, "usd") == 10
         assert Currency.get_current_value_in_currency(10, "usd") == 10
@@ -133,7 +131,9 @@ class TestCurrency:
         assert rate2xdr != 1
         assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.1
 
-    def test_get_current_value_in_usd_fixednnow(self, retrievers, secondary_rates_url):
+    def test_get_current_value_in_usd_fixednnow(
+        self, reset_currency, retrievers, secondary_rates_url
+    ):
         date = parse_date("2020-02-20")
         Currency.setup(
             no_historic=True,
@@ -147,7 +147,9 @@ class TestCurrency:
         # falls back to secondary current rates
         assert Currency.get_current_rate("xdr") == 0.76479065
 
-    def test_get_historic_value_in_usd(self, retrievers, secondary_historic_url):
+    def test_get_historic_value_in_usd(
+        self, reset_currency, retrievers, secondary_historic_url
+    ):
         Currency._no_historic = False
         Currency.setup(secondary_historic_url=secondary_historic_url)
         date = parse_date("2020-02-20")
@@ -238,7 +240,7 @@ class TestCurrency:
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * (1582156800-1580428800) / (1582934400 - 1580428800)
         assert Currency.get_historic_rate("gbp", date) == 0.7717896133008268
 
-    def test_broken_rates_no_secondary(self, retrievers):
+    def test_broken_rates_no_secondary(self, reset_currency, retrievers):
         Currency._no_historic = False
         Currency.setup(secondary_historic_url="fail")
         # Without the checking against high and low returned by Yahoo API, this
@@ -268,7 +270,9 @@ class TestCurrency:
             == 601.632568359375
         )
 
-    def test_broken_rates_with_secondary(self, retrievers, secondary_historic_url):
+    def test_broken_rates_with_secondary(
+        self, reset_currency, retrievers, secondary_historic_url
+    ):
         Currency._no_historic = False
         Currency.setup(secondary_historic_url=secondary_historic_url)
         # Without the checking against secondary historic rate, this
