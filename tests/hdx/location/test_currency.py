@@ -106,6 +106,9 @@ class TestCurrency:
             )
             Currency.get_current_value_in_currency(10, "gbp")
         Currency._rates_api = None
+        with pytest.raises(CurrencyError):
+            Currency.get_current_rate("gbp")
+        Currency._rates_api = Currency._primary_rates_url
         assert Currency.get_current_rate("usd") == 1
         rate1gbp = Currency.get_current_rate("gbp")
         assert rate1gbp != 1
@@ -114,22 +117,18 @@ class TestCurrency:
         Currency.setup(
             retriever=retrievers[1],
             primary_rates_url="fail",
-            secondary_rates_url="fail",
             fallback_current_to_static=False,
             no_historic=True,
         )
-        Currency._secondary_rates = None
         rate2gbp = Currency.get_current_rate("gbp")
         assert rate2gbp != 1
         assert abs(rate1gbp - rate2gbp) / rate1gbp < 0.008
         Currency.setup(
             retriever=retrievers[1],
             primary_rates_url="fail",
-            secondary_rates_url="fail",
             fallback_current_to_static=False,
             no_historic=True,
         )
-        Currency._secondary_rates = None
         rate2xdr = Currency.get_current_rate("xdr")
         assert rate2xdr != 1
         assert abs(rate1xdr - rate2xdr) / rate1xdr < 0.1
@@ -229,7 +228,11 @@ class TestCurrency:
                 fallback_historic_to_current=False,
             )
             Currency.get_historic_value_in_usd(10, "gbp", date)
-        Currency._secondary_historic_rates = None
+        Currency.setup(
+            retriever=retriever,
+            primary_rates_url="fail",
+            fallback_historic_to_current=False,
+        )
         # Interpolation
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * 20 / 29
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * (1582156800-1580428800) / (1582934400 - 1580428800)
