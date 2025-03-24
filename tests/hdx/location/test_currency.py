@@ -229,7 +229,7 @@ class TestCurrency:
                 fallback_historic_to_current=False,
             )
             Currency.get_historic_value_in_usd(10, "gbp", date)
-        Currency._secondary_historic = None
+        Currency._secondary_historic_rates = None
         # Interpolation
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * 20 / 29
         # 0.761817697025102 + (0.776276975624903 - 0.761817697025102) * (1582156800-1580428800) / (1582934400 - 1580428800)

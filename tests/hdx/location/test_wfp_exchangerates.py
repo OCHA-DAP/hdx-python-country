@@ -61,5 +61,7 @@ class TestWFPExchangeRates:
                 assert historic_rates[timestamp] == 77.01
 
                 all_historic_rates = wfp_fx.get_historic_rates([currency])
-                Currency.setup(historic_rates_cache=all_historic_rates)
+                Currency.setup(
+                    historic_rates_cache=all_historic_rates, only_historic_rates=True
+                )
                 assert Currency.get_historic_rate(currency, date) == 77.01
