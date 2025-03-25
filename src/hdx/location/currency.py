@@ -1,7 +1,7 @@
 """Currency conversion"""
 
 import logging
-from copy import copy
+from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
@@ -33,11 +33,11 @@ class Currency:
     _secondary_historic_url = (
         "https://codeforiati.org/imf-exchangerates/imf_exchangerates.csv"
     )
-    _cached_current_rates = None
-    _cached_historic_rates = None
-    _rates_api = None
-    _secondary_rates = None
-    _secondary_historic = None
+    _cached_current_rates = {}
+    _cached_historic_rates = {}
+    _rates_api = ""
+    _secondary_rates = {}
+    _secondary_historic_rates = {}
     _fallback_to_current = False
     _no_historic = False
     _user_agent = "hdx-python-country-rates"
@@ -52,7 +52,8 @@ class Currency:
         retriever: Optional[Retrieve] = None,
         primary_rates_url: str = _primary_rates_url,
         secondary_rates_url: str = _secondary_rates_url,
-        secondary_historic_url: str = _secondary_historic_url,
+        secondary_historic_url: Optional[str] = _secondary_historic_url,
+        secondary_historic_rates: Optional[Dict] = None,
         fallback_historic_to_current: bool = False,
         fallback_current_to_static: bool = False,
         no_historic: bool = False,
@@ -60,6 +61,7 @@ class Currency:
         log_level: int = logging.DEBUG,
         current_rates_cache: Dict = {"USD": 1},
         historic_rates_cache: Dict = {},
+        use_secondary_historic: bool = False,
     ) -> None:
         """
         Setup the sources. If you wish to use a static fallback file by setting
@@ -70,7 +72,8 @@ class Currency:
             retriever (Optional[Retrieve]): Retrieve object to use for downloading. Defaults to None (generate a new one).
             primary_rates_url (str): Primary rates url to use. Defaults to Yahoo API.
             secondary_rates_url (str): Current rates url to use. Defaults to currency-api.
-            secondary_historic_url (str): Historic rates url to use. Defaults to IMF (via IATI).
+            secondary_historic_url (Optional[str]): Historic rates url to use. Defaults to IMF (via IATI).
+            secondary_historic_rates (Optional[Dict]): Historic rates to use. Defaults to None.
             fallback_historic_to_current (bool): If historic unavailable, fallback to current. Defaults to False.
             fallback_current_to_static (bool): Use static file as final fallback. Defaults to False.
             no_historic (bool): Do not set up historic rates. Defaults to False.
@@ -78,16 +81,20 @@ class Currency:
             log_level (int): Level at which to log messages. Defaults to logging.DEBUG.
             current_rates_cache (Dict): Pre-populate current rates cache with given values. Defaults to {"USD": 1}.
             historic_rates_cache (Dict): Pre-populate historic rates cache with given values. Defaults to {}.
+            use_secondary_historic (bool): Use secondary historic first. Defaults to False.
 
         Returns:
             None
         """
 
-        cls._cached_current_rates = copy(current_rates_cache)
-        cls._cached_historic_rates = copy(historic_rates_cache)
+        cls._cached_current_rates = deepcopy(current_rates_cache)
+        cls._cached_historic_rates = deepcopy(historic_rates_cache)
         cls._rates_api = primary_rates_url
-        cls._secondary_rates = None
-        cls._secondary_historic = None
+        cls._secondary_rates = {}
+        if secondary_historic_rates is not None:
+            cls._secondary_historic_rates = secondary_historic_rates
+        else:
+            cls._secondary_historic_rates = {}
         if retriever is None:
             downloader = Download(user_agent=cls._user_agent)
             temp_dir = get_temp_dir(cls._user_agent)
@@ -110,30 +117,33 @@ class Currency:
             cls._secondary_rates = secondary_rates["usd"]
         except (DownloadError, OSError):
             logger.exception("Error getting secondary current rates!")
-            cls._secondary_rates = "FAIL"
         cls._fixed_now = fixed_now
         cls._log_level = log_level
         if no_historic:
-            cls._no_historic = True
-        if cls._no_historic:
             return
-        try:
-            _, iterator = retriever.get_tabular_rows(
-                secondary_historic_url,
-                dict_form=True,
-                filename="historic_rates.csv",
-                logstr="secondary historic exchange rates",
-            )
-            cls._secondary_historic = {}
-            for row in iterator:
-                currency = row["Currency"]
-                date = get_int_timestamp(parse_date(row["Date"]))
-                rate = float(row["Rate"])
-                dict_of_dicts_add(cls._secondary_historic, currency, date, rate)
-        except (DownloadError, OSError):
-            logger.exception("Error getting secondary historic rates!")
-            cls._secondary_historic = "FAIL"
+        cls._no_historic = no_historic
+        if secondary_historic_url:
+            try:
+                _, iterator = retriever.get_tabular_rows(
+                    secondary_historic_url,
+                    dict_form=True,
+                    filename="historic_rates.csv",
+                    logstr="secondary historic exchange rates",
+                )
+                for row in iterator:
+                    currency = row["Currency"]
+                    date = get_int_timestamp(parse_date(row["Date"]))
+                    rate = float(row["Rate"])
+                    dict_of_dicts_add(
+                        cls._secondary_historic_rates, currency, date, rate
+                    )
+            except (DownloadError, OSError):
+                logger.exception("Error getting secondary historic rates!")
         cls._fallback_to_current = fallback_historic_to_current
+        if use_secondary_historic:
+            cls._get_historic_rate = cls._get_historic_rate_secondary
+        else:
+            cls._get_historic_rate = cls._get_historic_rate_primary
 
     @classmethod
     def _get_primary_rates_data(
@@ -149,8 +159,8 @@ class Currency:
         Returns:
             Optional[float]: fx rate or None
         """
-        if cls._rates_api is None:
-            Currency.setup()
+        if not cls._rates_api:
+            return None
         url = cls._rates_api.format(currency=currency, date=str(timestamp))
         if downloader is None:
             downloader = cls._retriever
@@ -289,10 +299,6 @@ class Currency:
         Returns:
             Optional[float]: fx rate or None
         """
-        if cls._secondary_rates is None:
-            Currency.setup()
-        if cls._secondary_rates == "FAIL":
-            return None
         return cls._secondary_rates.get(currency.lower())
 
     @classmethod
@@ -307,8 +313,6 @@ class Currency:
             float: fx rate
         """
         currency = currency.upper()
-        if cls._cached_current_rates is None:
-            Currency.setup()
         fx_rate = cls._cached_current_rates.get(currency)
         if fx_rate is not None:
             return fx_rate
@@ -362,38 +366,12 @@ class Currency:
         return usdvalue * fx_rate
 
     @classmethod
-    def _get_interpolated_rate(
-        cls,
-        timestamp1: int,
-        rate1: float,
-        timestamp2: int,
-        rate2: float,
-        desired_timestamp: int,
-    ) -> float:
-        """
-        Return a rate for a desired timestamp based on linearly interpolating between
-        two timestamp/rate pairs.
-
-        Args:
-            timestamp1 (int): First timestamp to use for fx conversion
-            rate1 (float): Rate at first timestamp
-            timestamp2 (int): Second timestamp to use for fx conversion
-            rate2 (float): Rate at second timestamp
-            desired_timestamp (int): Timestamp at which rate is desired
-
-        Returns:
-            float: Rate at desired timestamp
-        """
-        return rate1 + (desired_timestamp - timestamp1) * (
-            (rate2 - rate1) / (timestamp2 - timestamp1)
-        )
-
-    @classmethod
     def _get_secondary_historic_rate(
         cls, currency: str, timestamp: int
     ) -> Optional[float]:
         """
-        Get the secondary fx rate for currency on a particular date
+        Get the historic fx rate for currency on a particular date using
+        interpolation if needed.
 
         Args:
             currency (str): Currency
@@ -402,11 +380,7 @@ class Currency:
         Returns:
             Optional[float]: fx rate or None
         """
-        if cls._secondary_historic is None:
-            Currency.setup()
-        if cls._secondary_historic == "FAIL":
-            return None
-        currency_data = cls._secondary_historic.get(currency)
+        currency_data = cls._secondary_historic_rates.get(currency)
         if currency_data is None:
             return None
         fx_rate = currency_data.get(timestamp)
@@ -426,13 +400,66 @@ class Currency:
             return currency_data[timestamp2]
         if timestamp2 is None:
             return currency_data[timestamp1]
-        return cls._get_interpolated_rate(
-            timestamp1,
-            currency_data[timestamp1],
-            timestamp2,
-            currency_data[timestamp2],
-            timestamp,
+        rate1 = currency_data[timestamp1]
+        return rate1 + (timestamp - timestamp1) * (
+            (currency_data[timestamp2] - rate1) / (timestamp2 - timestamp1)
         )
+
+    @classmethod
+    def _get_historic_rate_primary(cls, currency: str, timestamp: int) -> float:
+        currency_data = cls._cached_historic_rates.get(currency)
+        if currency_data is not None:
+            fx_rate = currency_data.get(timestamp)
+            if fx_rate is not None:
+                return fx_rate
+        fx_rate = cls._get_primary_rate(currency, timestamp)
+        if fx_rate is not None:
+            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
+            return fx_rate
+        fx_rate = cls._get_secondary_historic_rate(currency, timestamp)
+        if fx_rate is not None:
+            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
+            return fx_rate
+        if cls._fallback_to_current:
+            fx_rate = cls.get_current_rate(currency)
+            if fx_rate:
+                logger.debug(
+                    f"Falling back to current rate for currency {currency} on timestamp {timestamp}!"
+                )
+            return fx_rate
+        raise CurrencyError(
+            f"Failed to get rate for currency {currency} on timestamp {timestamp}!"
+        )
+
+    @classmethod
+    def _get_historic_rate_secondary(cls, currency: str, timestamp: int) -> float:
+        currency_data = cls._cached_historic_rates.get(currency)
+        if currency_data is not None:
+            fx_rate = currency_data.get(timestamp)
+            if fx_rate is not None:
+                return fx_rate
+        fx_rate = cls._get_secondary_historic_rate(currency, timestamp)
+        if fx_rate is None:
+            fx_rate = cls._get_primary_rate(currency, timestamp)
+            if fx_rate is None:
+                if cls._fallback_to_current:
+                    fx_rate = cls.get_current_rate(currency)
+                    if fx_rate:
+                        logger.debug(
+                            f"Falling back to current rate for currency {currency} on timestamp {timestamp}!"
+                        )
+                    return fx_rate
+                raise CurrencyError(
+                    f"Failed to get rate for currency {currency} on timestamp {timestamp}!"
+                )
+            else:
+                dict_of_dicts_add(
+                    cls._cached_historic_rates, currency, timestamp, fx_rate
+                )
+                return fx_rate
+        else:
+            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
+            return fx_rate
 
     @classmethod
     def get_historic_rate(
@@ -455,38 +482,12 @@ class Currency:
         currency = currency.upper()
         if currency == "USD":
             return 1
-        if cls._cached_historic_rates is None:
-            Currency.setup()
-        currency_data = cls._cached_historic_rates.get(currency)
         if ignore_timeinfo:
             date = date.replace(
                 hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
             )
-        else:
-            date = date.astimezone(timezone.utc)
         timestamp = get_int_timestamp(date)
-        if currency_data is not None:
-            fx_rate = currency_data.get(timestamp)
-            if fx_rate is not None:
-                return fx_rate
-        fx_rate = cls._get_primary_rate(currency, timestamp)
-        if fx_rate is not None:
-            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
-            return fx_rate
-        fx_rate = cls._get_secondary_historic_rate(currency, timestamp)
-        if fx_rate is not None:
-            dict_of_dicts_add(cls._cached_historic_rates, currency, timestamp, fx_rate)
-            return fx_rate
-        if cls._fallback_to_current:
-            fx_rate = cls.get_current_rate(currency)
-            if fx_rate:
-                logger.debug(
-                    f"Falling back to current rate for currency {currency} on date {date.isoformat()}!"
-                )
-            return fx_rate
-        raise CurrencyError(
-            f"Failed to get rate for currency {currency} on date {date.isoformat()}!"
-        )
+        return cls._get_historic_rate(currency, timestamp)
 
     @classmethod
     def get_historic_value_in_usd(

@@ -58,7 +58,7 @@ class WFPExchangeRates:
             parameters={"currencyName": currency},
         )
         historic_rates = {}
-        for quote in quotes:
+        for quote in reversed(quotes):
             if not quote["isOfficial"]:
                 continue
             date = parse_date(quote["date"])

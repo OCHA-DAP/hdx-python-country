@@ -13,10 +13,6 @@ from hdx.utilities.retriever import Retrieve
 
 
 class TestAdminLevel:
-    @pytest.fixture(scope="class")
-    def fixtures_dir(self):
-        return join("tests", "fixtures")
-
     @pytest.fixture(scope="function")
     def config(self, fixtures_dir):
         return load_yaml(join(fixtures_dir, "adminlevel.yaml"))

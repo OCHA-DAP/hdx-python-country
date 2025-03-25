@@ -42,7 +42,7 @@ ghp-import==2.1.0
     # via mkdocs
 hdx-python-utilities==3.8.5
     # via hdx-python-country (pyproject.toml)
-humanize==4.12.1
+humanize==4.12.2
     # via frictionless
 identify==2.6.9
     # via pre-commit

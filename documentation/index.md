@@ -42,6 +42,8 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 3.9.2, must call Currency.setup before using Currency methods.
+
 From 3.7.5, removed clean_name function. There is now a function normalise in
 HDX Python Utilities.
 
@@ -191,9 +193,11 @@ AdminLevel objects in a list or lists of p-codes per parent admin level:
 
 ## Currencies
 
-Various functions support the conversion of monetary amounts to USD. Note that the
-returned values are cached to reduce network usage which means that the library is
-unsuited for use where rates are expected to update while the program is running:
+Various functions support the conversion of monetary amounts to USD. The setup
+method must be called once before using any other methods. Note that the
+returned values are cached to reduce network usage which means that the
+library is unsuited for use where rates are expected to update while the
+program is running:
 
     Currency.setup(fallback_historic_to_current=True, fallback_current_to_static=True, log_level=logging.INFO)
     currency = Country.get_currency_from_iso3("usa")  # returns "USD"
