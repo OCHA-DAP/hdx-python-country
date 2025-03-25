@@ -106,8 +106,16 @@ class TestCurrency:
         Currency._rates_api = None
         with pytest.raises(CurrencyError):
             Currency.get_current_rate("gbp")
-        Currency._rates_api = Currency._primary_rates_url
         assert Currency.get_current_rate("usd") == 1
+
+        Currency._cached_current_rates = {}
+        Currency._cached_historic_rates = {}
+        Currency._rates_api = ""
+        Currency._secondary_rates = {}
+        Currency._secondary_historic_rates = {}
+        Currency._fallback_to_current = False
+        Currency._no_historic = False
+        Currency.setup(no_historic=True)
         rate1gbp = Currency.get_current_rate("gbp")
         assert rate1gbp != 1
         rate1xdr = Currency.get_current_rate("xdr")
