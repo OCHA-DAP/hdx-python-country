@@ -1,7 +1,7 @@
 """Currency conversion"""
 
 import logging
-from copy import copy
+from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
@@ -87,8 +87,8 @@ class Currency:
             None
         """
 
-        cls._cached_current_rates = copy(current_rates_cache)
-        cls._cached_historic_rates = copy(historic_rates_cache)
+        cls._cached_current_rates = deepcopy(current_rates_cache)
+        cls._cached_historic_rates = deepcopy(historic_rates_cache)
         cls._rates_api = primary_rates_url
         cls._secondary_rates = {}
         if secondary_historic_rates is not None:
