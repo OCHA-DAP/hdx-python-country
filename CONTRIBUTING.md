@@ -33,13 +33,14 @@ To run the tests and view coverage, execute:
 
     pytest --cov hdx
 
-Follow the example set out already in ``documentation/main.md`` as you write the documentation.
+Follow the example set out already in ``documentation/index.md``
+as you write the documentation.
 
 ## Packages
 
 [uv](https://github.com/astral-sh/uv) is used for
 package management.  If you’ve introduced a new package to the
-source code (i.e.anywhere in `src/`), please add it to the
+source code (i.e. anywhere in `src/`), please add it to the
 `project.dependencies` section of
 `pyproject.toml` with any known version constraints.
 
