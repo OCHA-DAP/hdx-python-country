@@ -51,3 +51,18 @@ Any changes to the dependencies will be automatically reflected in
 the file without committing by executing:
 
     pre-commit run pip-compile --all-files
+
+## Project
+
+[Hatch](https://hatch.pypa.io/) is used for project management. The project
+can be built using:
+
+    hatch build
+
+Linting and syntax checking can be run with:
+
+    hatch fmt --check
+
+Tests can be executed using:
+
+    hatch test
