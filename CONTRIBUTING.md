@@ -43,7 +43,7 @@ source code (i.e.anywhere in `src/`), please add it to the
 `project.dependencies` section of
 `pyproject.toml` with any known version constraints.
 
-For adding packages for testing or development, add them to
+To add packages for testing or development, add them to
 the `test` or `dev` sections under `[project.optional-dependencies]`.
 
 Any changes to the dependencies will be automatically reflected in
