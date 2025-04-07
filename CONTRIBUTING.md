@@ -21,7 +21,7 @@ you make a git commit:
     pre-commit install
 
 With pre-commit, all code is formatted according to
-[ruff](https://github.com/astral-sh/ruff) guidelines.
+[ruff](https://docs.astral.sh/ruff/) guidelines.
 
 To check if your changes pass pre-commit without committing, run:
 
@@ -37,7 +37,7 @@ Follow the example set out already in ``documentation/main.md`` as you write the
 
 ## Packages
 
-[pip-tools](https://github.com/jazzband/pip-tools) is used for
+[uv](https://github.com/astral-sh/uv) is used for
 package management.  If you’ve introduced a new package to the
 source code (i.e.anywhere in `src/`), please add it to the
 `project.dependencies` section of
