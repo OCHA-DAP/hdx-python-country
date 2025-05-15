@@ -70,9 +70,10 @@ The usage of the country mappings functionality is best illustrated by some exam
 
     from hdx.location.country import Country
 
-    Country.countriesdata(use_live=False, country_name_overrides={"PSE": "oPt"})
-    # Set up using non live data from repo rather and override default country name
-    # (Leaving out this step will use live data and no overrides)
+    Country.countriesdata(include_unofficial=True, use_live=False, country_name_overrides={"PSE": "oPt"})
+    # Set up including unofficial alpha2 (eg. AN) and alpha3 codes (eg. XKX)
+    # Use non live data from repo and override default country name
+    # (Leaving out this step will exclude unofficial alpha codes, use live data and no overrides)
     Country.get_country_name_from_iso3("jpn", use_live=False)  # returns "Japan"
     Country.get_country_name_from_iso3("vEn", formal=True)  # returns "the Bolivarian Republic of Venezuela"
     # uselive=False forces the use of internal files instead of accessing the live feeds.
