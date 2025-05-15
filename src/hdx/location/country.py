@@ -8,7 +8,7 @@ from string import punctuation
 from typing import Dict, List, Optional, Tuple, Union
 
 import hxl
-from hxl import InputOptions
+from hxl import Dataset, InputOptions
 
 from hdx.utilities.path import script_dir_plus_file
 from hdx.utilities.text import get_words_in_sentence
@@ -69,6 +69,8 @@ class Country:
         "KINGDOM",
         "PROTECTORATE",
     ]
+    _include_unofficial_default = False
+    _include_unofficial = _include_unofficial_default
     _use_live_default = True
     _use_live = _use_live_default
     _countriesdata = None
@@ -102,6 +104,8 @@ class Country:
         if countryname is not None:
             country["#country+name+override"] = countryname
         iso2 = hxlcountry.get("#country+code+v_iso2")
+        if not iso2 and cls._include_unofficial:
+            iso2 = hxlcountry.get("#country+code+alpha2")
         if iso2:
             cls._countriesdata["iso2iso3"][iso2] = iso3
             # different types so keys won't clash
@@ -159,12 +163,12 @@ class Country:
         return country
 
     @classmethod
-    def set_countriesdata(cls, countries: str) -> None:
+    def set_countriesdata(cls, countries: Dataset) -> None:
         """
-        Set up countries data from data in form provided by UNStats and World Bank
+        Set up countries data from OCHA countries and territories dataset
 
         Args:
-            countries (str): Countries data in HTML format provided by UNStats
+            countries (Dataset): Countries data from countries and territories dataset
 
         Returns:
             None
@@ -186,7 +190,12 @@ class Country:
         for country in countries:
             iso3 = country.get("#country+code+v_iso3")
             if not iso3:
-                continue
+                if cls._include_unofficial:
+                    iso3 = country.get("#country+code+alpha3")
+                    if not iso3:
+                        continue
+                else:
+                    continue
             iso3 = iso3.upper()
             countrydict = cls._add_countriesdata(iso3, country)
             cls._countriesdata["countries"][iso3] = countrydict
@@ -202,30 +211,37 @@ class Country:
     @classmethod
     def countriesdata(
         cls,
-        use_live: bool = None,
-        country_name_overrides: Dict = None,
-        country_name_mappings: Dict = None,
+        include_unofficial: Optional[bool] = None,
+        use_live: Optional[bool] = None,
+        country_name_overrides: Optional[Dict] = None,
+        country_name_mappings: Optional[Dict] = None,
     ) -> List[Dict[str, Dict]]:
         """
-        Read countries data from OCHA countries feed (falling back to file)
+        Read countries data from OCHA countries feed (falling back to file).
+        include_unofficial, use_live, country_name_overrides and country_name_mappings
+        are taken from internal defaults if they are None, otherwise the internal
+        defaults are overridden.
 
         Args:
-            use_live (bool): Try to get use latest data from web rather than file in package. Defaults to True.
-            country_name_overrides (Dict): Dictionary of mappings from iso3 to country name
-            country_name_mappings (Dict): Dictionary of mappings from country name to iso3
+            include_unofficial (Optional[bool]): Include unofficial country alpha codes. Defaults to False.
+            use_live (Optional[bool]): Try to get latest data from web rather than file in package. Defaults to True.
+            country_name_overrides (Optional[Dict]): Dictionary of mappings from iso3 to country name
+            country_name_mappings (Optional[Dict]): Dictionary of mappings from country name to iso3
 
         Returns:
             List[Dict[str,Dict]]: Countries dictionaries
         """
-        if use_live is None:
-            use_live = cls._use_live
+        if include_unofficial is not None:
+            cls._include_unofficial = include_unofficial
+        if use_live is not None:
+            cls._use_live = use_live
         if cls._countriesdata is None:
             countries = None
             if country_name_overrides is not None:
                 cls.set_country_name_overrides(country_name_overrides)
             if country_name_mappings is not None:
                 cls.set_country_name_mappings(country_name_mappings)
-            if use_live:
+            if cls._use_live:
                 try:
                     countries = hxl.data(cls._ochaurl, InputOptions(encoding="utf-8"))
                 except OSError:
@@ -239,6 +255,24 @@ class Country:
                 )
             cls.set_countriesdata(countries)
         return cls._countriesdata
+
+    @classmethod
+    def set_include_unofficial_default(
+        cls, include_unofficial: Optional[bool] = None
+    ) -> None:
+        """
+        Set the default for include_unofficial which defines if unofficial alpha2 and
+        alpha3 codes such as AN and XKX will be included.
+
+        Args:
+            include_unofficial (bool): Default value to use for include_unofficial. Defaults to internal value (False).
+
+        Returns:
+            None
+        """
+        if include_unofficial is None:
+            include_unofficial = cls._include_unofficial
+        cls._include_unofficial = include_unofficial
 
     @classmethod
     def set_use_live_default(cls, use_live: Optional[bool] = None) -> None:

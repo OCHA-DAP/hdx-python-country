@@ -13,13 +13,22 @@ class LocationError(Exception):
 
 
 class TestCountry:
-    @pytest.fixture(scope="function", autouse=True)
-    def setup(self):
-        # Clean up Country class before each test
+    def clear_data(self):
         Country._countriesdata = None
         Country.set_use_live_default(False)
         Country.set_ocha_url()
         Country.set_ocha_path()
+
+    def setup_unofficial_date(self):
+        self.clear_data()
+        Country.set_include_unofficial_default(True)
+        Country.countriesdata()
+
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self):
+        # Clean up Country class before each test
+        self.clear_data()
+        Country.set_include_unofficial_default(False)
         Country.countriesdata(
             country_name_overrides={"PSE": "oPt"},
             country_name_mappings={"Congo DR": "COD"},
@@ -52,6 +61,10 @@ class TestCountry:
             == "Taiwan (Province of China)"
         )
         assert Country.get_country_name_from_iso3("PSE") == "oPt"
+        with pytest.raises(LocationError):
+            Country.get_iso2_from_iso3("CHI", exception=LocationError)
+        self.setup_unofficial_date()
+        assert Country.get_country_name_from_iso3("CHI") == "Channel Islands"
 
     def test_get_iso2_from_iso3(self):
         assert Country.get_iso2_from_iso3("jpn") == "JP"
@@ -67,6 +80,8 @@ class TestCountry:
 
     def test_get_country_info_from_iso3(self):
         assert Country.get_country_info_from_iso3("bih") == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "البوسنة والهرسك",
             "#country+alt+i_ar+name+v_unterm": "البوسنة والهرسك",
             "#country+alt+i_en+name+v_m49": "Bosnia and Herzegovina",
@@ -111,6 +126,8 @@ class TestCountry:
             "#region+name+preferred+sub": "Southern Europe",
         }
         assert Country.get_country_info_from_iso3("PSE") == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "دولة فلسطين",
             "#country+alt+i_ar+name+v_unterm": "دولة فلسطين",
             "#country+alt+i_en+name+v_m49": "State of Palestine",
@@ -155,6 +172,55 @@ class TestCountry:
             "#region+main+name+preferred": "Asia",
             "#region+name+preferred+sub": "Western Asia",
         }
+        with pytest.raises(LocationError):
+            Country.get_country_name_from_iso2("AZO", exception=LocationError)
+        self.setup_unofficial_date()
+        assert Country.get_country_info_from_iso3("AZO") == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "AZO",
+            "#country+alt+i_ar+name+v_m49": "",
+            "#country+alt+i_ar+name+v_unterm": "",
+            "#country+alt+i_en+name+v_m49": "",
+            "#country+alt+i_en+name+v_unterm": "Azores Islands",
+            "#country+alt+i_es+name+v_m49": "",
+            "#country+alt+i_es+name+v_unterm": "",
+            "#country+alt+i_fr+name+v_m49": "",
+            "#country+alt+i_fr+name+v_unterm": "",
+            "#country+alt+i_ru+name+v_m49": "",
+            "#country+alt+i_ru+name+v_unterm": "",
+            "#country+alt+i_zh+name+v_m49": "",
+            "#country+alt+i_zh+name+v_unterm": "",
+            "#country+alt+name+v_dgacm": "",
+            "#country+alt+name+v_fts": "",
+            "#country+alt+name+v_iso": "",
+            "#country+alt+name+v_reliefweb": "",
+            "#country+code+num+v_m49": "",
+            "#country+code+v_fts": "",
+            "#country+code+v_iso2": "",
+            "#country+code+v_iso3": "",
+            "#country+code+v_reliefweb": "28",
+            "#country+formal+i_en+name+v_unterm": "",
+            "#country+name+preferred": "Azores Islands (Portugal)",
+            "#country+name+short+v_reliefweb": "",
+            "#country+regex": "azores",
+            "#currency+code": "EUR",
+            "#date+start": "1974-01-01",
+            "#geo+admin_level": "",
+            "#geo+lat": "38.72708329",
+            "#geo+lon": "-27.26017212",
+            "#indicator+bool+gho": "",
+            "#indicator+bool+hrp": "",
+            "#indicator+incomelevel": "",
+            "#meta+bool+deprecated": "N",
+            "#meta+bool+independent": "N",
+            "#meta+id": "249",
+            "#region+code+intermediate": "",
+            "#region+code+main": "150",
+            "#region+code+sub": "39",
+            "#region+intermediate+name+preferred": "",
+            "#region+main+name+preferred": "Europe",
+            "#region+name+preferred+sub": "Southern Europe",
+        }
 
     def test_get_currency_from_iso3(self):
         assert Country.get_currency_from_iso3("jpn") == "JPY"
@@ -164,6 +230,8 @@ class TestCountry:
 
     def test_get_country_info_from_iso2(self):
         assert Country.get_country_info_from_iso2("jp") == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "اليابان",
             "#country+alt+i_ar+name+v_unterm": "اليابان",
             "#country+alt+i_en+name+v_m49": "Japan",
@@ -209,6 +277,8 @@ class TestCountry:
         }
         assert Country.get_country_info_from_iso2("ab") is None
         assert Country.get_country_info_from_iso2("TW") == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "",
             "#country+alt+i_ar+name+v_unterm": "",
             "#country+alt+i_en+name+v_m49": "",
@@ -254,6 +324,8 @@ class TestCountry:
         }
 
         assert Country.get_country_info_from_iso2("PS") == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "دولة فلسطين",
             "#country+alt+i_ar+name+v_unterm": "دولة فلسطين",
             "#country+alt+i_en+name+v_m49": "State of Palestine",
@@ -299,6 +371,56 @@ class TestCountry:
             "#region+name+preferred+sub": "Western Asia",
         }
         with pytest.raises(LocationError):
+            Country.get_country_info_from_iso2("XK", exception=LocationError)
+        self.setup_unofficial_date()
+        assert Country.get_country_info_from_iso2("XK") == {
+            "#country+alpha2+code": "XK",
+            "#country+alpha3+code": "XKX",
+            "#country+alt+i_ar+name+v_m49": "",
+            "#country+alt+i_ar+name+v_unterm": "",
+            "#country+alt+i_en+name+v_m49": "",
+            "#country+alt+i_en+name+v_unterm": "Kosovo",
+            "#country+alt+i_es+name+v_m49": "",
+            "#country+alt+i_es+name+v_unterm": "",
+            "#country+alt+i_fr+name+v_m49": "",
+            "#country+alt+i_fr+name+v_unterm": "",
+            "#country+alt+i_ru+name+v_m49": "",
+            "#country+alt+i_ru+name+v_unterm": "",
+            "#country+alt+i_zh+name+v_m49": "",
+            "#country+alt+i_zh+name+v_unterm": "",
+            "#country+alt+name+v_dgacm": "",
+            "#country+alt+name+v_fts": "",
+            "#country+alt+name+v_iso": "",
+            "#country+alt+name+v_reliefweb": "",
+            "#country+code+num+v_m49": "",
+            "#country+code+v_fts": "",
+            "#country+code+v_iso2": "",
+            "#country+code+v_iso3": "",
+            "#country+code+v_reliefweb": "",
+            "#country+formal+i_en+name+v_unterm": "",
+            "#country+name+preferred": "Kosovo",
+            "#country+name+short+v_reliefweb": "",
+            "#country+regex": "kosovo",
+            "#currency+code": "EUR",
+            "#date+start": "1974-01-01",
+            "#geo+admin_level": "",
+            "#geo+lat": "42.61901705",
+            "#geo+lon": "20.90987836",
+            "#indicator+bool+gho": "",
+            "#indicator+bool+hrp": "",
+            "#indicator+incomelevel": "",
+            "#meta+bool+deprecated": "N",
+            "#meta+bool+independent": "N",
+            "#meta+id": "266",
+            "#region+code+intermediate": "",
+            "#region+code+main": "150",
+            "#region+code+sub": "39",
+            "#region+intermediate+name+preferred": "",
+            "#region+main+name+preferred": "Europe",
+            "#region+name+preferred+sub": "Southern Europe",
+        }
+
+        with pytest.raises(LocationError):
             Country.get_country_info_from_iso2("ab", exception=LocationError)
 
     def test_get_country_name_from_iso2(self):
@@ -319,6 +441,13 @@ class TestCountry:
         )
         assert Country.get_country_name_from_iso2("TW") == "Taiwan (Province of China)"
         assert Country.get_country_name_from_iso2("PS") == "oPt"
+        with pytest.raises(LocationError):
+            Country.get_country_name_from_iso2("AN", exception=LocationError)
+        self.setup_unofficial_date()
+        assert (
+            Country.get_country_name_from_iso2("AN")
+            == "Netherlands Antilles (The Netherlands)"
+        )
 
     def test_get_currency_from_iso2(self):
         assert Country.get_currency_from_iso2("jp") == "JPY"
@@ -343,6 +472,8 @@ class TestCountry:
 
     def test_get_country_info_from_m49(self):
         assert Country.get_country_info_from_m49(4) == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "أفغانستان",
             "#country+alt+i_ar+name+v_unterm": "أفغانستان",
             "#country+alt+i_en+name+v_m49": "Afghanistan",
@@ -387,6 +518,8 @@ class TestCountry:
             "#region+name+preferred+sub": "Southern Asia",
         }
         assert Country.get_country_info_from_m49(882) == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "ساموا",
             "#country+alt+i_ar+name+v_unterm": "ساموا",
             "#country+alt+i_en+name+v_m49": "Samoa",
@@ -431,6 +564,8 @@ class TestCountry:
             "#region+name+preferred+sub": "Polynesia",
         }
         assert Country.get_country_info_from_m49(275) == {
+            "#country+alpha2+code": "",
+            "#country+alpha3+code": "",
             "#country+alt+i_ar+name+v_m49": "دولة فلسطين",
             "#country+alt+i_ar+name+v_unterm": "دولة فلسطين",
             "#country+alt+i_en+name+v_m49": "State of Palestine",
@@ -688,6 +823,9 @@ class TestCountry:
             Country.get_iso3_country_code("abc", exception=ValueError)
         with pytest.raises(ValueError):
             Country.get_iso3_country_code_fuzzy("abcde", exception=ValueError)
+        self.setup_unofficial_date()
+        assert Country.get_iso3_country_code_fuzzy("Kosovo") == ("XKX", True)
+        assert Country.get_iso3_country_code_fuzzy("Kosovo*") == ("XKX", False)
 
     def test_get_countries_in_region(self):
         assert Country.get_countries_in_region("Eastern Asia") == [
