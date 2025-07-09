@@ -743,7 +743,10 @@ class Country:
             for simplification2 in simplifications:
                 remove.append(simplification2)
         remove = "|".join(remove)
-        regex = re.compile(r"[^\w\s]|\b(" + remove + r")\b", flags=re.IGNORECASE)
+        regex = re.compile(
+            r"[" + punctuation.replace("'", "") + r"]|\b(" + remove + r")\b",
+            flags=re.IGNORECASE,
+        )
         countryupper = regex.sub("", countryupper)
         countryupper = countryupper.strip()
         countryupper_words = get_words_in_sentence(countryupper)

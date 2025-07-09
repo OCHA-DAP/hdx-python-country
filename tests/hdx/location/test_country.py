@@ -674,6 +674,7 @@ class TestCountry:
         assert Country.simplify_countryname(
             "The former Yugoslav Republic of Macedonia"
         ) == ("MACEDONIA", ["THE", "FORMER", "YUGOSLAV", "REPUBLIC", "OF"])
+        assert Country.simplify_countryname("d'Ivoire Côte") == ("D'IVOIRE", ["CÔTE"])
 
     def test_get_iso3_country_code(self):
         assert Country.get_iso3_country_code("jpn") == "JPN"
@@ -826,6 +827,7 @@ class TestCountry:
         self.setup_unofficial_date()
         assert Country.get_iso3_country_code_fuzzy("Kosovo") == ("XKX", True)
         assert Country.get_iso3_country_code_fuzzy("Kosovo*") == ("XKX", False)
+        assert Country.get_iso3_country_code_fuzzy("d'Ivoire Côte") == ("CIV", False)
 
     def test_get_countries_in_region(self):
         assert Country.get_countries_in_region("Eastern Asia") == [
