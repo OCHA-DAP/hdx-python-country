@@ -1,10 +1,9 @@
 """Country location"""
 
-import copy
 import logging
 import os.path
 import re
-from string import punctuation
+from itertools import tee
 from typing import Dict, List, Optional, Tuple, Union
 
 import hxl
@@ -62,6 +61,7 @@ class Country:
         "BOLIVARIAN",
         "PLURINATIONAL",
         "PEOPLE'S",
+        "PEOPLES",
         "DUTCH PART",
         "FRENCH PART",
         "MALVINAS",
@@ -729,33 +729,80 @@ class Country:
         index = countryupper.find(":")
         if index != -1:
             countryupper = countryupper[:index]
-        regex = re.compile(r"\(.+?\)")
-        countryupper = regex.sub("", countryupper)
-        remove = copy.deepcopy(cls.simplifications)
-        for simplification1, simplification2 in cls.abbreviations.items():
-            countryupper = countryupper.replace(simplification1, "")
-            remove.append(simplification2)
-        for (
-            simplification1,
-            simplifications,
-        ) in cls.multiple_abbreviations.items():
-            countryupper = countryupper.replace(simplification1, "")
-            for simplification2 in simplifications:
-                remove.append(simplification2)
-        remove = "|".join(remove)
-        regex = re.compile(
-            r"[" + punctuation.replace("'", "") + r"]|\b(" + remove + r")\b",
-            flags=re.IGNORECASE,
+
+        if not (countryupper[0] == "(" and countryupper[-1] == ")"):
+            regex = re.compile(r"\(.+?\)")
+            countryupper = regex.sub("", countryupper)
+
+        candidate_words = get_words_in_sentence(countryupper)
+        # Create a set for optimised lookup
+        candidate_words_set = set(candidate_words)
+
+        terms = (
+            # Put multi-word terms first so that we don't accidentally find them
+            # after intermediary simplification words were removed
+            sorted(cls.simplifications, key=lambda term: " " not in term)
+            + list(cls.abbreviations.keys())
+            + [abbrev.strip(".") for abbrev in cls.abbreviations if abbrev[-1] == "."]
+            + list(cls.abbreviations.values())
+            + list(cls.multiple_abbreviations.keys())
+            + [
+                abbrev.strip(".")
+                for abbrev in cls.multiple_abbreviations
+                if abbrev[-1] == "."
+            ]
+            + [
+                full_term
+                for full_terms in cls.multiple_abbreviations.values()
+                for full_term in full_terms
+            ]
         )
-        countryupper = regex.sub("", countryupper)
-        countryupper = countryupper.strip()
-        countryupper_words = get_words_in_sentence(countryupper)
-        if len(countryupper_words) > 1:
-            countryupper = countryupper_words[0]
-        if countryupper:
-            countryupper = countryupper.strip(punctuation)
-            words.remove(countryupper)
-        return countryupper, words
+
+        for term in terms:
+            if " " not in term:
+                if term not in candidate_words_set:
+                    continue
+                candidate_words = [
+                    candidate_word
+                    for candidate_word in candidate_words
+                    if candidate_word != term
+                ]
+            else:
+                # Special case multi-word term - e.g. "French Part"
+                term_parts = term.split(" ")
+                if not all(
+                    term_part in candidate_words_set for term_part in term_parts
+                ):
+                    continue
+
+                start = 0
+                new_candidate_words = []
+                num_parts = len(term_parts)
+                iters = tee(candidate_words, num_parts)
+
+                # Build a set of iterators that are consecutive words
+                for i in range(1, num_parts):
+                    for _ in range(i):
+                        next(iters[i])
+
+                # Rebuild the string with matches removed
+                for i, word_sequence in enumerate(zip(*iters)):
+                    if list(word_sequence) == term_parts:
+                        new_candidate_words.extend(candidate_words[start:i])
+                        start = i + num_parts
+
+                if start != 0:
+                    new_candidate_words.extend(candidate_words[start:])
+                    candidate_words = new_candidate_words
+                # ELse we didn't find the words consecutively and don't need to rebuild
+
+        if len(candidate_words) >= 1:
+            simplified_term = candidate_words[0]
+            words.remove(simplified_term)
+        else:
+            simplified_term = ""
+
+        return simplified_term, words
 
     @classmethod
     def get_iso3_country_code(

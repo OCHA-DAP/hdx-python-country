@@ -653,7 +653,34 @@ class TestCountry:
             "MICRONESIA",
             ["FEDERATED", "STATES", "OF"],
         )
+        assert Country.simplify_countryname("Federated States of Micronesia") == (
+            "MICRONESIA",
+            ["FEDERATED", "STATES", "OF"],
+        )
+        assert Country.simplify_countryname("(Federated States of) Micronesia") == (
+            "MICRONESIA",
+            ["FEDERATED", "STATES", "OF"],
+        )
+        assert Country.simplify_countryname("French Part of Saint Martin") == (
+            "MARTIN",
+            ["FRENCH", "PART", "OF", "SAINT"],
+        )
+        assert Country.simplify_countryname("French Part of Saint-Martin") == (
+            "MARTIN",
+            ["FRENCH", "PART", "OF", "SAINT"],
+        )
+        # "French Part" is a simplification and so can't be the simplified term
+        assert Country.simplify_countryname("French Part") == ("", ["FRENCH", "PART"])
+        # But the words must be consecutive
+        assert Country.simplify_countryname("French and Part") == (
+            "FRENCH",
+            ["AND", "PART"],
+        )
         assert Country.simplify_countryname("Dem. Rep. of the Congo") == (
+            "CONGO",
+            ["DEM", "REP", "OF", "THE"],
+        )
+        assert Country.simplify_countryname("Dem Rep of the Congo") == (
             "CONGO",
             ["DEM", "REP", "OF", "THE"],
         )
@@ -671,10 +698,45 @@ class TestCountry:
             "KOREA",
             ["THE", "REPUBLIC", "OF"],
         )
+        assert Country.simplify_countryname("(the Republic of Korea)") == (
+            "KOREA",
+            ["THE", "REPUBLIC", "OF"],
+        )
+        assert Country.simplify_countryname("(Sometimes) Korea") == (
+            "KOREA",
+            ["SOMETIMES"],
+        )
         assert Country.simplify_countryname(
             "The former Yugoslav Republic of Macedonia"
         ) == ("MACEDONIA", ["THE", "FORMER", "YUGOSLAV", "REPUBLIC", "OF"])
         assert Country.simplify_countryname("d'Ivoire Côte") == ("D'IVOIRE", ["CÔTE"])
+        assert Country.simplify_countryname("Guinea-Bissau") == ("GUINEA", ["BISSAU"])
+        assert Country.simplify_countryname("People's Republic of Bangladesh") == (
+            "BANGLADESH",
+            ["PEOPLE'S", "REPUBLIC", "OF"],
+        )
+        assert Country.simplify_countryname("Peoples Republic of Bangladesh") == (
+            "BANGLADESH",
+            ["PEOPLES", "REPUBLIC", "OF"],
+        )
+        # Known limitation with "smart quote" handling
+        assert Country.simplify_countryname("People’s Republic of Bangladesh") == (
+            "PEOPLE’S",
+            ["REPUBLIC", "OF", "BANGLADESH"],
+        )
+        # Simplifying assumes that it isn't getting an address and simplifies to the first
+        # part around commas, even if it isn't a country
+        assert Country.simplify_countryname("Paris, France") == (
+            "PARIS",
+            ["FRANCE"],
+        )
+        # Some people supply strings that aren't countries
+        # (often indirectly via `get_iso3_country_code_fuzzy()`)
+        # Ensure the function doesn't error, even if the value is meaningless.
+        assert Country.simplify_countryname("3.1 Global scores and ranking") == (
+            "3",
+            ["1", "GLOBAL", "SCORES", "AND", "RANKING"],
+        )
 
     def test_get_iso3_country_code(self):
         assert Country.get_iso3_country_code("jpn") == "JPN"
