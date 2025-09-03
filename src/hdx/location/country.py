@@ -738,63 +738,54 @@ class Country:
         # Create a set for optimised lookup
         candidate_words_set = set(candidate_words)
 
-        terms = (
-            # Put multi-word terms first so that we don't accidentally find them
-            # after intermediary simplification words were removed
-            sorted(cls.simplifications, key=lambda term: " " not in term)
-            + list(cls.abbreviations.keys())
-            + [abbrev.strip(".") for abbrev in cls.abbreviations if abbrev[-1] == "."]
-            + list(cls.abbreviations.values())
-            + list(cls.multiple_abbreviations.keys())
-            + [
-                abbrev.strip(".")
-                for abbrev in cls.multiple_abbreviations
-                if abbrev[-1] == "."
-            ]
-            + [
-                full_term
-                for full_terms in cls.multiple_abbreviations.values()
-                for full_term in full_terms
-            ]
-        )
+        multiword_terms = set()
+        singleword_terms = set()
 
-        for term in terms:
-            if " " not in term:
-                if term not in candidate_words_set:
-                    continue
-                candidate_words = [
-                    candidate_word
-                    for candidate_word in candidate_words
-                    if candidate_word != term
-                ]
-            else:
-                # Special case multi-word term - e.g. "French Part"
-                term_parts = term.split(" ")
-                if not all(
-                    term_part in candidate_words_set for term_part in term_parts
-                ):
-                    continue
+        for terms in [
+            cls.simplifications,
+            cls.abbreviations.keys(),
+            cls.abbreviations.values(),
+            cls.multiple_abbreviations.keys(),
+        ] + cls.multiple_abbreviations.values():
+            for term in terms:
+                if " " in term:
+                    multiword_terms.add(term)
+                else:
+                    singleword_terms.add(term)
+                    if term[-1] == ".":
+                        singleword_terms.add(term.strip("."))
 
-                start = 0
-                new_candidate_words = []
-                num_parts = len(term_parts)
-                iters = tee(candidate_words, num_parts)
+        # Remove multi-word terms first so that we don't accidentally find them
+        # after intermediary simplification words were removed
+        for term in multiword_terms:
+            term_parts = tuple(term.split(" "))
+            if not all(term_part in candidate_words_set for term_part in term_parts):
+                continue
 
-                # Build a set of iterators that are consecutive words
-                for i in range(1, num_parts):
-                    for _ in range(i):
-                        next(iters[i])
+            start = 0
+            new_candidate_words = []
+            num_parts = len(term_parts)
+            iters = tee(candidate_words, num_parts)
 
-                # Rebuild the string with matches removed
-                for i, word_sequence in enumerate(zip(*iters)):
-                    if list(word_sequence) == term_parts:
-                        new_candidate_words.extend(candidate_words[start:i])
-                        start = i + num_parts
+            # Build a set of iterators that are consecutive words
+            for i in range(1, num_parts):
+                for _ in range(i):
+                    next(iters[i])
 
-                if start != 0:
-                    new_candidate_words.extend(candidate_words[start:])
-                    candidate_words = new_candidate_words
-                # ELse we didn't find the words consecutively and don't need to rebuild
+            # Rebuild the string with matches removed
+            for i, word_sequence in enumerate(zip(*iters)):
+                if word_sequence == term_parts:
+                    new_candidate_words.extend(candidate_words[start:i])
+                    start = i + num_parts
+
+            if start != 0:
+                new_candidate_words.extend(candidate_words[start:])
+                candidate_words = new_candidate_words
+            # ELse we didn't find the words consecutively and don't need to rebuild
+
+        candidate_words = [
+            word for word in candidate_words if word not in singleword_terms
+        ]
 
         if len(candidate_words) >= 1:
             simplified_term = candidate_words[0]
