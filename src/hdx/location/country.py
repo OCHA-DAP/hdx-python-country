@@ -781,14 +781,12 @@ class Country:
             if start != 0:
                 new_candidate_words.extend(candidate_words[start:])
                 candidate_words = new_candidate_words
-            # ELse we didn't find the words consecutively and don't need to rebuild
+            # Else we didn't find the words consecutively and don't need to rebuild
 
-        candidate_words = [
-            word for word in candidate_words if word not in singleword_terms
-        ]
-
-        if len(candidate_words) >= 1:
-            simplified_term = candidate_words[0]
+        if candidate_words:
+            simplified_term = next(
+                word for word in candidate_words if word not in singleword_terms
+            )
             words.remove(simplified_term)
         else:
             simplified_term = ""
