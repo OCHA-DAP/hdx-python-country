@@ -707,6 +707,10 @@ class TestCountry:
             "KOREA",
             ["THE", "REPUBLIC", "OF"],
         )
+        assert Country.simplify_countryname("   (the Republic of Korea)   ") == (
+            "KOREA",
+            ["THE", "REPUBLIC", "OF"],
+        )
         assert Country.simplify_countryname("(Sometimes) Korea") == (
             "KOREA",
             ["SOMETIMES"],

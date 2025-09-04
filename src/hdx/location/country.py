@@ -724,7 +724,7 @@ class Country:
         if not country:
             return "", []
 
-        countryupper = country.upper()
+        countryupper = country.upper().strip()
         words = get_words_in_sentence(countryupper)
         index = countryupper.find(",")
         if index != -1:
