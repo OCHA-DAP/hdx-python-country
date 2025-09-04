@@ -739,9 +739,8 @@ class Country:
 
         candidate_words = get_words_in_sentence(countryupper)
         # Create a set for optimised lookup
-        candidate_words_set = set(candidate_words)
 
-        multiword_terms = set()
+        multiword_terms = {}
         singleword_terms = set()
 
         for terms in [
@@ -752,44 +751,34 @@ class Country:
         ] + list(cls.multiple_abbreviations.values()):
             for term in terms:
                 if " " in term:
-                    multiword_terms.add(term)
+                    term_parts = term.split(" ")
+                    multiword_terms[term_parts[0]] = term_parts
                 else:
                     singleword_terms.add(term)
                     if term[-1] == ".":
                         singleword_terms.add(term.strip("."))
 
-        # Remove multi-word terms first so that we don't accidentally find them
-        # after intermediary simplification words were removed
-        for term in multiword_terms:
-            term_parts = tuple(term.split(" "))
-            if not all(term_part in candidate_words_set for term_part in term_parts):
-                continue
-
-            start = 0
-            new_candidate_words = []
-            num_parts = len(term_parts)
-            iters = tee(candidate_words, num_parts)
-
-            # Build a set of iterators that are consecutive words
-            for i in range(1, num_parts):
-                for _ in range(i):
-                    next(iters[i])
-
-            # Rebuild the string with matches removed
-            for i, word_sequence in enumerate(zip(*iters)):
-                if word_sequence == term_parts:
-                    new_candidate_words.extend(candidate_words[start:i])
-                    start = i + num_parts
-
-            if start != 0:
-                new_candidate_words.extend(candidate_words[start:])
-                candidate_words = new_candidate_words
-            # Else we didn't find the words consecutively and don't need to rebuild
-
         if candidate_words:
-            simplified_term = next(
-                (word for word in candidate_words if word not in singleword_terms), ""
-            )
+            num_candidate_words = len(candidate_words)
+            simplified_term = ""
+            enumerated_words = enumerate(candidate_words)
+            default = (num_candidate_words, "")
+            while (val := next(enumerated_words, default)) != default:
+                i, word = val
+                if word in singleword_terms:
+                    continue
+                if (term_parts := multiword_terms.get(word)) and all(
+                    i + j < num_candidate_words and candidate_words[i + j] == term_part
+                    for j, term_part in enumerate(term_parts)
+                ):
+                    for _ in range(len(term_parts) - 1):
+                        # Skip the other words in the term
+                        next(enumerated_words)
+
+                    continue
+                simplified_term = word
+                break
+
             if simplified_term:
                 words.remove(simplified_term)
         else:
