@@ -644,7 +644,8 @@ class TestCountry:
         ]
 
     def test_simplify_countryname(self):
-        assert Country.simplify_countryname("jpn") == ("JPN", list())
+        assert Country.simplify_countryname("") == ("", [])
+        assert Country.simplify_countryname("jpn") == ("JPN", [])
         assert Country.simplify_countryname("United Rep. of Tanzania") == (
             "TANZANIA",
             ["UNITED", "REP", "OF"],
@@ -660,6 +661,10 @@ class TestCountry:
         assert Country.simplify_countryname("(Federated States of) Micronesia") == (
             "MICRONESIA",
             ["FEDERATED", "STATES", "OF"],
+        )
+        assert Country.simplify_countryname("Federated States") == (
+            "",
+            ["FEDERATED", "STATES"],
         )
         assert Country.simplify_countryname("French Part of Saint Martin") == (
             "MARTIN",

@@ -721,6 +721,9 @@ class Country:
         Returns:
             Tuple[str, List[str]]: Uppercase simplified country name and list of removed words
         """
+        if not country:
+            return "", []
+
         countryupper = country.upper()
         words = get_words_in_sentence(countryupper)
         index = countryupper.find(",")
@@ -746,7 +749,7 @@ class Country:
             cls.abbreviations.keys(),
             cls.abbreviations.values(),
             cls.multiple_abbreviations.keys(),
-        ] + cls.multiple_abbreviations.values():
+        ] + list(cls.multiple_abbreviations.values()):
             for term in terms:
                 if " " in term:
                     multiword_terms.add(term)
@@ -785,9 +788,10 @@ class Country:
 
         if candidate_words:
             simplified_term = next(
-                word for word in candidate_words if word not in singleword_terms
+                (word for word in candidate_words if word not in singleword_terms), ""
             )
-            words.remove(simplified_term)
+            if simplified_term:
+                words.remove(simplified_term)
         else:
             simplified_term = ""
 
