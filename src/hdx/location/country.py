@@ -3,7 +3,6 @@
 import logging
 import os.path
 import re
-from itertools import tee
 from typing import Dict, List, Optional, Tuple, Union
 
 import hxl
