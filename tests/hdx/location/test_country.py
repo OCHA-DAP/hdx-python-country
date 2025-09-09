@@ -644,12 +644,23 @@ class TestCountry:
         ]
 
     def test_simplify_countryname(self):
+        # Test that we handle the empty string case
         assert Country.simplify_countryname("") == ("", [])
+
+        # Test that country codes and arbitrary words return just the word but capitalised
         assert Country.simplify_countryname("jpn") == ("JPN", [])
+        assert Country.simplify_countryname("test") == ("TEST", [])
+
+        # Test simplified terms are removed, including abbreviations
         assert Country.simplify_countryname("United Rep. of Tanzania") == (
             "TANZANIA",
             ["UNITED", "REP", "OF"],
         )
+        assert Country.simplify_countryname(
+            "The former Yugoslav Republic of Macedonia"
+        ) == ("MACEDONIA", ["THE", "FORMER", "YUGOSLAV", "REPUBLIC", "OF"])
+
+        # Test different word orderings and bracketing are consistent
         assert Country.simplify_countryname("Micronesia (Federated States of)") == (
             "MICRONESIA",
             ["FEDERATED", "STATES", "OF"],
@@ -662,10 +673,15 @@ class TestCountry:
             "MICRONESIA",
             ["FEDERATED", "STATES", "OF"],
         )
+
+        # Test that the simplified terms on their own are dropped and that we handle
+        # the "no simplified term" case
         assert Country.simplify_countryname("Federated States") == (
             "",
             ["FEDERATED", "STATES"],
         )
+
+        # Test that multi-word simplifications are dropped
         assert Country.simplify_countryname("French Part of Saint Martin") == (
             "MARTIN",
             ["FRENCH", "PART", "OF", "SAINT"],
@@ -676,11 +692,14 @@ class TestCountry:
         )
         # "French Part" is a simplification and so can't be the simplified term
         assert Country.simplify_countryname("French Part") == ("", ["FRENCH", "PART"])
-        # But the words must be consecutive
+        # But the words must be consecutive for multi-part terms,
+        # so we don't drop "French" and "part" here
         assert Country.simplify_countryname("French and Part") == (
             "FRENCH",
             ["AND", "PART"],
         )
+
+        # Test that we handle abbreviations with and without punctuation
         assert Country.simplify_countryname("Dem. Rep. of the Congo") == (
             "CONGO",
             ["DEM", "REP", "OF", "THE"],
@@ -689,20 +708,28 @@ class TestCountry:
             "CONGO",
             ["DEM", "REP", "OF", "THE"],
         )
+
+        # Test that we handle the "Country, Specifics" comma format
         assert Country.simplify_countryname(
             "Korea, Democratic People's Republic of"
         ) == ("KOREA", ["DEMOCRATIC", "PEOPLE'S", "REPUBLIC", "OF"])
         assert Country.simplify_countryname(
             "Democratic People's Republic of Korea"
         ) == ("KOREA", ["DEMOCRATIC", "PEOPLE'S", "REPUBLIC", "OF"])
+
+        # Test that we handle more bracketed formats
         assert Country.simplify_countryname("Korea (the Republic of))") == (
             "KOREA",
             ["THE", "REPUBLIC", "OF"],
         )
+        # Regression test for bug #70 - partial brackets
         assert Country.simplify_countryname("Korea (the Republic of") == (
             "KOREA",
             ["THE", "REPUBLIC", "OF"],
         )
+
+        # Test that we don't strip everything just because it's bracketed, even if the brackets
+        # are surrounded by whitespace
         assert Country.simplify_countryname("(the Republic of Korea)") == (
             "KOREA",
             ["THE", "REPUBLIC", "OF"],
@@ -711,15 +738,21 @@ class TestCountry:
             "KOREA",
             ["THE", "REPUBLIC", "OF"],
         )
+
+        # Test that we're actually stripping the brackets and that it's not all just been
+        # simplified words that we'd drop anyway, even if they weren't in brackets
         assert Country.simplify_countryname("(Sometimes) Korea") == (
             "KOREA",
             ["SOMETIMES"],
         )
-        assert Country.simplify_countryname(
-            "The former Yugoslav Republic of Macedonia"
-        ) == ("MACEDONIA", ["THE", "FORMER", "YUGOSLAV", "REPUBLIC", "OF"])
+
+        # Regression test for bug #75 - apostrophes in simplified term
         assert Country.simplify_countryname("d'Ivoire Côte") == ("D'IVOIRE", ["CÔTE"])
+
+        # Regression test for bug #77 - other punctuation in simplified term
         assert Country.simplify_countryname("Guinea-Bissau") == ("GUINEA", ["BISSAU"])
+
+        # Test simplification of terms with apostrophes, and the non-apostrophe form
         assert Country.simplify_countryname("People's Republic of Bangladesh") == (
             "BANGLADESH",
             ["PEOPLE'S", "REPUBLIC", "OF"],
@@ -733,12 +766,14 @@ class TestCountry:
             "PEOPLE’S",
             ["REPUBLIC", "OF", "BANGLADESH"],
         )
+
         # Simplifying assumes that it isn't getting an address and simplifies to the first
         # part around commas, even if it isn't a country
         assert Country.simplify_countryname("Paris, France") == (
             "PARIS",
             ["FRANCE"],
         )
+
         # Some people supply strings that aren't countries
         # (often indirectly via `get_iso3_country_code_fuzzy()`)
         # Ensure the function doesn't error, even if the value is meaningless.
