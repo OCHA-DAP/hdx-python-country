@@ -779,7 +779,7 @@ class Country:
                     # If the current term is the first word in a multi-part term
                     (term_parts := multiword_terms.get(word))
                     # And there are enough words left in the sentence
-                    and i + len(term_parts) < num_candidate_words
+                    and i + len(term_parts) <= num_candidate_words
                     # And all of the words in the multi-word phrase are in sequence
                     # in the candidate term starting at the current position
                     and all(
