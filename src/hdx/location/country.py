@@ -1,10 +1,8 @@
 """Country location"""
 
-import copy
 import logging
 import os.path
 import re
-from string import punctuation
 from typing import Dict, List, Optional, Tuple, Union
 
 import hxl
@@ -62,6 +60,7 @@ class Country:
         "BOLIVARIAN",
         "PLURINATIONAL",
         "PEOPLE'S",
+        "PEOPLES",
         "DUTCH PART",
         "FRENCH PART",
         "MALVINAS",
@@ -721,41 +720,90 @@ class Country:
         Returns:
             Tuple[str, List[str]]: Uppercase simplified country name and list of removed words
         """
-        countryupper = country.upper()
+        # Convert the input into an upper-cased list of words
+        countryupper = country.upper().strip()
         words = get_words_in_sentence(countryupper)
+
+        # Strip common patterns
         index = countryupper.find(",")
         if index != -1:
             countryupper = countryupper[:index]
         index = countryupper.find(":")
         if index != -1:
             countryupper = countryupper[:index]
-        regex = re.compile(r"\(.+?\)")
-        countryupper = regex.sub("", countryupper)
-        remove = copy.deepcopy(cls.simplifications)
-        for simplification1, simplification2 in cls.abbreviations.items():
-            countryupper = countryupper.replace(simplification1, "")
-            remove.append(simplification2)
-        for (
-            simplification1,
-            simplifications,
-        ) in cls.multiple_abbreviations.items():
-            countryupper = countryupper.replace(simplification1, "")
-            for simplification2 in simplifications:
-                remove.append(simplification2)
-        remove = "|".join(remove)
-        regex = re.compile(
-            r"[" + punctuation.replace("'", "") + r"]|\b(" + remove + r")\b",
-            flags=re.IGNORECASE,
-        )
-        countryupper = regex.sub("", countryupper)
-        countryupper = countryupper.strip()
-        countryupper_words = get_words_in_sentence(countryupper)
-        if len(countryupper_words) > 1:
-            countryupper = countryupper_words[0]
-        if countryupper:
-            countryupper = countryupper.strip(punctuation)
-            words.remove(countryupper)
-        return countryupper, words
+
+        if countryupper and not (countryupper[0] == "(" and countryupper[-1] == ")"):
+            regex = re.compile(r"\(.+?\)")
+            countryupper = regex.sub("", countryupper)
+
+        # Find the words that remain as candidates for the simplified name.
+        # These are guaranteed to be a subset of `words` because we have only pruned
+        # parts from the sentence and not done any transformative processing.
+        candidate_words = get_words_in_sentence(countryupper)
+
+        if candidate_words:
+            # Make the simplifying terms indexable for efficient lookup
+            multiword_terms = {}
+            singleword_terms = set()
+
+            for terms in [
+                cls.simplifications,
+                cls.abbreviations.keys(),
+                cls.abbreviations.values(),
+                cls.multiple_abbreviations.keys(),
+            ] + list(cls.multiple_abbreviations.values()):
+                for term in terms:
+                    if " " in term:
+                        # Index multi-word terms by the first term against a list of the terms
+                        term_parts = term.split(" ")
+                        multiword_terms[term_parts[0]] = term_parts
+                    else:
+                        # Add single word terms to the set, and add their dot-less form as well
+                        singleword_terms.add(term)
+                        if term[-1] == ".":
+                            singleword_terms.add(term.strip("."))
+
+            num_candidate_words = len(candidate_words)
+            simplified_term = ""
+            enumerated_words = enumerate(candidate_words)
+            default = (num_candidate_words, "")
+
+            # Iterate through the candidate terms until we a) find a non-simplified word
+            # or b) hit the end of the list of words
+            while (val := next(enumerated_words, default)) != default:
+                i, word = val
+                if word in singleword_terms:
+                    # If the word was a single word simplification term then skip it
+                    continue
+                if (
+                    # If the current term is the first word in a multi-part term
+                    (term_parts := multiword_terms.get(word))
+                    # And there are enough words left in the sentence
+                    and i + len(term_parts) <= num_candidate_words
+                    # And all of the words in the multi-word phrase are in sequence
+                    # in the candidate term starting at the current position
+                    and all(
+                        candidate_words[i + j] == term_part
+                        for j, term_part in enumerate(term_parts)
+                    )
+                ):
+                    # Then skip the other words in the term and continue
+                    for _ in range(len(term_parts) - 1):
+                        next(enumerated_words)
+
+                    continue
+                # Else we found a word that we aren't dropping - it is our simplified word.
+                # Take it and break.
+                simplified_term = word
+                break
+
+            if simplified_term:
+                # We found a simplified term. Remove it from the list of other terms
+                words.remove(simplified_term)
+        else:
+            simplified_term = ""
+
+        return simplified_term, words
 
     @classmethod
     def get_iso3_country_code(
