@@ -28,8 +28,8 @@ class WFPAPI:
     """
 
     token_url = "https://api.wfp.org/token"
-    base_url = "https://api.wfp.org/vam-data-bridges/5.0.0/"
-    scope = "vamdatabridges_commodities-list_get vamdatabridges_commodityunits-list_get vamdatabridges_marketprices-alps_get vamdatabridges_commodities-categories-list_get vamdatabridges_commodityunits-conversion-list_get vamdatabridges_marketprices-priceweekly_get vamdatabridges_markets-geojsonlist_get vamdatabridges_marketprices-pricemonthly_get vamdatabridges_markets-list_get vamdatabridges_currency-list_get vamdatabridges_currency-usdindirectquotation_get"
+    base_url = "https://api.wfp.org/vam-data-bridges/6.0.0/"
+    scope = "gefs_geoless-items-countries_get vamdatabridges_commodities-list_get vamdatabridges_commodityunits-list_get vamdatabridges_marketprices-alps_get vamdatabridges_commodities-categories-list_get vamdatabridges_commodityunits-conversion-list_get vamdatabridges_marketprices-priceweekly_get vamdatabridges_markets-geojsonlist_get vamdatabridges_marketprices-pricemonthly_get vamdatabridges_markets-list_get vamdatabridges_currency-list_get vamdatabridges_currency-usdindirectquotation_get"
     default_retry_params = {
         "retry": retry_if_exception_type(DownloadError),
         "after": after_log(logger, logging.INFO),
