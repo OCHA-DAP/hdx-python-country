@@ -382,8 +382,8 @@ class AdminLevel:
             countryiso3: ISO3 country code
             pcode: P code to match
             **kwargs:
-            parent: Parent admin code
-            logname: Log using this identifying name. Defaults to not logging.
+            parent (str): Parent admin code
+            logname (str): Log using this identifying name. Defaults to not logging.
 
         Returns:
             Matched P code or None if no match
