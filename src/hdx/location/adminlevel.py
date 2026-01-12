@@ -381,7 +381,7 @@ class AdminLevel:
         Args:
             countryiso3: ISO3 country code
             pcode: P code to match
-            **kwargs:
+            **kwargs: See below
             parent (str): Parent admin code
             logname (str): Log using this identifying name. Defaults to not logging.
 
@@ -613,9 +613,9 @@ class AdminLevel:
             countryiso3: ISO3 country code
             name: Name to match
             normalised_name: Normalised name
-            **kwargs:
-            parent: Parent admin code
-            logname: Log using this identifying name. Defaults to not logging.
+            **kwargs: See below
+            parent (str): Parent admin code
+            logname (str): Log using this identifying name. Defaults to not logging.
 
         Returns:
             Matched P code or None if no match
@@ -776,9 +776,9 @@ class AdminLevel:
             name: Name to match
             fuzzy_match: Whether to try fuzzy matching. Defaults to True.
             fuzzy_length: Minimum length for fuzzy matching. Defaults to 4.
-            **kwargs:
-            parent: Parent admin code
-            logname: Log using this identifying name. Defaults to not logging.
+            **kwargs: See below
+            parent (str): Parent admin code
+            logname (str): Log using this identifying name. Defaults to not logging.
 
         Returns:
             (Matched P code or None if no match, True if exact match or False if not)
