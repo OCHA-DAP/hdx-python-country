@@ -2,10 +2,10 @@
 
 import hxl
 import pytest
+from hdx.utilities.path import script_dir_plus_file
 from hxl import InputOptions
 
 from hdx.location.country import Country
-from hdx.utilities.path import script_dir_plus_file
 
 
 class LocationError(Exception):

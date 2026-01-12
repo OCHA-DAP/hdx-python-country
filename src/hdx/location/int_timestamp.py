@@ -10,10 +10,10 @@ def get_int_timestamp(date: datetime) -> int:
     Get integer timestamp from datetime object with caching
 
     Args:
-        date (datetime): datetime object
+        date: datetime object
 
     Returns:
-        int: Integer timestamp
+        Integer timestamp
     """
     timestamp = _cache_timestamp_lookup.get(date)
     if timestamp is None:

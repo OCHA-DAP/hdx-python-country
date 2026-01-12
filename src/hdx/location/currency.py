@@ -3,9 +3,7 @@
 import logging
 from copy import deepcopy
 from datetime import datetime, timezone
-from typing import Dict, Optional, Union
 
-from .int_timestamp import get_int_timestamp
 from hdx.utilities.dateparse import (
     now_utc,
     parse_date,
@@ -14,6 +12,8 @@ from hdx.utilities.dictandlist import dict_of_dicts_add
 from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.path import get_temp_dir
 from hdx.utilities.retriever import Retrieve
+
+from .int_timestamp import get_int_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -49,18 +49,18 @@ class Currency:
     @classmethod
     def setup(
         cls,
-        retriever: Optional[Retrieve] = None,
+        retriever: Retrieve | None = None,
         primary_rates_url: str = _primary_rates_url,
         secondary_rates_url: str = _secondary_rates_url,
-        secondary_historic_url: Optional[str] = _secondary_historic_url,
-        secondary_historic_rates: Optional[Dict] = None,
+        secondary_historic_url: str | None = _secondary_historic_url,
+        secondary_historic_rates: dict | None = None,
         fallback_historic_to_current: bool = False,
         fallback_current_to_static: bool = False,
         no_historic: bool = False,
-        fixed_now: Optional[datetime] = None,
+        fixed_now: datetime | None = None,
         log_level: int = logging.DEBUG,
-        current_rates_cache: Dict = {"USD": 1},
-        historic_rates_cache: Dict = {},
+        current_rates_cache: dict = {"USD": 1},
+        historic_rates_cache: dict = {},
         use_secondary_historic: bool = False,
     ) -> None:
         """
@@ -69,19 +69,19 @@ class Currency:
         and put in the fallback_dir of the passed in Retriever.
 
         Args:
-            retriever (Optional[Retrieve]): Retrieve object to use for downloading. Defaults to None (generate a new one).
-            primary_rates_url (str): Primary rates url to use. Defaults to Yahoo API.
-            secondary_rates_url (str): Current rates url to use. Defaults to currency-api.
-            secondary_historic_url (Optional[str]): Historic rates url to use. Defaults to IMF (via IATI).
-            secondary_historic_rates (Optional[Dict]): Historic rates to use. Defaults to None.
-            fallback_historic_to_current (bool): If historic unavailable, fallback to current. Defaults to False.
-            fallback_current_to_static (bool): Use static file as final fallback. Defaults to False.
-            no_historic (bool): Do not set up historic rates. Defaults to False.
-            fixed_now (Optional[datetime]): Use a fixed datetime for now. Defaults to None (use datetime.now()).
-            log_level (int): Level at which to log messages. Defaults to logging.DEBUG.
-            current_rates_cache (Dict): Pre-populate current rates cache with given values. Defaults to {"USD": 1}.
-            historic_rates_cache (Dict): Pre-populate historic rates cache with given values. Defaults to {}.
-            use_secondary_historic (bool): Use secondary historic first. Defaults to False.
+            retriever: Retrieve object to use for downloading. Defaults to None (generate a new one).
+            primary_rates_url: Primary rates url to use. Defaults to Yahoo API.
+            secondary_rates_url: Current rates url to use. Defaults to currency-api.
+            secondary_historic_url: Historic rates url to use. Defaults to IMF (via IATI).
+            secondary_historic_rates: Historic rates to use. Defaults to None.
+            fallback_historic_to_current: If historic unavailable, fallback to current. Defaults to False.
+            fallback_current_to_static: Use static file as final fallback. Defaults to False.
+            no_historic: Do not set up historic rates. Defaults to False.
+            fixed_now: Use a fixed datetime for now. Defaults to None (use datetime.now()).
+            log_level: Level at which to log messages. Defaults to logging.DEBUG.
+            current_rates_cache: Pre-populate current rates cache with given values. Defaults to {"USD": 1}.
+            historic_rates_cache: Pre-populate historic rates cache with given values. Defaults to {}.
+            use_secondary_historic: Use secondary historic first. Defaults to False.
 
         Returns:
             None
@@ -148,16 +148,16 @@ class Currency:
     @classmethod
     def _get_primary_rates_data(
         cls, currency: str, timestamp: int, downloader=None
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Get the primary fx rate data for currency
 
         Args:
-            currency (str): Currency
-            timestamp (int): Timestamp to use for fx conversion
+            currency: Currency
+            timestamp: Timestamp to use for fx conversion
 
         Returns:
-            Optional[float]: fx rate or None
+            fx rate or None
         """
         if not cls._rates_api:
             return None
@@ -174,19 +174,19 @@ class Currency:
 
     @classmethod
     def _get_adjclose(
-        cls, indicators: Dict, currency: str, timestamp: int
-    ) -> Optional[float]:
+        cls, indicators: dict, currency: str, timestamp: int
+    ) -> float | None:
         """
         Get the adjusted close fx rate from the indicators dictionary returned
         from the Yahoo API.
 
         Args:
-            indicators (Dict): Indicators dictionary from Yahoo API
-            currency (str): Currency
-            timestamp (int): Timestamp to use for fx conversion
+            indicators: Indicators dictionary from Yahoo API
+            currency: Currency
+            timestamp: Timestamp to use for fx conversion
 
         Returns:
-            Optional[float]: Adjusted close fx rate or None
+            Adjusted close fx rate or None
         """
         adjclose = indicators["adjclose"][0].get("adjclose")
         if adjclose is None:
@@ -258,18 +258,18 @@ class Currency:
 
     @classmethod
     def _get_primary_rate(
-        cls, currency: str, timestamp: Optional[int] = None
-    ) -> Optional[float]:
+        cls, currency: str, timestamp: int | None = None
+    ) -> float | None:
         """
         Get the primary current fx rate for currency ofr a given timestamp. If no timestamp is supplied,
         datetime.now() will be used unless fixed_now was passed in the constructor.
 
         Args:
-            currency (str): Currency
-            timestamp (Optional[int]): Timestamp to use for fx conversion. Defaults to None (datetime.now())
+            currency: Currency
+            timestamp: Timestamp to use for fx conversion. Defaults to None (datetime.now())
 
         Returns:
-            Optional[float]: fx rate or None
+            fx rate or None
         """
         if timestamp is None:
             if cls._fixed_now:
@@ -289,15 +289,15 @@ class Currency:
         return data["meta"]["regularMarketPrice"]
 
     @classmethod
-    def _get_secondary_current_rate(cls, currency: str) -> Optional[float]:
+    def _get_secondary_current_rate(cls, currency: str) -> float | None:
         """
         Get the secondary current fx rate for currency
 
         Args:
-            currency (str): Currency
+            currency: Currency
 
         Returns:
-            Optional[float]: fx rate or None
+            fx rate or None
         """
         return cls._secondary_rates.get(currency.lower())
 
@@ -307,10 +307,10 @@ class Currency:
         Get the current fx rate for currency
 
         Args:
-            currency (str): Currency
+            currency: Currency
 
         Returns:
-            float: fx rate
+            fx rate
         """
         currency = currency.upper()
         fx_rate = cls._cached_current_rates.get(currency)
@@ -328,16 +328,16 @@ class Currency:
         raise CurrencyError(f"Failed to get rate for currency {currency}!")
 
     @classmethod
-    def get_current_value_in_usd(cls, value: Union[int, float], currency: str) -> float:
+    def get_current_value_in_usd(cls, value: int | float, currency: str) -> float:
         """
         Get the current USD value of the value in local currency
 
         Args:
-            value (Union[int, float]): Value in local currency
-            currency (str): Currency
+            value: Value in local currency
+            currency: Currency
 
         Returns:
-            float: Value in USD
+            Value in USD
         """
         currency = currency.upper()
         if currency == "USD":
@@ -347,17 +347,17 @@ class Currency:
 
     @classmethod
     def get_current_value_in_currency(
-        cls, usdvalue: Union[int, float], currency: str
+        cls, usdvalue: int | float, currency: str
     ) -> float:
         """
         Get the current value in local currency of the value in USD
 
         Args:
-            usdvalue (Union[int, float]): Value in USD
-            currency (str): Currency
+            usdvalue: Value in USD
+            currency: Currency
 
         Returns:
-            float: Value in local currency
+            Value in local currency
         """
         currency = currency.upper()
         if currency == "USD":
@@ -368,17 +368,17 @@ class Currency:
     @classmethod
     def _get_secondary_historic_rate(
         cls, currency: str, timestamp: int
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Get the historic fx rate for currency on a particular date using
         interpolation if needed.
 
         Args:
-            currency (str): Currency
-            timestamp (int): Timestamp to use for fx conversion
+            currency: Currency
+            timestamp: Timestamp to use for fx conversion
 
         Returns:
-            Optional[float]: fx rate or None
+            fx rate or None
         """
         currency_data = cls._secondary_historic_rates.get(currency)
         if currency_data is None:
@@ -472,12 +472,12 @@ class Currency:
         set ignore_timeinfo to False. This may affect which day's closing value is used.
 
         Args:
-            currency (str): Currency
-            date (datetime): Date to use for fx conversion
-            ignore_timeinfo (bool): Ignore time and time zone of date. Defaults to True.
+            currency: Currency
+            date: Date to use for fx conversion
+            ignore_timeinfo: Ignore time and time zone of date. Defaults to True.
 
         Returns:
-            float: fx rate
+            fx rate
         """
         currency = currency.upper()
         if currency == "USD":
@@ -492,7 +492,7 @@ class Currency:
     @classmethod
     def get_historic_value_in_usd(
         cls,
-        value: Union[int, float],
+        value: int | float,
         currency: str,
         date: datetime,
         ignore_timeinfo: bool = True,
@@ -505,13 +505,13 @@ class Currency:
         value is used.
 
         Args:
-            value (Union[int, float]): Value in local currency
-            currency (str): Currency
-            date (datetime): Date to use for fx conversion
-            ignore_timeinfo (bool): Ignore time and time zone of date. Defaults to True.
+            value: Value in local currency
+            currency: Currency
+            date: Date to use for fx conversion
+            ignore_timeinfo: Ignore time and time zone of date. Defaults to True.
 
         Returns:
-            float: Value in USD
+            Value in USD
         """
         currency = currency.upper()
         if currency == "USD":
@@ -522,7 +522,7 @@ class Currency:
     @classmethod
     def get_historic_value_in_currency(
         cls,
-        usdvalue: Union[int, float],
+        usdvalue: int | float,
         currency: str,
         date: datetime,
         ignore_timeinfo: bool = True,
@@ -535,13 +535,13 @@ class Currency:
         day's closing value is used.
 
         Args:
-            value (Union[int, float]): Value in USD
-            currency (str): Currency
-            date (datetime): Date to use for fx conversion
-            ignore_timeinfo (bool): Ignore time and time zone of date. Defaults to True.
+            value: Value in USD
+            currency: Currency
+            date: Date to use for fx conversion
+            ignore_timeinfo: Ignore time and time zone of date. Defaults to True.
 
         Returns:
-            float: Value in local currency
+            Value in local currency
         """
         currency = currency.upper()
         if currency == "USD":

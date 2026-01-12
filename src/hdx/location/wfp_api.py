@@ -1,6 +1,9 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
+from hdx.utilities.base_downloader import DownloadError
+from hdx.utilities.downloader import Download
+from hdx.utilities.retriever import Retrieve
 from tenacity import (
     Retrying,
     after_log,
@@ -8,10 +11,6 @@ from tenacity import (
     stop_after_attempt,
     wait_fixed,
 )
-
-from hdx.utilities.base_downloader import DownloadError
-from hdx.utilities.downloader import Download
-from hdx.utilities.retriever import Retrieve
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +22,8 @@ class WFPAPI:
     token_downloader.
 
     Args:
-        token_downloader (Download): Download object with WFP basic authentication
-        retriever (Retrieve): Retrieve object for interacting with WFP API
+        token_downloader: Download object with WFP basic authentication
+        retriever: Retrieve object for interacting with WFP API
     """
 
     token_url = "https://api.wfp.org/token"
@@ -44,10 +43,10 @@ class WFPAPI:
         self.retriever = retriever
         self.retry_params = {"attempts": 1, "wait": 1}
 
-    def get_retry_params(self) -> Dict:
+    def get_retry_params(self) -> dict:
         return self.retry_params
 
-    def update_retry_params(self, attempts: int, wait: int) -> Dict:
+    def update_retry_params(self, attempts: int, wait: int) -> dict:
         self.retry_params["attempts"] = attempts
         self.retry_params["wait"] = wait
         return self.retry_params
@@ -69,18 +68,18 @@ class WFPAPI:
         url: str,
         filename: str,
         log: str,
-        parameters: Optional[Dict] = None,
+        parameters: dict | None = None,
     ) -> Any:
         """Retrieve JSON from WFP API.
 
         Args:
-            url (str): URL to download
-            filename (Optional[str]): Filename of saved file. Defaults to getting from url.
-            log (Optional[str]): Text to use in log string to describe download. Defaults to filename.
-            parameters (Dict): Parameters to pass to download_json call
+            url: URL to download
+            filename: Filename of saved file. Defaults to getting from url.
+            log: Text to use in log string to describe download. Defaults to filename.
+            parameters: Parameters to pass to download_json call
 
         Returns:
-            Any: The data from the JSON file
+            The data from the JSON file
         """
         retryer = Retrying(
             retry=self.default_retry_params["retry"],
@@ -111,18 +110,18 @@ class WFPAPI:
     def get_items(
         self,
         endpoint: str,
-        countryiso3: Optional[str] = None,
-        parameters: Optional[Dict] = None,
-    ) -> List:
+        countryiso3: str | None = None,
+        parameters: dict | None = None,
+    ) -> list:
         """Retrieve a list of items from the WFP API.
 
         Args:
-            endpoint (str): End point to call
-            countryiso3 (Optional[str]): Country for which to obtain data. Defaults to all countries.
-            parameters (Optional[Dict]): Paramaters to pass to call. Defaults to None.
+            endpoint: End point to call
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+            parameters: Paramaters to pass to call. Defaults to None.
 
         Returns:
-            List: List of items from the WFP endpoint
+            List of items from the WFP endpoint
         """
         if not parameters:
             parameters = {}

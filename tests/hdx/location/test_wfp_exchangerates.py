@@ -1,11 +1,12 @@
-from hdx.location.currency import Currency
-from hdx.location.int_timestamp import get_int_timestamp
-from hdx.location.wfp_api import WFPAPI
-from hdx.location.wfp_exchangerates import WFPExchangeRates
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
+
+from hdx.location.currency import Currency
+from hdx.location.int_timestamp import get_int_timestamp
+from hdx.location.wfp_api import WFPAPI
+from hdx.location.wfp_exchangerates import WFPExchangeRates
 
 
 class TestWFPExchangeRates:

@@ -3,13 +3,13 @@
 from os.path import join
 
 import pytest
-
-from hdx.location.adminlevel import AdminLevel
 from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.downloader import Download
 from hdx.utilities.loader import load_yaml
 from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
+
+from hdx.location.adminlevel import AdminLevel
 
 
 class TestAdminLevel:
@@ -418,7 +418,7 @@ class TestAdminLevel:
         adminone = AdminLevel(config)
         adminone.setup_from_url()
         assert adminone.get_admin_level("YEM") == 1
-        assert len(adminone.get_pcode_list()) == 2455
+        assert len(adminone.get_pcode_list()) == 1875
         assert adminone.get_pcode_length("YEM") == 4
         assert adminone.get_pcode("YEM", "YE30", logname="test") == (
             "YE30",

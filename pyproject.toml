@@ -31,10 +31,10 @@ classifiers = [
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 dependencies = [
-    "hdx-python-utilities>=3.9.2",
+    "hdx-python-utilities>=3.9.9",
     "libhxl>=5.2.2",
     "tenacity",
 ]
