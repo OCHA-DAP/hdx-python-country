@@ -42,7 +42,7 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
-From 4.0.0, Python 3.10 or later is required 
+From 4.0.0, Python 3.10 or later is required
 
 From 3.9.2, must call Currency.setup before using Currency methods.
 
