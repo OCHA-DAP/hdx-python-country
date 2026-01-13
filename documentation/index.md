@@ -42,6 +42,8 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 4.0.0, Python 3.10 up are required 
+
 From 3.9.2, must call Currency.setup before using Currency methods.
 
 From 3.7.5, removed clean_name function. There is now a function normalise in
