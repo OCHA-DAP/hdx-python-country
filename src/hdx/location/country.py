@@ -3,6 +3,7 @@
 import logging
 import os.path
 import re
+from pathlib import Path
 
 import hxl
 from hdx.utilities.path import script_dir_plus_file
@@ -239,14 +240,16 @@ class Country:
                 cls.set_country_name_mappings(country_name_mappings)
             if cls._use_live:
                 try:
-                    countries = hxl.data(cls._ochaurl, InputOptions(encoding="utf-8"))
+                    countries = hxl.data(
+                        str(cls._ochaurl), InputOptions(encoding="utf-8")
+                    )
                 except OSError:
                     logger.exception(
                         "Download from OCHA feed failed! Falling back to stored file."
                     )
             if countries is None:
                 countries = hxl.data(
-                    cls._ochapath,
+                    str(cls._ochapath),
                     InputOptions(allow_local=True, encoding="utf-8"),
                 )
             cls.set_countriesdata(countries)
@@ -302,7 +305,7 @@ class Country:
         cls._ochaurl = url
 
     @classmethod
-    def set_ocha_path(cls, path: str | None = None) -> None:
+    def set_ocha_path(cls, path: Path | str | None = None) -> None:
         """
         Set local path from which to retrieve OCHA countries data
 

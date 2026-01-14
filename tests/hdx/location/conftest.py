@@ -1,4 +1,4 @@
-from os.path import join
+from pathlib import Path
 
 import pytest
 
@@ -7,12 +7,12 @@ from hdx.location.currency import Currency
 
 @pytest.fixture(scope="session")
 def fixtures_dir():
-    return join("tests", "fixtures")
+    return Path("tests") / "fixtures"
 
 
 @pytest.fixture(scope="session")
 def input_dir(fixtures_dir):
-    return join(fixtures_dir, "wfp")
+    return fixtures_dir / "wfp"
 
 
 @pytest.fixture(scope="function")

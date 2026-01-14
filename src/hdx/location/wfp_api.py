@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Any
 
 from hdx.utilities.base_downloader import DownloadError
@@ -65,7 +66,7 @@ class WFPAPI:
 
     def retrieve(
         self,
-        url: str,
+        url: Path | str,
         filename: str,
         log: str,
         parameters: dict | None = None,

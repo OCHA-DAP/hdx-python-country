@@ -1,7 +1,5 @@
 """Currency Tests"""
 
-from os.path import join
-
 import pytest
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.downloader import Download
@@ -16,11 +14,11 @@ from hdx.location.int_timestamp import get_int_timestamp
 class TestCurrency:
     @pytest.fixture(scope="class")
     def secondary_rates_url(self, fixtures_dir):
-        return join(fixtures_dir, "secondary_rates.json")
+        return fixtures_dir / "secondary_rates.json"
 
     @pytest.fixture(scope="class")
     def secondary_historic_url(self, fixtures_dir):
-        return join(fixtures_dir, "secondary_historic_rates.csv")
+        return fixtures_dir / "secondary_historic_rates.csv"
 
     @pytest.fixture(scope="class", autouse=True)
     def retrievers(self, fixtures_dir):
