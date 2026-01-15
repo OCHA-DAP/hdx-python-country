@@ -1,7 +1,5 @@
 """location Tests"""
 
-from os.path import join
-
 import pytest
 from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.downloader import Download
@@ -15,19 +13,19 @@ from hdx.location.adminlevel import AdminLevel
 class TestAdminLevel:
     @pytest.fixture(scope="function")
     def config(self, fixtures_dir):
-        return load_yaml(join(fixtures_dir, "adminlevel.yaml"))
+        return load_yaml(fixtures_dir / "adminlevel.yaml")
 
     @pytest.fixture(scope="function")
     def config_parent(self, fixtures_dir):
-        return load_yaml(join(fixtures_dir, "adminlevelparent.yaml"))
+        return load_yaml(fixtures_dir / "adminlevelparent.yaml")
 
     @pytest.fixture(scope="function")
     def url(self, fixtures_dir):
-        return join(fixtures_dir, "download-global-pcodes-adm-1-2.csv")
+        return fixtures_dir / "download-global-pcodes-adm-1-2.csv"
 
     @pytest.fixture(scope="function")
     def formats_url(self, fixtures_dir):
-        return join(fixtures_dir, "download-global-pcode-lengths.csv")
+        return fixtures_dir / "download-global-pcode-lengths.csv"
 
     def test_adminlevel(self, config):
         adminone = AdminLevel(config)

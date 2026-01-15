@@ -1,6 +1,7 @@
 import logging
 import re
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 
 import hxl
@@ -116,7 +117,7 @@ class AdminLevel:
 
     @staticmethod
     def get_libhxl_dataset(
-        url: str = admin_url, retriever: Retrieve | None = None
+        url: Path | str = admin_url, retriever: Retrieve | None = None
     ) -> hxl.Dataset:
         """
         Get libhxl Dataset object given a URL which defaults to global p-codes
@@ -139,7 +140,7 @@ class AdminLevel:
             url_to_use = url
         try:
             return hxl.data(
-                url_to_use,
+                str(url_to_use),
                 InputOptions(InputOptions(allow_local=True, encoding="utf-8")),
             )
         except (FileNotFoundError, HXLIOException):
@@ -247,7 +248,7 @@ class AdminLevel:
 
     def setup_from_url(
         self,
-        admin_url: str = admin_url,
+        admin_url: Path | str = admin_url,
         countryiso3s: Sequence[str] | None = None,
     ) -> None:
         """
@@ -289,7 +290,7 @@ class AdminLevel:
             for x in re.finditer("0", pcode):
                 dict_of_sets_add(self.zeroes, countryiso3, x.start())
 
-    def load_pcode_formats(self, formats_url: str = formats_url) -> None:
+    def load_pcode_formats(self, formats_url: Path | str = formats_url) -> None:
         """
         Load p-code formats from a URL. Defaults to global p-codes dataset on HDX.
 

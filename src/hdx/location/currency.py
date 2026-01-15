@@ -3,6 +3,7 @@
 import logging
 from copy import deepcopy
 from datetime import datetime, timezone
+from pathlib import Path
 
 from hdx.utilities.dateparse import (
     now_utc,
@@ -50,9 +51,9 @@ class Currency:
     def setup(
         cls,
         retriever: Retrieve | None = None,
-        primary_rates_url: str = _primary_rates_url,
-        secondary_rates_url: str = _secondary_rates_url,
-        secondary_historic_url: str | None = _secondary_historic_url,
+        primary_rates_url: Path | str = _primary_rates_url,
+        secondary_rates_url: Path | str = _secondary_rates_url,
+        secondary_historic_url: Path | str | None = _secondary_historic_url,
         secondary_historic_rates: dict | None = None,
         fallback_historic_to_current: bool = False,
         fallback_current_to_static: bool = False,
@@ -100,7 +101,7 @@ class Currency:
             temp_dir = get_temp_dir(cls._user_agent)
             retriever = Retrieve(
                 downloader,
-                None,
+                temp_dir,
                 temp_dir,
                 temp_dir,
                 save=False,
