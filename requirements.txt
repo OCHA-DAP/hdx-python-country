@@ -20,7 +20,7 @@ et-xmlfile==2.0.0
     # via openpyxl
 frictionless==5.18.1
     # via hdx-python-utilities
-hdx-python-utilities==4.0.1
+hdx-python-utilities==4.0.4
     # via hdx-python-country (pyproject.toml)
 humanize==4.15.0
     # via frictionless
@@ -56,6 +56,8 @@ mdurl==0.1.2
     # via markdown-it-py
 openpyxl==3.1.5
     # via hdx-python-utilities
+packaging==26.0
+    # via wheel
 petl==1.7.17
     # via frictionless
 ply==3.11
@@ -98,7 +100,7 @@ requests-file==3.0.1
     # via hdx-python-utilities
 rfc3986==2.0.0
     # via frictionless
-rich==14.2.0
+rich==14.3.1
     # via typer
 rpds-py==0.30.0
     # via
@@ -127,6 +129,7 @@ typer==0.21.1
 typing-extensions==4.15.0
     # via
     #   frictionless
+    #   hdx-python-utilities
     #   pydantic
     #   pydantic-core
     #   typer
@@ -143,7 +146,7 @@ urllib3==2.6.3
     #   requests
 validators==0.35.0
     # via frictionless
-wheel==0.45.1
+wheel==0.46.3
     # via libhxl
 xlrd==2.0.2
     # via hdx-python-utilities

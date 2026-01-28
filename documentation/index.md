@@ -43,7 +43,7 @@ The library has detailed API documentation which can be found in the menu at the
 
 ## Breaking Changes
 From 4.0.0, Python 3.10 or later is required as well as HDX Python Utilities >= 4. To
-continue using HDX Python Country < 4, please pin to HDX Python Utilities < 4. 
+continue using HDX Python Country < 4, please pin to HDX Python Utilities < 4.
 
 From 3.9.2, must call Currency.setup before using Currency methods.
 
