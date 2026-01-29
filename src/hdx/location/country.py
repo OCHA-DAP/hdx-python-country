@@ -3,12 +3,13 @@
 import logging
 import os.path
 import re
+from collections.abc import Iterator
 from pathlib import Path
 
-import hxl
+from hdx.utilities.base_downloader import BaseDownload, DownloadError
+from hdx.utilities.downloader import Download
 from hdx.utilities.path import script_dir_plus_file
 from hdx.utilities.text import get_words_in_sentence
-from hxl import Dataset, InputOptions
 
 logger = logging.getLogger(__name__)
 
@@ -71,61 +72,82 @@ class Country:
     _use_live_default = True
     _use_live = _use_live_default
     _countriesdata = None
-    _ochaurl_default = "https://docs.google.com/spreadsheets/d/1NjSI2LaS3SqbgYc0HdD8oIb7lofGtiHgoKKATCpwVdY/export?format=csv&gid=1088874596"
+    _ochaurl_default = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIIswgPn6oc_Ui3hCl2RTAdVZEw2sx4GjgqWFywrr8dt9R9B-p6Cs3jKeJigDguIbOjMxYtnloLlmI/pub?gid=1528390745&single=true&output=csv"
     _ochaurl = _ochaurl_default
     _ochapath_default = script_dir_plus_file(
-        "Countries & Territories Taxonomy MVP - C&T Taxonomy with HXL Tags.csv",
+        "Countries & Territories Taxonomy MVP - C&T Taxonomy.csv",
         CountryError,
     )
     _ochapath = _ochapath_default
     _country_name_overrides = {}
     _country_name_mappings = {}
+    _country_name_keys = (
+        "Preferred Term",
+        "ISO Alt Term",
+        "DGACM Alt Term",
+        "HPC Tools Alt Term",
+        "RW Short Name",
+        "RW API Alt Term",
+        "English Short",
+        "French Short",
+        "Spanish Short",
+        "Russian Short",
+        "Chinese Short",
+        "Arabic Short",
+        "English Formal",
+        "M49 English",
+        "M49 French",
+        "M49 Spanish",
+        "M49 Russian",
+        "M49 Chinese",
+        "M49 Arabic",
+    )
 
     @classmethod
-    def _add_countriesdata(cls, iso3: str, hxlcountry: hxl.Row) -> dict:
+    def _add_countriesdata(cls, iso3: str, country: dict) -> dict:
         """
         Set up countries data from data in form provided by UNStats and World Bank
 
         Args:
             iso3: ISO3 code for country
-            hxlcountry: Country information
+            country: Country information
 
         Returns:
             Country dictionary
         """
-        country = hxlcountry.dictionary
-        for value in hxlcountry.get_all("#country+name"):
+        for key in cls._country_name_keys:
+            value = country[key]
             if value:
                 cls._countriesdata["countrynames2iso3"][value.upper()] = iso3
         countryname = cls._country_name_overrides.get(iso3)
         if countryname is not None:
-            country["#country+name+override"] = countryname
-        iso2 = hxlcountry.get("#country+code+v_iso2")
+            country["Name Override"] = countryname
+        iso2 = country.get("ISO 3166-1 Alpha 2-Codes")
         if not iso2 and cls._include_unofficial:
-            iso2 = hxlcountry.get("#country+code+alpha2")
+            iso2 = country.get("x Alpha2 codes")
         if iso2:
             cls._countriesdata["iso2iso3"][iso2] = iso3
             # different types so keys won't clash
             cls._countriesdata["iso2iso3"][iso3] = iso2
-        m49 = hxlcountry.get("#country+code+num+v_m49")
+        m49 = country.get("m49 numerical code")
         if m49:
             m49 = int(m49)
             cls._countriesdata["m49iso3"][m49] = iso3
             # different types so keys won't clash
             cls._countriesdata["m49iso3"][iso3] = m49
         cls._countriesdata["aliases"][iso3] = re.compile(
-            hxlcountry.get("#country+regex"), re.IGNORECASE
+            country.get("Regex"), re.IGNORECASE
         )
-        regionname = hxlcountry.get("#region+main+name+preferred")
-        sub_regionname = hxlcountry.get("#region+name+preferred+sub")
-        intermediate_regionname = hxlcountry.get("#region+intermediate+name+preferred")
-        regionid = hxlcountry.get("#region+code+main")
+        regionname = country.get("Region Name")
+        sub_regionname = country.get("Sub-region Name")
+        intermediate_regionname = country.get("Intermediate Region Name")
+        regionid = country.get("Region Code")
         if regionid:
             regionid = int(regionid)
-        sub_regionid = hxlcountry.get("#region+code+sub")
+        sub_regionid = country.get("Sub-region Code")
         if sub_regionid:
             sub_regionid = int(sub_regionid)
-        intermediate_regionid = hxlcountry.get("#region+code+intermediate")
+        intermediate_regionid = country.get("Intermediate Region Code")
         if intermediate_regionid:
             intermediate_regionid = int(intermediate_regionid)
 
@@ -155,12 +177,12 @@ class Country:
             cls._countriesdata["regionnames2codes"][intermediate_regionname.upper()] = (
                 intermediate_regionid
             )
-        currency = hxlcountry.get("#currency+code")
+        currency = country.get("Currency")
         cls._countriesdata["currencies"][iso3] = currency
         return country
 
     @classmethod
-    def set_countriesdata(cls, countries: Dataset) -> None:
+    def set_countriesdata(cls, countries: Iterator[dict]) -> None:
         """
         Set up countries data from OCHA countries and territories dataset
 
@@ -185,10 +207,10 @@ class Country:
             cls._countriesdata["countrynames2iso3"][key.upper()] = value.upper()
 
         for country in countries:
-            iso3 = country.get("#country+code+v_iso3")
+            iso3 = country.get("ISO 3166-1 Alpha 3-Codes")
             if not iso3:
                 if cls._include_unofficial:
-                    iso3 = country.get("#country+code+alpha3")
+                    iso3 = country.get("x Alpha3 codes")
                     if not iso3:
                         continue
                 else:
@@ -212,6 +234,7 @@ class Country:
         use_live: bool | None = None,
         country_name_overrides: dict | None = None,
         country_name_mappings: dict | None = None,
+        downloader: BaseDownload | None = None,
     ) -> list[dict[str, dict]]:
         """
         Read countries data from OCHA countries feed (falling back to file).
@@ -224,6 +247,7 @@ class Country:
             use_live: Try to get latest data from web rather than file in package. Defaults to True.
             country_name_overrides: Dictionary of mappings from iso3 to country name
             country_name_mappings: Dictionary of mappings from country name to iso3
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Countries dictionaries
@@ -238,19 +262,21 @@ class Country:
                 cls.set_country_name_overrides(country_name_overrides)
             if country_name_mappings is not None:
                 cls.set_country_name_mappings(country_name_mappings)
+            if downloader is None:
+                downloader = Download(user_agent="HDXPythonCountry")
             if cls._use_live:
                 try:
-                    countries = hxl.data(
-                        str(cls._ochaurl), InputOptions(encoding="utf-8")
+                    _, countries = downloader.get_tabular_rows(
+                        cls._ochaurl, dict_form=True
                     )
-                except OSError:
-                    logger.exception(
-                        "Download from OCHA feed failed! Falling back to stored file."
+                except DownloadError:
+                    countries = None
+                    logger.warning(
+                        f"Download of {cls._ochaurl} failed. Will use internal static file."
                     )
             if countries is None:
-                countries = hxl.data(
-                    str(cls._ochapath),
-                    InputOptions(allow_local=True, encoding="utf-8"),
+                _, countries = downloader.get_tabular_rows(
+                    cls._ochapath, dict_form=True
                 )
             cls.set_countriesdata(countries)
         return cls._countriesdata
@@ -351,6 +377,7 @@ class Country:
         iso3: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> dict[str, str] | None:
         """Get country information from ISO3 code
 
@@ -358,11 +385,12 @@ class Country:
             iso3: ISO3 code for which to get country information
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             country information
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         country = countriesdata["countries"].get(iso3.upper())
         if country is not None:
             return country
@@ -378,6 +406,7 @@ class Country:
         use_live: bool = None,
         exception: Exception | None = None,
         formal: bool = False,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get country name from ISO3 code
 
@@ -386,24 +415,25 @@ class Country:
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
             formal: Return preferred name if False, formal name if True. Defaults to False.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Country name
         """
         countryinfo = cls.get_country_info_from_iso3(
-            iso3, use_live=use_live, exception=exception
+            iso3, use_live=use_live, exception=exception, downloader=downloader
         )
         if countryinfo is not None:
-            countryname = countryinfo.get("#country+name+override")
+            countryname = countryinfo.get("Name Override")
             if countryname is not None:
                 return countryname
             if formal:
-                countryname = countryinfo.get("#country+formal+i_en+name+v_unterm")
+                countryname = countryinfo.get("English Formal")
                 if countryname is None or countryname == "":
-                    countryname = countryinfo.get("#country+name+preferred")
+                    countryname = countryinfo.get("Preferred Term")
                 return countryname
             else:
-                return countryinfo.get("#country+name+preferred")
+                return countryinfo.get("Preferred Term")
         return None
 
     @classmethod
@@ -412,6 +442,7 @@ class Country:
         iso3: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> int | None:
         """Get currency code from ISO3 code
 
@@ -419,11 +450,12 @@ class Country:
             iso3: ISO3 code for which to get M49 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Currency code
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         currency = countriesdata["currencies"].get(iso3.upper())
         if currency is not None:
             return currency
@@ -438,6 +470,7 @@ class Country:
         iso3: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get ISO2 from ISO3 code
 
@@ -445,11 +478,12 @@ class Country:
             iso3: ISO3 code for which to get ISO2 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             ISO2 code
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         iso2 = countriesdata["iso2iso3"].get(iso3.upper())
         if iso2 is not None:
             return iso2
@@ -464,6 +498,7 @@ class Country:
         iso2: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get ISO3 from ISO2 code
 
@@ -471,11 +506,12 @@ class Country:
             iso2: ISO2 code for which to get ISO3 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             ISO3 code
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         iso3 = countriesdata["iso2iso3"].get(iso2.upper())
         if iso3 is not None:
             return iso3
@@ -490,6 +526,7 @@ class Country:
         iso2: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> dict[str, str] | None:
         """Get country name from ISO2 code
 
@@ -497,14 +534,17 @@ class Country:
             iso2: ISO2 code for which to get country information
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Country information
         """
-        iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_iso2(
+            iso2, use_live=use_live, exception=exception, downloader=downloader
+        )
         if iso3 is not None:
             return cls.get_country_info_from_iso3(
-                iso3, use_live=use_live, exception=exception
+                iso3, use_live=use_live, exception=exception, downloader=downloader
             )
         return None
 
@@ -515,6 +555,7 @@ class Country:
         use_live: bool = None,
         exception: Exception | None = None,
         formal: bool = False,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get country name from ISO2 code
 
@@ -523,14 +564,17 @@ class Country:
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
             formal: Return preferred name if False, formal name if True. Defaults to False.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Country name
         """
-        iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_iso2(
+            iso2, use_live=use_live, exception=exception, downloader=downloader
+        )
         if iso3 is not None:
             return cls.get_country_name_from_iso3(
-                iso3, exception=exception, formal=formal
+                iso3, exception=exception, formal=formal, downloader=downloader
             )
         return None
 
@@ -540,6 +584,7 @@ class Country:
         iso2: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get currency from ISO2 code
 
@@ -547,14 +592,17 @@ class Country:
             iso2: ISO2 code for which to get country information
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Currency
         """
-        iso3 = cls.get_iso3_from_iso2(iso2, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_iso2(
+            iso2, use_live=use_live, exception=exception, downloader=downloader
+        )
         if iso3 is not None:
             return cls.get_currency_from_iso3(
-                iso3, use_live=use_live, exception=exception
+                iso3, use_live=use_live, exception=exception, downloader=downloader
             )
         return None
 
@@ -564,6 +612,7 @@ class Country:
         iso3: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> int | None:
         """Get M49 from ISO3 code
 
@@ -571,11 +620,12 @@ class Country:
             iso3: ISO3 code for which to get M49 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             M49 code
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         m49 = countriesdata["m49iso3"].get(iso3)
         if m49 is not None:
             return m49
@@ -590,6 +640,7 @@ class Country:
         m49: int,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get ISO3 from M49 code
 
@@ -597,11 +648,12 @@ class Country:
             m49: M49 numeric code for which to get ISO3 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             ISO3 code
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         iso3 = countriesdata["m49iso3"].get(m49)
         if iso3 is not None:
             return iso3
@@ -616,6 +668,7 @@ class Country:
         m49: int,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> dict[str, str] | None:
         """Get country name from M49 code
 
@@ -623,13 +676,18 @@ class Country:
             m49: M49 numeric code for which to get country information
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Country information
         """
-        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_m49(
+            m49, use_live=use_live, exception=exception, downloader=downloader
+        )
         if iso3 is not None:
-            return cls.get_country_info_from_iso3(iso3, exception=exception)
+            return cls.get_country_info_from_iso3(
+                iso3, exception=exception, downloader=downloader
+            )
         return None
 
     @classmethod
@@ -639,6 +697,7 @@ class Country:
         use_live: bool = None,
         exception: Exception | None = None,
         formal: bool = False,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get country name from M49 code
 
@@ -647,14 +706,17 @@ class Country:
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
             formal: Return preferred name if False, formal name if True. Defaults to False.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Country name
         """
-        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_m49(
+            m49, use_live=use_live, exception=exception, downloader=downloader
+        )
         if iso3 is not None:
             return cls.get_country_name_from_iso3(
-                iso3, exception=exception, formal=formal
+                iso3, exception=exception, formal=formal, downloader=downloader
             )
         return None
 
@@ -664,6 +726,7 @@ class Country:
         m49: int,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get currency from M49 code
 
@@ -671,14 +734,17 @@ class Country:
             m49: M49 numeric code for which to get country name
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Currency
         """
-        iso3 = cls.get_iso3_from_m49(m49, use_live=use_live, exception=exception)
+        iso3 = cls.get_iso3_from_m49(
+            m49, use_live=use_live, exception=exception, downloader=downloader
+        )
         if iso3 is not None:
             return cls.get_currency_from_iso3(
-                iso3, use_live=use_live, exception=exception
+                iso3, use_live=use_live, exception=exception, downloader=downloader
             )
         return None
 
@@ -711,7 +777,7 @@ class Country:
         return candidates
 
     @classmethod
-    def simplify_countryname(cls, country: str) -> (str, list[str]):
+    def simplify_countryname(cls, country: str) -> tuple[str, list[str]]:
         """Simplifies country name by removing descriptive text eg. DEMOCRATIC, REPUBLIC OF etc.
 
         Args:
@@ -811,6 +877,7 @@ class Country:
         country: str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> str | None:
         """Get ISO3 code for cls. Only exact matches or None are returned.
 
@@ -818,11 +885,12 @@ class Country:
             country: Country for which to get ISO3 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             ISO3 country code or None
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         countryupper = country.strip().upper()
         if countryupper.isupper():
             len_countryupper = len(countryupper)
@@ -844,21 +912,11 @@ class Country:
                     return iso3
         elif re.search(r"[\u4e00-\u9fff]+", countryupper):
             for country in countriesdata["countries"]:
-                if (
-                    countriesdata["countries"][country][
-                        "#country+alt+i_zh+name+v_unterm"
-                    ]
-                    == countryupper
-                ):
+                if countriesdata["countries"][country]["Chinese Short"] == countryupper:
                     return country
         elif re.search(r"[\u0600-\u06FF]+", countryupper):
             for country in countriesdata["countries"]:
-                if (
-                    countriesdata["countries"][country][
-                        "#country+alt+i_ar+name+v_unterm"
-                    ]
-                    == countryupper
-                ):
+                if countriesdata["countries"][country]["Arabic Short"] == countryupper:
                     return country
 
         if exception is not None:
@@ -872,6 +930,7 @@ class Country:
         use_live: bool = None,
         exception: Exception | None = None,
         min_chars: int = 5,
+        downloader: BaseDownload | None = None,
     ) -> tuple[str | None, bool]:
         """Get ISO3 code for cls. A tuple is returned with the first value being the ISO3 code and the second
         showing if the match is exact or not.
@@ -881,16 +940,19 @@ class Country:
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
             min_chars: Minimum number of characters for fuzzy matching to be tried. Defaults to 5.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             ISO3 code and if the match is exact or (None, False).
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         country = country.strip()
         if not country.upper().isupper():
             return None, False
 
-        iso3 = cls.get_iso3_country_code(country, use_live=use_live)
+        iso3 = cls.get_iso3_country_code(
+            country, use_live=use_live, downloader=downloader
+        )
         # don't put exception param here as we don't want it to throw
 
         if iso3 is not None:
@@ -959,6 +1021,7 @@ class Country:
         region: int | str,
         use_live: bool = None,
         exception: Exception | None = None,
+        downloader: BaseDownload | None = None,
     ) -> list[str]:
         """Get countries (ISO3 codes) in region
 
@@ -966,11 +1029,12 @@ class Country:
             region: Three digit UNStats M49 region code or region name
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if region not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
             Sorted list of ISO3 country names
         """
-        countriesdata = cls.countriesdata(use_live=use_live)
+        countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         if isinstance(region, int):
             regioncode = region
         else:
@@ -990,28 +1054,25 @@ class Country:
         iso3: str,
         use_live: bool = None,
         exception: Exception | None = None,
-    ) -> int | None:
+        downloader: BaseDownload | None = None,
+    ) -> bool | None:
         """Get HRP status from ISO3 code
 
         Args:
             iso3: ISO3 code for which to get M49 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
-            Has HRP (true or false)
+            Has HRP (True, False or None)
         """
         countryinfo = cls.get_country_info_from_iso3(
-            iso3, use_live=use_live, exception=exception
+            iso3, use_live=use_live, exception=exception, downloader=downloader
         )
-        if countryinfo is not None:
-            hrp = countryinfo.get("#indicator+bool+hrp")
-            if hrp is not None:
-                if hrp == "":
-                    return False
-                if hrp == "Y":
-                    return True
-        return None
+        if not countryinfo:
+            return None
+        return countryinfo.get("Has HRP") == "Y"
 
     @classmethod
     def get_gho_status_from_iso3(
@@ -1019,25 +1080,22 @@ class Country:
         iso3: str,
         use_live: bool = None,
         exception: Exception | None = None,
-    ) -> int | None:
+        downloader: BaseDownload | None = None,
+    ) -> bool | None:
         """Get GHO status from ISO3 code
 
         Args:
             iso3: ISO3 code for which to get M49 code
             use_live: Try to get use latest data from web rather than file in package. Defaults to True.
             exception: An exception to raise if country not found. Defaults to None.
+            downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
-            In GHO (true or false)
+            In GHO (True, False or None)
         """
         countryinfo = cls.get_country_info_from_iso3(
-            iso3, use_live=use_live, exception=exception
+            iso3, use_live=use_live, exception=exception, downloader=downloader
         )
-        if countryinfo is not None:
-            gho = countryinfo.get("#indicator+bool+gho")
-            if gho is not None:
-                if gho == "":
-                    return False
-                if gho == "Y":
-                    return True
-        return None
+        if not countryinfo:
+            return None
+        return countryinfo.get("In GHO") == "Y"

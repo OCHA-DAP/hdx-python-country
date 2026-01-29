@@ -31,30 +31,24 @@ This library is part of the [Humanitarian Data Exchange](https://data.humdata.or
 (HDX) project. If you have humanitarian related data, please upload your datasets to
 HDX.
 
-## Development
+# Development
 
-### Environment
+## Environment
 
-Development is currently done using Python 3.12. We recommend using a virtual
-environment such as ``venv``:
-
-```shell
-    python -m venv venv
-    source venv/bin/activate
-```
-
-In your virtual environment, install all packages for development by running:
+Development is currently done using Python 3.13. The environment can be created with:
 
 ```shell
-    pip install -r requirements.txt
+    uv sync
 ```
+
+This creates a .venv folder with the versions specified in the project's uv.lock file.
 
 ### Pre-commit
 
-Be sure to install `pre-commit`, which is run every time you make a git commit:
+pre-commit will be installed when syncing uv. It is run every time you make a git
+commit if you call it like this:
 
 ```shell
-    pip install pre-commit
     pre-commit install
 ```
 
@@ -67,20 +61,6 @@ To check if your changes pass pre-commit without committing, run:
     pre-commit run --all-files
 ```
 
-### Testing
-
-Ensure you have the required packages to run the tests:
-
-```shell
-    pip install -r requirements.txt
-```
-
-To run the tests and view coverage, execute:
-
-```shell
-    pytest -c --cov hdx
-```
-
 ## Packages
 
 [uv](https://github.com/astral-sh/uv) is used for package management.  If
@@ -88,33 +68,40 @@ you’ve introduced a new package to the source code (i.e. anywhere in `src/`),
 please add it to the `project.dependencies` section of `pyproject.toml` with
 any known version constraints.
 
-To add packages required only for testing, add them to the `test` section under
-`[project.optional-dependencies]`.
+To add packages required only for testing, add them to the
+`[dependency-groups]`.
 
 Any changes to the dependencies will be automatically reflected in
-`requirements.txt` with `pre-commit`, but you can re-generate the file without
-committing by executing:
+`uv.lock` with `pre-commit`, but you can re-generate the files without committing by
+executing:
 
 ```shell
-    pre-commit run pip-compile --all-files
+    uv lock --upgrade
 ```
 
 ## Project
 
-[Hatch](https://hatch.pypa.io/) is used for project management. The project can be built using:
+[uv](https://github.com/astral-sh/uv) is used for project management. The project can be
+built using:
 
 ```shell
-    hatch build
+    uv build
 ```
 
 Linting and syntax checking can be run with:
 
 ```shell
-    hatch fmt --check
+    uv run ruff check
 ```
 
-Tests can be executed using:
+To run the tests and view coverage, execute:
 
 ```shell
-    hatch test
+    uv run pytest
 ```
+
+## Documentation
+
+The documentation, including API documentation, is generated using ReadtheDocs and
+MkDocs with Material. As you change the source code, remember to update the
+documentation at `documentation/index.md`.
