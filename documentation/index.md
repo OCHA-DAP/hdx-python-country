@@ -42,6 +42,9 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 4.1.0, HXL hashtags no longer used in Country class. The header names are used
+instead.
+
 From 4.0.0, Python 3.10 or later is required as well as HDX Python Utilities >= 4. To
 continue using HDX Python Country < 4, please pin to HDX Python Utilities < 4.
 
@@ -92,26 +95,33 @@ The usage of the country mappings functionality is best illustrated by some exam
     # returns ("CZE", False)
 
     Country.get_country_info_from_iso2("jp")
-    # Returns dictionary with HXL hashtags as keys. For more on HXL, see http://hxlstandard.org/
-    # {"#country+alt+i_ar+name+v_m49": "اليابان", "#country+alt+i_ar+name+v_unterm": "اليابان",
-    # "#country+alt+i_en+name+v_m49": "Japan", "#country+alt+i_en+name+v_unterm": "Japan",
-    # "#country+alt+i_es+name+v_m49": "Japón", "#country+alt+i_es+name+v_unterm": "Japón",
-    # "#country+alt+i_fr+name+v_m49": "Japon", "#country+alt+i_fr+name+v_unterm": "Japon",
-    # "#country+alt+i_ru+name+v_m49": "Япония", "#country+alt+i_ru+name+v_unterm": "Япония",
-    # "#country+alt+i_zh+name+v_m49": "日本", "#country+alt+i_zh+name+v_unterm": "日本",
-    # "#country+alt+name+v_dgacm": "", "#country+alt+name+v_hpctools": "",
-    # "#country+alt+name+v_iso": "", "#country+alt+name+v_reliefweb": "",
-    # "#country+code+num+v_m49": "392", "#country+code+v_hpctools": "112",
-    # "#country+code+v_iso2": "JP", "#country+code+v_iso3": "JPN",
-    # "#country+code+v_reliefweb": "128", "#country+formal+i_en+name+v_unterm": "Japan",
-    # "#country+name+preferred": "Japan", "#country+name+short+v_reliefweb": "",
-    # "#country+regex": "japan", "#currency+code": "JPY", "#date+start": "1974-01-01",
-    # "#geo+admin_level": "0", "#geo+lat": "37.63209801", "#geo+lon": "138.0812256",
-    # "#indicator+bool+hrp": "", "#indicator+bool+gho": "", "#indicator+incomelevel": "High",
-    # "#meta+bool+deprecated": "N", "#meta+bool+independent": "Y", "#meta+id": "112",
-    # "#region+code+intermediate": "", "#region+code+main": "142", "#region+code+sub": "30",
-    # "#region+intermediate+name+preferred": "", "#region+main+name+preferred": "Asia",
-    # "#region+name+preferred+sub": "Eastern Asia"}
+    # Returns dictionary of country data
+    # {
+    #     "Admin Level": "0",                     "Appears in DGACM list": "Y",
+    #     "Appears in UNTERM list": "Y",          "Arabic Short": "اليابان",
+    #     "Chinese Short": "日本",                 "Concatenation": "112 - Japan",
+    #     "Currency": "JPY",                      "DGACM Alt Term": None,
+    #     "Deprecated": "N",                      "English Formal": "Japan",
+    #     "English Short": "Japan",               "French Short": "Japon",
+    #     "HPC Tools API ID": "112",              "HPC Tools Alt Term": None,
+    #     "Has HRP": None,                        "ID": "112",
+    #     "ISO 3166-1 Alpha 2-Codes": "JP",       "ISO 3166-1 Alpha 3-Codes": "JPN",
+    #     "ISO Alt Term": None,                   "In GHO": None,
+    #     "Independent": "Y",                     "Intermediate Region Code": None,
+    #     "Intermediate Region Name": None,       "Latitude": "37.63209801",
+    #     "Longitude": "138.0812256",             "M49 Arabic": "اليابان",
+    #     "M49 Chinese": "日本",                   "M49 English": "Japan",
+    #     "M49 French": "Japon",                  "M49 Russian": "Япония",
+    #     "M49 Spanish": "Japón",                 "Preferred Term": "Japan",
+    #     "RW API Alt Term": None,                "RW ID": "128",
+    #     "RW Short Name": None,                  "Reference Period Start": "1974-01-01",
+    #     "Regex": "japan",                       "Region Code": "142",
+    #     "Region Name": "Asia",                  "Russian Short": "Япония",
+    #     "Spanish Short": "Japón",               "Sub-region Code": "30",
+    #     "Sub-region Name": "Eastern Asia",      "World Bank Income Level": "High",
+    #     "m49 numerical code": "392",            "x Alpha2 codes": None,
+    #     "x Alpha3 codes": None
+    # }
     Country.get_countries_in_region("Channel Islands")
     # ["GGY", "JEY"]
     len(Country.get_countries_in_region("Africa"))

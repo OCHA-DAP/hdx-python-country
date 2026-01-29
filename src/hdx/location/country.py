@@ -3,8 +3,8 @@
 import logging
 import os.path
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from hdx.utilities.base_downloader import BaseDownload, DownloadError
 from hdx.utilities.downloader import Download
@@ -82,26 +82,26 @@ class Country:
     _country_name_overrides = {}
     _country_name_mappings = {}
     _country_name_keys = (
-    "Preferred Term",
-    "ISO Alt Term",
-    "DGACM Alt Term",
-    "HPC Tools Alt Term",
-    "RW Short Name",
-    "RW API Alt Term",
-    "English Short",
-    "French Short",
-    "Spanish Short",
-    "Russian Short",
-    "Chinese Short",
-    "Arabic Short",
-    "English Formal",
-    "M49 English",
-    "M49 French",
-    "M49 Spanish",
-    "M49 Russian",
-    "M49 Chinese",
-    "M49 Arabic",
-)
+        "Preferred Term",
+        "ISO Alt Term",
+        "DGACM Alt Term",
+        "HPC Tools Alt Term",
+        "RW Short Name",
+        "RW API Alt Term",
+        "English Short",
+        "French Short",
+        "Spanish Short",
+        "Russian Short",
+        "Chinese Short",
+        "Arabic Short",
+        "English Formal",
+        "M49 English",
+        "M49 French",
+        "M49 Spanish",
+        "M49 Russian",
+        "M49 Chinese",
+        "M49 Arabic",
+    )
 
     @classmethod
     def _add_countriesdata(cls, iso3: str, country: dict) -> dict:
@@ -266,12 +266,18 @@ class Country:
                 downloader = Download(user_agent="HDXPythonCountry")
             if cls._use_live:
                 try:
-                    _, countries = downloader.get_tabular_rows(cls._ochaurl, dict_form=True)
+                    _, countries = downloader.get_tabular_rows(
+                        cls._ochaurl, dict_form=True
+                    )
                 except DownloadError:
                     countries = None
-                    logger.warning(f"Download of {cls._ochaurl} failed. Will use internal static file.")
+                    logger.warning(
+                        f"Download of {cls._ochaurl} failed. Will use internal static file."
+                    )
             if countries is None:
-                _, countries = downloader.get_tabular_rows(cls._ochapath, dict_form=True)
+                _, countries = downloader.get_tabular_rows(
+                    cls._ochapath, dict_form=True
+                )
             cls.set_countriesdata(countries)
         return cls._countriesdata
 
@@ -906,21 +912,11 @@ class Country:
                     return iso3
         elif re.search(r"[\u4e00-\u9fff]+", countryupper):
             for country in countriesdata["countries"]:
-                if (
-                    countriesdata["countries"][country][
-                        "Chinese Short"
-                    ]
-                    == countryupper
-                ):
+                if countriesdata["countries"][country]["Chinese Short"] == countryupper:
                     return country
         elif re.search(r"[\u0600-\u06FF]+", countryupper):
             for country in countriesdata["countries"]:
-                if (
-                    countriesdata["countries"][country][
-                        "Arabic Short"
-                    ]
-                    == countryupper
-                ):
+                if countriesdata["countries"][country]["Arabic Short"] == countryupper:
                     return country
 
         if exception is not None:
