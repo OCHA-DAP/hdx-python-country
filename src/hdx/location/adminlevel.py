@@ -1,17 +1,13 @@
 import logging
 import re
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any
 
-import hxl
-from hdx.utilities.base_downloader import DownloadError
 from hdx.utilities.dictandlist import dict_of_sets_add
 from hdx.utilities.matching import Phonetics, multiple_replace
 from hdx.utilities.retriever import Retrieve
 from hdx.utilities.text import normalise
-from hxl import InputOptions
-from hxl.input import HXLIOException
 
 from hdx.location.country import Country
 
@@ -46,7 +42,7 @@ class AdminLevel:
         admin_config: Configuration dictionary. Defaults to {}.
         admin_level: Admin level. Defaults to 1.
         admin_level_overrides: Countries at other admin levels.
-        retriever: Retriever object to use for loading/saving files. Defaults to None.
+        retriever: Retriever object to use for loading/saving files.
     """
 
     pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d+)$")
@@ -58,18 +54,24 @@ class AdminLevel:
 
     def __init__(
         self,
-        admin_config: dict = {},
+        admin_config: dict | None = None,
         admin_level: int = 1,
-        admin_level_overrides: dict = {},
+        admin_level_overrides: dict | None = None,
         retriever: Retrieve | None = None,
     ) -> None:
+        self._admin_level_overrides = admin_level_overrides or {}
+        self._retriever: Retrieve | None = retriever
+        admin_config = admin_config or {}
+        self._countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
+        self._admin_name_mappings = admin_config.get("admin_name_mappings", {})
+        self._admin_name_replacements = admin_config.get("admin_name_replacements", {})
+        self._admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", list())
+        self._use_parent = False
+        self._zeroes = {}
+        self._parent_admins = []
+        self._phonetics = Phonetics()
+        self.init_matches_errors()
         self.admin_level = admin_level
-        self.admin_level_overrides = admin_level_overrides
-        self.retriever: Retrieve | None = retriever
-        self.countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
-        self.admin_name_mappings = admin_config.get("admin_name_mappings", {})
-        self.admin_name_replacements = admin_config.get("admin_name_replacements", {})
-        self.admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", list())
         self.pcodes = []
         self.pcode_lengths = {}
         self.name_to_pcode = {}
@@ -78,12 +80,6 @@ class AdminLevel:
         self.pcode_to_iso3 = {}
         self.pcode_to_parent = {}
         self.pcode_formats = {}
-        self.use_parent = False
-        self.zeroes = {}
-        self.parent_admins = []
-
-        self.init_matches_errors()
-        self.phonetics = Phonetics()
 
     @classmethod
     def looks_like_pcode(cls, string: str) -> bool:
@@ -115,140 +111,69 @@ class AdminLevel:
             admin_url = cls._admin_url_default
         cls.admin_url = admin_url
 
-    @staticmethod
-    def get_libhxl_dataset(
-        url: Path | str = admin_url, retriever: Retrieve | None = None
-    ) -> hxl.Dataset:
-        """
-        Get libhxl Dataset object given a URL which defaults to global p-codes
-        dataset on HDX.
-
-        Args:
-            url: URL from which to load data. Defaults to internal admin url.
-            retriever: Retriever object to use for loading file. Defaults to None.
-
-        Returns:
-            HXL Dataset object
-        """
-        if retriever:
-            try:
-                url_to_use = retriever.download_file(url)
-            except DownloadError:
-                logger.exception(f"Setup of libhxl Dataset object with {url} failed!")
-                raise
-        else:
-            url_to_use = url
-        try:
-            return hxl.data(
-                str(url_to_use),
-                InputOptions(InputOptions(allow_local=True, encoding="utf-8")),
-            )
-        except (FileNotFoundError, HXLIOException):
-            logger.exception(f"Setup of libhxl Dataset object with {url} failed!")
-            raise
-
-    def setup_row(
+    def setup_from_iterable(
         self,
-        countryiso3: str,
-        pcode: str,
-        adm_name: str | None,
-        parent: str | None,
-    ):
+        iterable: Iterable[dict],
+        countryiso3s: Sequence[str] | None = None,
+    ) -> None:
         """
-        Setup a single p-code
+        Setup p-codes from an Iterable such as an Iterator or Sequence
 
         Args:
-            countryiso3: Country
-            pcode: P-code
-            adm_name: Administrative name (which can be None)
-            parent: Parent p-code
+            iterable: Iterable such as an Iterator or Sequence
+            countryiso3s: Countries to read. Defaults to None (all).
 
         Returns:
             None
         """
-        self.pcode_lengths[countryiso3] = len(pcode)
-        self.pcodes.append(pcode)
-        if adm_name is None:
-            adm_name = ""
-        self.pcode_to_name[pcode] = adm_name
-        self.pcode_to_iso3[pcode] = countryiso3
-        if not adm_name:
-            logger.error(f"Admin name is blank for pcode {pcode} of {countryiso3}!")
+        if countryiso3s:
+            countryiso3s = [countryiso3.upper() for countryiso3 in countryiso3s]
+        iterator = iter(iterable)
+        row = next(iterator, None)
+        if not row:
             return
 
-        adm_name = normalise(adm_name)
-        name_to_pcode = self.name_to_pcode.get(countryiso3, {})
-        name_to_pcode[adm_name] = pcode
-        self.name_to_pcode[countryiso3] = name_to_pcode
+        def process_row(row):
+            admin_level = row.get("Admin Level")
+            if admin_level and int(admin_level) != self.admin_level:
+                return
+            countryiso3 = row["Location"].upper()
+            if countryiso3s and countryiso3 not in countryiso3s:
+                return
+            pcode = row["P-Code"].upper()
+            adm_name = row["Name"]
+            self.pcode_lengths[countryiso3] = len(pcode)
+            self.pcodes.append(pcode)
+            if adm_name is None:
+                adm_name = ""
+            self.pcode_to_name[pcode] = adm_name
+            self.pcode_to_iso3[pcode] = countryiso3
+            if not adm_name:
+                logger.error(f"Admin name is blank for pcode {pcode} of {countryiso3}!")
+                return
 
-        if self.use_parent:
-            name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3, {})
-            name_to_pcode = name_parent_to_pcode.get(parent, {})
+            adm_name = normalise(adm_name)
+            name_to_pcode = self.name_to_pcode.get(countryiso3, {})
             name_to_pcode[adm_name] = pcode
-            name_parent_to_pcode[parent] = name_to_pcode
-            self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
-            self.pcode_to_parent[pcode] = parent
+            self.name_to_pcode[countryiso3] = name_to_pcode
 
-    def setup_from_admin_info(
-        self,
-        admin_info: Sequence[dict],
-        countryiso3s: Sequence[str] | None = None,
-    ) -> None:
-        """
-        Setup p-codes from admin_info which is a list with values of the form
-        below with parent optional:
-        ::
-            {"iso3": "AFG", "pcode": "AF0101", "name": "Kabul", parent: "AF01"}
-        Args:
-            admin_info: p-code dictionary
-            countryiso3s: Countries to read. Defaults to None (all).
+            if self._use_parent:
+                name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3, {})
+                parent = row["Parent P-Code"]
+                name_to_pcode = name_parent_to_pcode.get(parent, {})
+                name_to_pcode[adm_name] = pcode
+                name_parent_to_pcode[parent] = name_to_pcode
+                self.name_parent_to_pcode[countryiso3] = name_parent_to_pcode
+                self.pcode_to_parent[pcode] = parent
 
-        Returns:
-            None
-        """
-        if countryiso3s:
-            countryiso3s = [countryiso3.upper() for countryiso3 in countryiso3s]
-        self.use_parent = "parent" in admin_info[0]
-        for row in admin_info:
-            countryiso3 = row["iso3"].upper()
-            if countryiso3s and countryiso3 not in countryiso3s:
-                continue
-            pcode = row.get("pcode").upper()
-            adm_name = row["name"]
-            parent = row.get("parent")
-            self.setup_row(countryiso3, pcode, adm_name, parent)
-
-    def setup_from_libhxl_dataset(
-        self,
-        libhxl_dataset: hxl.Dataset,
-        countryiso3s: Sequence[str] | None = None,
-    ) -> None:
-        """
-        Setup p-codes from a libhxl Dataset object.
-
-        Args:
-            libhxl_dataset: Dataset object from libhxl library
-            countryiso3s: Countries to read. Defaults to None (all).
-
-        Returns:
-            None
-        """
-        admin_info = libhxl_dataset.with_rows(f"#geo+admin_level={self.admin_level}")
-        if countryiso3s:
-            countryiso3s = [countryiso3.upper() for countryiso3 in countryiso3s]
-        self.use_parent = "#adm+code+parent" in admin_info.display_tags
-        for row in admin_info:
-            countryiso3 = row.get("#country+code").upper()
-            if countryiso3s and countryiso3 not in countryiso3s:
-                continue
-            pcode = row.get("#adm+code").upper()
-            adm_name = row.get("#adm+name")
-            parent = row.get("#adm+code+parent")
-            self.setup_row(countryiso3, pcode, adm_name, parent)
+        self._use_parent = "Parent P-Code" in row
+        process_row(row)
+        for row in iterator:
+            process_row(row)
 
     def setup_from_url(
         self,
-        admin_url: Path | str = admin_url,
+        admin_url: Path | str | None = None,
         countryiso3s: Sequence[str] | None = None,
     ) -> None:
         """
@@ -261,36 +186,41 @@ class AdminLevel:
         Returns:
             None
         """
-        admin_info = self.get_libhxl_dataset(admin_url, self.retriever)
-        self.setup_from_libhxl_dataset(admin_info, countryiso3s)
+        if not self._retriever:
+            raise ValueError(
+                "AdminLevel must be constructed with a valid Retrieve object to use this method!"
+            )
 
-    def load_pcode_formats_from_libhxl_dataset(
-        self, libhxl_dataset: hxl.Dataset
-    ) -> None:
+        if not admin_url:
+            admin_url = self.admin_url
+        _, iterator = self._retriever.get_tabular_rows(admin_url, dict_form=True)
+        self.setup_from_iterable(iterator, countryiso3s)
+
+    def load_pcode_formats_from_iterable(self, iterable: Iterable) -> None:
         """
-        Load p-code formats from a libhxl Dataset object.
+        Load p-code formats from an Iterable such as an Iterator or Sequence
 
         Args:
-            libhxl_dataset: Dataset object from libhxl library
+            iterable: Iterable such as an Iterator or Sequence
 
         Returns:
             None
         """
-        for row in libhxl_dataset:
-            pcode_format = [int(row.get("#country+len"))]
+        for row in iterable:
+            pcode_format = [int(row["Country Length"])]
             for admin_no in range(1, 4):
-                length = row.get(f"#adm{admin_no}+len")
+                length = row[f"Admin {admin_no} Length"]
                 if not length or "|" in length:
                     break
                 pcode_format.append(int(length))
-            self.pcode_formats[row.get("#country+code")] = pcode_format
+            self.pcode_formats[row["Location"]] = pcode_format
 
         for pcode in self.pcodes:
             countryiso3 = self.pcode_to_iso3[pcode]
             for x in re.finditer("0", pcode):
-                dict_of_sets_add(self.zeroes, countryiso3, x.start())
+                dict_of_sets_add(self._zeroes, countryiso3, x.start())
 
-    def load_pcode_formats(self, formats_url: Path | str = formats_url) -> None:
+    def load_pcode_formats(self, formats_url: Path | str | None = None) -> None:
         """
         Load p-code formats from a URL. Defaults to global p-codes dataset on HDX.
 
@@ -300,8 +230,14 @@ class AdminLevel:
         Returns:
             None
         """
-        formats_info = self.get_libhxl_dataset(formats_url, self.retriever)
-        self.load_pcode_formats_from_libhxl_dataset(formats_info)
+        if not self._retriever:
+            raise ValueError(
+                "AdminLevel must be constructed with a valid Retrieve object to use this method!"
+            )
+        if not formats_url:
+            formats_url = self.formats_url
+        _, iterator = self._retriever.get_tabular_rows(formats_url, dict_form=True)
+        self.load_pcode_formats_from_iterable(iterator)
 
     def set_parent_admins(self, parent_admins: list[list]) -> None:
         """
@@ -313,7 +249,7 @@ class AdminLevel:
         Returns:
             None
         """
-        self.parent_admins = parent_admins
+        self._parent_admins = parent_admins
 
     def set_parent_admins_from_adminlevels(
         self, adminlevels: list["AdminLevel"]
@@ -322,12 +258,12 @@ class AdminLevel:
         Set parent admins from AdminLevel objects
 
         Args:
-            parent_admins: List of parent AdminLevel objects
+            adminlevels: List of parent AdminLevel objects
 
         Returns:
             None
         """
-        self.parent_admins = [adminlevel.pcodes for adminlevel in adminlevels]
+        self._parent_admins = [adminlevel.pcodes for adminlevel in adminlevels]
 
     def get_pcode_list(self) -> list[str]:
         """Get list of all pcodes
@@ -346,7 +282,7 @@ class AdminLevel:
         Returns:
             Admin level
         """
-        admin_level = self.admin_level_overrides.get(countryiso3)
+        admin_level = self._admin_level_overrides.get(countryiso3)
         if admin_level:
             return admin_level
         return self.admin_level
@@ -368,10 +304,9 @@ class AdminLevel:
         Returns:
             None
         """
-
-        self.matches = set()
-        self.ignored = set()
-        self.errors = set()
+        self._matches = set()
+        self._ignored = set()
+        self._errors = set()
 
     def convert_admin_pcode_length(
         self, countryiso3: str, pcode: str, **kwargs: Any
@@ -410,7 +345,7 @@ class AdminLevel:
         new_pcode = "".join(pcode_parts)
         if new_pcode in self.pcodes:
             if logname:
-                self.matches.add(
+                self._matches.add(
                     (
                         logname,
                         countryiso3,
@@ -433,7 +368,7 @@ class AdminLevel:
                 break
             pos = sum(pcode_format[:admin_no])
             if part_length < admin_length:
-                if pos in self.zeroes[countryiso3]:
+                if pos in self._zeroes[countryiso3]:
                     pcode_parts[admin_no] = f"0{pcode_part}"
                     admin_changes.append(str(admin_no))
                     new_pcode = "".join(pcode_parts)
@@ -445,13 +380,13 @@ class AdminLevel:
                     new_pcode = "".join(pcode_parts)
                     break
             if len_new_pcode < total_length:
-                if admin_length > 2 and pos in self.zeroes[countryiso3]:
+                if admin_length > 2 and pos in self._zeroes[countryiso3]:
                     pcode_part = f"0{pcode_part}"
-                    if self.parent_admins and admin_no < self.admin_level:
+                    if self._parent_admins and admin_no < self.admin_level:
                         parent_pcode = [pcode_parts[i] for i in range(admin_no)]
                         parent_pcode.append(pcode_part[:admin_length])
                         parent_pcode = "".join(parent_pcode)
-                        if parent_pcode not in self.parent_admins[admin_no - 1]:
+                        if parent_pcode not in self._parent_admins[admin_no - 1]:
                             pcode_part = pcode_part[1:]
                         else:
                             admin_changes.append(str(admin_no))
@@ -460,11 +395,11 @@ class AdminLevel:
             elif len_new_pcode > total_length:
                 if admin_length <= 2 and pcode_part[0] == "0":
                     pcode_part = pcode_part[1:]
-                    if self.parent_admins and admin_no < self.admin_level:
+                    if self._parent_admins and admin_no < self.admin_level:
                         parent_pcode = [pcode_parts[i] for i in range(admin_no)]
                         parent_pcode.append(pcode_part[:admin_length])
                         parent_pcode = "".join(parent_pcode)
-                        if parent_pcode not in self.parent_admins[admin_no - 1]:
+                        if parent_pcode not in self._parent_admins[admin_no - 1]:
                             pcode_part = f"0{pcode_part}"
                         else:
                             admin_changes.append(str(admin_no))
@@ -476,7 +411,7 @@ class AdminLevel:
         if new_pcode in self.pcodes:
             if logname:
                 admin_changes_str = ",".join(admin_changes)
-                self.matches.add(
+                self._matches.add(
                     (
                         logname,
                         countryiso3,
@@ -524,7 +459,7 @@ class AdminLevel:
             pcode = None
         if pcode in self.pcodes:
             if logname:
-                self.matches.add(
+                self._matches.add(
                     (
                         logname,
                         countryiso3,
@@ -554,7 +489,7 @@ class AdminLevel:
             Relevant admin name replacements
         """
         relevant_name_replacements = {}
-        for key, value in self.admin_name_replacements.items():
+        for key, value in self._admin_name_replacements.items():
             if "|" not in key:
                 if key not in relevant_name_replacements:
                     relevant_name_replacements[key] = value
@@ -585,7 +520,7 @@ class AdminLevel:
             Relevant admin names that should not be fuzzy matched
         """
         relevant_admin_fuzzy_dont = []
-        for value in self.admin_fuzzy_dont:
+        for value in self._admin_fuzzy_dont:
             if "|" not in value:
                 if value not in relevant_admin_fuzzy_dont:
                     relevant_admin_fuzzy_dont.append(value)
@@ -623,13 +558,13 @@ class AdminLevel:
         """
         logname = kwargs.get("logname")
         if (
-            self.countries_fuzzy_try is not None
-            and countryiso3 not in self.countries_fuzzy_try
+            self._countries_fuzzy_try is not None
+            and countryiso3 not in self._countries_fuzzy_try
         ):
             if logname:
-                self.ignored.add((logname, countryiso3))
+                self._ignored.add((logname, countryiso3))
             return None
-        if self.use_parent:
+        if self._use_parent:
             parent = kwargs.get("parent")
         else:
             parent = None
@@ -637,18 +572,18 @@ class AdminLevel:
             name_to_pcode = self.name_to_pcode.get(countryiso3)
             if not name_to_pcode:
                 if logname:
-                    self.errors.add((logname, countryiso3))
+                    self._errors.add((logname, countryiso3))
                 return None
         else:
             name_parent_to_pcode = self.name_parent_to_pcode.get(countryiso3)
             if not name_parent_to_pcode:
                 if logname:
-                    self.errors.add((logname, countryiso3))
+                    self._errors.add((logname, countryiso3))
                 return None
             name_to_pcode = name_parent_to_pcode.get(parent)
             if not name_to_pcode:
                 if logname:
-                    self.errors.add((logname, countryiso3, parent))
+                    self._errors.add((logname, countryiso3, parent))
                 return None
         alt_normalised_name = multiple_replace(
             normalised_name,
@@ -659,14 +594,14 @@ class AdminLevel:
         )
         if not pcode and name.lower() in self.get_admin_fuzzy_dont(countryiso3, parent):
             if logname:
-                self.ignored.add((logname, countryiso3, name))
+                self._ignored.add((logname, countryiso3, name))
             return None
         if not pcode:
             for map_name in name_to_pcode:
                 if normalised_name in map_name:
                     pcode = name_to_pcode[map_name]
                     if logname:
-                        self.matches.add(
+                        self._matches.add(
                             (
                                 logname,
                                 countryiso3,
@@ -680,7 +615,7 @@ class AdminLevel:
                 if alt_normalised_name in map_name:
                     pcode = name_to_pcode[map_name]
                     if logname:
-                        self.matches.add(
+                        self._matches.add(
                             (
                                 logname,
                                 countryiso3,
@@ -709,7 +644,7 @@ class AdminLevel:
                 else:
                     return None
 
-            matching_index = self.phonetics.match(
+            matching_index = self._phonetics.match(
                 map_names,
                 normalised_name,
                 alternative_name=alt_normalised_name,
@@ -718,13 +653,13 @@ class AdminLevel:
 
             if matching_index is None:
                 if logname:
-                    self.errors.add((logname, countryiso3, name))
+                    self._errors.add((logname, countryiso3, name))
                 return None
 
             map_name = map_names[matching_index]
             pcode = name_to_pcode[map_name]
             if logname:
-                self.matches.add(
+                self._matches.add(
                     (
                         logname,
                         countryiso3,
@@ -753,13 +688,13 @@ class AdminLevel:
             P code match from admin name mappings or None if no match
         """
         if parent:
-            pcode = self.admin_name_mappings.get(f"{parent}|{name}")
+            pcode = self._admin_name_mappings.get(f"{parent}|{name}")
             if pcode is None:
-                pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
+                pcode = self._admin_name_mappings.get(f"{countryiso3}|{name}")
         else:
-            pcode = self.admin_name_mappings.get(f"{countryiso3}|{name}")
+            pcode = self._admin_name_mappings.get(f"{countryiso3}|{name}")
         if pcode is None:
-            pcode = self.admin_name_mappings.get(name)
+            pcode = self._admin_name_mappings.get(name)
         return pcode
 
     def get_pcode(
@@ -784,7 +719,7 @@ class AdminLevel:
         Returns:
             (Matched P code or None if no match, True if exact match or False if not)
         """
-        if self.use_parent:
+        if self._use_parent:
             parent = kwargs.get("parent")
         else:
             parent = None
@@ -831,7 +766,7 @@ class AdminLevel:
             List of matches
         """
         output = []
-        for match in sorted(self.matches):
+        for match in sorted(self._matches):
             line = f"{match[0]} - {match[1]}: Matching ({match[4]}) {match[2]} to {match[3]} on map"
             logger.info(line)
             output.append(line)
@@ -844,7 +779,7 @@ class AdminLevel:
             List of ignored
         """
         output = []
-        for ignored in sorted(self.ignored):
+        for ignored in sorted(self._ignored):
             if len(ignored) == 2:
                 line = f"{ignored[0]} - Ignored {ignored[1]}!"
             else:
@@ -860,7 +795,7 @@ class AdminLevel:
             List of errors
         """
         output = []
-        for error in sorted(self.errors):
+        for error in sorted(self._errors):
             if len(error) == 2:
                 line = f"{error[0]} - Could not find {error[1]} in map names!"
             else:
@@ -878,7 +813,7 @@ class AdminLevel:
             List of mappings
         """
         output = []
-        for name, pcode in self.admin_name_mappings.items():
+        for name, pcode in self._admin_name_mappings.items():
             line = f"{name}: {self.pcode_to_name[pcode]} ({pcode})"
             logger.info(line)
             output.append(line)
@@ -891,7 +826,7 @@ class AdminLevel:
             List of name replacements
         """
         output = []
-        for name, replacement in self.admin_name_replacements.items():
+        for name, replacement in self._admin_name_replacements.items():
             line = f"{name}: {replacement}"
             logger.info(line)
             output.append(line)

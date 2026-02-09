@@ -42,6 +42,10 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 4.1.1, HXL hashtags no longer used in AdminLevel class. The header names are used
+instead. setup_from_iterable replaces setup_from_admin_info and
+setup_from_libhxl_dataset using keys: "Location", "P-Code", "Name" and "Parent P-Code".
+
 From 4.1.0, HXL hashtags no longer used in Country class. The header names are used
 instead.
 
@@ -154,23 +158,21 @@ A Retrieve object can be passed in the *retriever* parameter that enables
 saving data downloaded to a file or loading previously saved data depending
 on how the Retrieve object is configured.
 
-Once an AdminLevel object is constructed, one of three setup methods must be
-called: *setup_from_admin_info*, *setup_from_libhxl_dataset* or
-*setup_from_url*.
+Once an AdminLevel object is constructed, either *setup_from_iterable* or
+*setup_from_url* must be called.
 
-Method *setup_from_admin_info* takes key *admin_info* which is a list with
-values of the form:
+Method *setup_from_iterable* takes an iterable (eg. iterator or sequence) of the form:
 
-    {"iso3": "AFG", "pcode": "AF01", "name": "Kabul"}
-    {"iso3": "AFG", "pcode": "AF0101", "name": "Kabul", "parent": "AF01"}
+    {"Location": "AFG", "P-Code": "AF01", "Name": "Kabul"}
+    {"Location": "AFG", "P-Code": "AF0101", "Name": "Kabul", "Parent P-Code": "AF01"}
+
 
 Dictionaries *pcode_to_name* and *pcode_to_iso3* are populated in the
-AdminLevel object. *parent* is optional, but if provided enables lookup of
+AdminLevel object. *Parent P-Code* is optional, but if provided enables lookup of
 location names by both country and parent rather than just country which should
 help with any name clashes. It also results in the population of a dictionary
 in the AdminLevel object *pcode_to_parent*.
 
-Method *setup_from_libhxl_dataset* takes a libhxl Dataset object, while
 *setup_from_url* takes a URL which defaults to a resource in the global p-codes
 dataset on HDX.
 

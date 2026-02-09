@@ -1,14 +1,14 @@
 admin_info_with_parent:
-  - {pcode: AF0101, name: Kabul, iso3: AFG, parent: AF01}
-  - {pcode: AF0102, name: Paghman, iso3: AFG, parent: AF01}
-  - {pcode: AF0201, name: Kabul, iso3: AFG, parent: AF02}  # testing purposes
-  - {pcode: AF0301, name: Charikar, iso3: AFG, parent: AF03}
-  - {pcode: AF0401, name: Maydan Shahr, iso3: AFG, parent: AF04}
-  - {pcode: AF0501, name: Pul-e-Alam, iso3: AFG, parent: AF05}
-  - {pcode: AF0501, name: Pul-e-Alam, iso3: AFG, parent: AF05}
-  - {pcode: CD2013, name: Mbanza-Ngungu, iso3: COD, parent: CD20}
-  - {pcode: CD3102, name: Kenge, iso3: COD, parent: CD31}
-  - {pcode: MW305, name: Blantyre, iso3: MWI, parent: MW3}
+  - {P-Code: AF0101, Name: Kabul, Location: AFG, Parent P-Code: AF01}
+  - {P-Code: AF0102, Name: Paghman, Location: AFG, Parent P-Code: AF01}
+  - {P-Code: AF0201, Name: Kabul, Location: AFG, Parent P-Code: AF02}  # testing purposes
+  - {P-Code: AF0301, Name: Charikar, Location: AFG, Parent P-Code: AF03}
+  - {P-Code: AF0401, Name: Maydan Shahr, Location: AFG, Parent P-Code: AF04}
+  - {P-Code: AF0501, Name: Pul-e-Alam, Location: AFG, Parent P-Code: AF05}
+  - {P-Code: AF0501, Name: Pul-e-Alam, Location: AFG, Parent P-Code: AF05}
+  - {P-Code: CD2013, Name: Mbanza-Ngungu, Location: COD, Parent P-Code: CD20}
+  - {P-Code: CD3102, Name: Kenge, Location: COD, Parent P-Code: CD31}
+  - {P-Code: MW305, Name: Blantyre, Location: MWI, Parent P-Code: MW3}
 
 admin_name_mappings:
   "MyMapping": "AF0301"
