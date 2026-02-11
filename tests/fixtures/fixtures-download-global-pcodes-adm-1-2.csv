@@ -1,5 +1,4 @@
 Location,Admin Level,P-Code,Name,Parent P-Code,Valid from date
-#country+code,#geo+admin_level,#adm+code,#adm+name,#adm+code+parent,#date+start
 AFG,1,AF01,Kabul,AFG,2021-11-17
 AFG,1,AF02,Kapisa,AFG,2021-11-17
 AFG,1,AF03,Parwan,AFG,2021-11-17
