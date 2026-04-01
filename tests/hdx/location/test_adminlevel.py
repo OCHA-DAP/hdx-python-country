@@ -420,7 +420,7 @@ class TestAdminLevel:
                 adminone = AdminLevel(config, retriever=retriever)
                 adminone.setup_from_url()
                 assert adminone.get_admin_level("YEM") == 1
-                assert len(adminone.get_pcode_list()) == 2510
+                assert len(adminone.get_pcode_list()) == 1888
                 assert adminone.get_pcode_length("YEM") == 4
                 assert adminone.get_pcode("YEM", "YE30", logname="test") == (
                     "YE30",
@@ -774,10 +774,10 @@ class TestAdminLevel:
                     True,
                 )
                 assert admintwo.get_pcode("JAM", "JM10001", logname="test") == (
-                    "JM10001",
+                    "JM1001",
                     True,
                 )
                 assert admintwo.get_pcode("JAM", "JAM10001", logname="test") == (
-                    "JM10001",
+                    "JM1001",
                     True,
                 )

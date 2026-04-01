@@ -397,7 +397,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "hdx-python-utilities", specifier = ">=4.0.4,<5" },
+    { name = "hdx-python-utilities", specifier = ">=4.0.8,<5" },
     { name = "mkapi", marker = "extra == 'docs'" },
     { name = "tenacity" },
 ]
@@ -413,7 +413,7 @@ dev = [
 
 [[package]]
 name = "hdx-python-utilities"
-version = "4.0.4"
+version = "4.0.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frictionless" },
@@ -432,9 +432,9 @@ dependencies = [
     { name = "xlsx2csv" },
     { name = "xlwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/92/fb/771c502dad4abcc7e309aca1edf27ebce2465174c179b7558d0f99b61d45/hdx_python_utilities-4.0.4.tar.gz", hash = "sha256:63b0d859076df4b700f5e08a22124617ff7d55b8491823f85984441d11debbf1", size = 2061336, upload-time = "2026-01-26T04:04:15.702Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/05/35b56fae90e5c5e9c6cfc6250ab17d1ab54c20db381aee4cef2cc7005e5e/hdx_python_utilities-4.0.8.tar.gz", hash = "sha256:53a9c45f7be4ce15d4ae3c039ad696ca5dd0b1ee64f4c623a06c7ea66c4dc3b0", size = 2108216, upload-time = "2026-02-26T02:17:05.493Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f3/3b/134a5f3700cc03b26020a692037b32b3cc772302cc010c5f35576bfd87dc/hdx_python_utilities-4.0.4-py3-none-any.whl", hash = "sha256:f6d83a6582d706dc041658523a96795da0bd0458b724489b6f6a3a2bac128cff", size = 64585, upload-time = "2026-01-26T04:04:13.792Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl", hash = "sha256:d6f608c680ec3a19357e0e6506fed25f8c8b9ac253e1886962e60f7817de6cd6", size = 66204, upload-time = "2026-02-26T02:17:04.091Z" },
 ]
 
 [[package]]
