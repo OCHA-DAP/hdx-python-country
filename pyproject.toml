@@ -36,7 +36,7 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-    "hdx-python-utilities>=4.0.8,<5",
+    "hdx-python-utilities>=4.1.2,<5",
     "tenacity",
 ]
 
