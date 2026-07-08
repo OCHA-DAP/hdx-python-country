@@ -160,7 +160,7 @@ class WFPAPI:
                 else:
                     filename = f"{base_filename}_{countryiso3}_{page}.json"
                     log = f"{base_filename} for {countryiso3} page {page}"
-                    page_parameters["CountryCode"] = countryiso3
+                    page_parameters["countryCode"] = countryiso3
                 try:
                     json = self.retrieve(url, filename, log, page_parameters)
                 except FileNotFoundError:
