@@ -1,4 +1,5 @@
 import logging
+from os import getenv
 from pathlib import Path
 from typing import Any
 
@@ -27,9 +28,10 @@ class WFPAPI:
         retriever: Retrieve object for interacting with WFP API
     """
 
-    token_url = "https://api.wfp.org/token"
-    base_url = "https://api.wfp.org/vam-data-bridges/7.0.0/"
-    scope = "gefs_geoless-items-countries_get vamdatabridges_commodities-list_get vamdatabridges_commodityunits-list_get vamdatabridges_marketprices-alps_get vamdatabridges_commodities-categories-list_get vamdatabridges_commodityunits-conversion-list_get vamdatabridges_marketprices-priceweekly_get vamdatabridges_markets-geojsonlist_get vamdatabridges_marketprices-pricemonthly_get vamdatabridges_markets-list_get vamdatabridges_currency-list_get vamdatabridges_currency-usdindirectquotation_get"
+    token_url = "https://login.microsoftonline.com/462ad9ae-d7d9-4206-b874-71b1e079776f/oauth2/v2.0/token"
+    base_url = "https://gateway.api.wfp.org/vam-data-bridges/v2/"
+    scope = "api://wfp-api-mediation-service/.default"
+    grant_type = "client_credentials"
     default_retry_params = {
         "retry": retry_if_exception_type(DownloadError),
         "after": after_log(logger, logging.INFO),
@@ -39,10 +41,20 @@ class WFPAPI:
         self,
         token_downloader: Download,
         retriever: Retrieve,
+        wfp_key: str | None = None,
+        wfp_secret: str | None = None,
     ):
         self.token_downloader = token_downloader
         self.retriever = retriever
         self.retry_params = {"attempts": 1, "wait": 1}
+        if wfp_key:
+            self._wfp_key = wfp_key
+        else:
+            self._wfp_key = getenv("WFP_KEY")
+        if wfp_secret:
+            self._wfp_secret = wfp_secret
+        else:
+            self._wfp_secret = getenv("WFP_SECRET")
 
     def get_retry_params(self) -> dict:
         return self.retry_params
@@ -57,8 +69,10 @@ class WFPAPI:
             self.token_url,
             post=True,
             parameters={
-                "grant_type": "client_credentials",
+                "grant_type": self.grant_type,
                 "scope": self.scope,
+                "client_id": self._wfp_key,
+                "client_secret": self._wfp_secret,
             },
         )
         bearer_token = self.token_downloader.get_json()["access_token"]

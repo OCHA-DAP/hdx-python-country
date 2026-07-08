@@ -53,6 +53,8 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/OCHA-DAP/hdx-python-country"
+Repository = "https://github.com/OCHA-DAP/hdx-python-country"
+Issues = "https://github.com/OCHA-DAP/hdx-python-country/issues"
 
 # ----------------------------------------------------------------------------
 # Hatchling (Build & Versioning)
