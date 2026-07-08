@@ -34,9 +34,9 @@ class TestWFPExchangeRates:
                 assert retry_params["attempts"] == 5
                 assert retry_params["wait"] == 5
                 currenciesinfo = wfp_fx.get_currencies_info()
-                assert len(currenciesinfo) == 127
+                assert len(currenciesinfo) == 128
                 currencies = wfp_fx.get_currencies()
-                assert len(currencies) == 127
+                assert len(currencies) == 128
 
                 Currency.setup()
                 assert Currency.get_historic_rate(currency, date) == 76.80000305175781
