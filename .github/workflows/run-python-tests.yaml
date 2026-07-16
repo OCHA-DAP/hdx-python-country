@@ -37,7 +37,7 @@ jobs:
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
+        if: success()
         with:
           files: test-results.xml
 
