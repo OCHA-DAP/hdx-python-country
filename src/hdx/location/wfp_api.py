@@ -1,5 +1,7 @@
+import json
 import logging
 from collections.abc import Callable
+from datetime import date, datetime
 from os import getenv
 from typing import Any
 
@@ -27,7 +29,6 @@ from data_bridges_client.models.view_extended_monthly_aggregated_price import (
 from data_bridges_client.token import WfpApiToken
 from hdx.utilities.loader import load_json
 from hdx.utilities.retriever import Retrieve
-from hdx.utilities.saver import save_json
 from tenacity import (
     Retrying,
     after_log,
@@ -37,6 +38,16 @@ from tenacity import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _json_default(value: Any) -> str:
+    """JSON serializer fallback for values data_bridges_client's generated
+    to_dict() leaves as native Python objects (e.g. datetime fields, since
+    it calls pydantic's model_dump() rather than model_dump(mode="json")).
+    """
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
 
 
 class WFPAPI:
@@ -139,7 +150,8 @@ class WFPAPI:
         result = self._with_retry(api_method, **kwargs)
         if self.retriever.save:
             logger.info(f"Saving {log} in {saved_path}")
-            save_json(result.to_dict(), saved_path)
+            with open(saved_path, "w", encoding="utf-8") as f:
+                json.dump(result.to_dict(), f, default=_json_default)
         return result
 
     @staticmethod
