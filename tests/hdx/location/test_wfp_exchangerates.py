@@ -27,7 +27,7 @@ class TestWFPExchangeRates:
                 )
                 currency = "afn"
                 date = parse_date("2020-02-20")
-                wfp_api = WFPAPI(downloader, retriever)
+                wfp_api = WFPAPI(retriever)
                 wfp_api.update_retry_params(attempts=5, wait=5)
                 wfp_fx = WFPExchangeRates(wfp_api)
                 retry_params = wfp_fx.wfp_api.get_retry_params()
@@ -62,3 +62,8 @@ class TestWFPExchangeRates:
                     Currency.get_historic_rate(currency, date, ignore_timeinfo=False)
                     == 77.01
                 )
+
+                markets = wfp_api.get_markets(countryiso3="AFG")
+                assert len(markets) == 2
+                assert markets[0].market_name == "Kabul"
+                assert markets[1].market_name == "Herat"

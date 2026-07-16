@@ -1,7 +1,6 @@
 import logging
 from collections.abc import Sequence
-
-from hdx.utilities.dateparse import parse_date
+from datetime import timezone
 
 from .int_timestamp import get_int_timestamp
 from .wfp_api import WFPAPI
@@ -26,11 +25,11 @@ class WFPExchangeRates:
             List of currency codes and names in WFP API
         """
         currencies = []
-        for currency in self.wfp_api.get_items("Currency/List"):
-            currency_name = currency["extendedName"]
+        for currency in self.wfp_api.get_currencies():
+            currency_name = currency.extended_name
             if currency_name:
                 currency_name = currency_name.strip()
-            currencies.append({"code": currency["name"], "name": currency_name})
+            currencies.append({"code": currency.name, "name": currency_name})
         return currencies
 
     def get_currencies(self) -> list[str]:
@@ -40,8 +39,8 @@ class WFPExchangeRates:
             List of currency codes in WFP API
         """
         currencies = []
-        for currency in self.wfp_api.get_items("Currency/List"):
-            currencies.append(currency["name"])
+        for currency in self.wfp_api.get_currencies():
+            currencies.append(currency.name)
         return currencies
 
     def get_currency_historic_rates(self, currency: str) -> dict[int, float]:
@@ -53,17 +52,19 @@ class WFPExchangeRates:
         Returns:
             Mapping from timestamp to rate
         """
-        quotes = self.wfp_api.get_items(
-            "Currency/UsdIndirectQuotation",
-            parameters={"currencyName": currency},
-        )
+        quotes = self.wfp_api.get_currency_usd_indirect_quotations(currency)
         historic_rates = {}
         for quote in reversed(quotes):
-            if not quote["isOfficial"]:
+            if not quote.is_official:
                 continue
-            date = parse_date(quote["date"])
+            date = quote.var_date
+            if date.tzinfo is None:
+                # data_bridges_client parses WFP's timezone-less date strings
+                # into naive datetimes; assume UTC to match previous
+                # parse_date-based behaviour
+                date = date.replace(tzinfo=timezone.utc)
             timestamp = get_int_timestamp(date)
-            historic_rates[timestamp] = quote["value"]
+            historic_rates[timestamp] = quote.value
         return historic_rates
 
     def get_historic_rates(self, currencies: Sequence[str]) -> dict[str, dict]:
