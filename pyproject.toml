@@ -42,6 +42,7 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = ["mkapi"]
+wfp = ["data-bridges-client>=9.0.0,<10"]
 
 [dependency-groups]
 dev = [
@@ -49,6 +50,7 @@ dev = [
     "pytest-cov",
     "pre-commit",
     "ruff==0.14.13",
+    "data-bridges-client>=9.0.0,<10",
 ]
 
 [project.urls]
@@ -75,6 +77,17 @@ packages = ["src/hdx"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+# ----------------------------------------------------------------------------
+# uv (Package Management)
+# ----------------------------------------------------------------------------
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[[tool.uv.index]]
+name = "wfp"
+url = "https://d2i4vvypvg40rv.cloudfront.net/pypi/"
 
 # ----------------------------------------------------------------------------
 # Ruff (Linting & Formatting)

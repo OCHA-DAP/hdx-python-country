@@ -1,10 +1,33 @@
+import json
 import logging
+from collections.abc import Callable
+from datetime import date, datetime
 from os import getenv
-from pathlib import Path
 from typing import Any
 
-from hdx.utilities.base_downloader import DownloadError
-from hdx.utilities.downloader import Download
+from data_bridges_client import (
+    ApiClient,
+    ApiException,
+    CommoditiesApi,
+    Configuration,
+    CurrencyApi,
+    MarketPricesApi,
+    MarketsApi,
+    PagedCommodityListDTO,
+    PagedCurrencyListDTO,
+    PagedMarketListDTO,
+    UsdIndirectQuotationPagedResult,
+    ViewExtendedMonthlyAggregatedPricePagedResult,
+)
+from data_bridges_client.models.commodity_dto import CommodityDTO
+from data_bridges_client.models.currency_dto import CurrencyDTO
+from data_bridges_client.models.market_dto import MarketDTO
+from data_bridges_client.models.usd_indirect_quotation import UsdIndirectQuotation
+from data_bridges_client.models.view_extended_monthly_aggregated_price import (
+    ViewExtendedMonthlyAggregatedPrice,
+)
+from data_bridges_client.token import WfpApiToken
+from hdx.utilities.loader import load_json
 from hdx.utilities.retriever import Retrieve
 from tenacity import (
     Retrying,
@@ -17,34 +40,37 @@ from tenacity import (
 logger = logging.getLogger(__name__)
 
 
+def _json_default(value: Any) -> str:
+    """JSON serializer fallback for values data_bridges_client's generated
+    to_dict() leaves as native Python objects (e.g. datetime fields, since
+    it calls pydantic's model_dump() rather than model_dump(mode="json")).
+    """
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 class WFPAPI:
-    """Light wrapper around WFP REST API. It needs a token_downloader that has
-    been configured with WFP basic authentication credentials and a retriever
-    that will configured by this class with the bearer token obtained from the
-    token_downloader.
+    """Light wrapper around WFP's data-bridges-client library. It needs a
+    retriever used only to decide whether to load from disk or hit the
+    network and whether to persist the network result. Token refreshing is
+    delegated to data_bridges_client's own WfpApiToken.
 
     Args:
-        token_downloader: Download object with WFP basic authentication
         retriever: Retrieve object for interacting with WFP API
     """
 
-    token_url = "https://login.microsoftonline.com/462ad9ae-d7d9-4206-b874-71b1e079776f/oauth2/v2.0/token"
-    base_url = "https://gateway.api.wfp.org/vam-data-bridges/v2/"
-    scope = "api://wfp-api-mediation-service/.default"
-    grant_type = "client_credentials"
     default_retry_params = {
-        "retry": retry_if_exception_type(DownloadError),
+        "retry": retry_if_exception_type(ApiException),
         "after": after_log(logger, logging.INFO),
     }
 
     def __init__(
         self,
-        token_downloader: Download,
         retriever: Retrieve,
         wfp_key: str | None = None,
         wfp_secret: str | None = None,
     ):
-        self.token_downloader = token_downloader
         self.retriever = retriever
         self.retry_params = {"attempts": 1, "wait": 1}
         if wfp_key:
@@ -55,6 +81,13 @@ class WFPAPI:
             self._wfp_secret = wfp_secret
         else:
             self._wfp_secret = getenv("WFP_SECRET")
+        self.token = WfpApiToken(api_key=self._wfp_key, api_secret=self._wfp_secret)
+        self.configuration = Configuration()
+        self.api_client = ApiClient(self.configuration)
+        self.currency_api = CurrencyApi(self.api_client)
+        self.markets_api = MarketsApi(self.api_client)
+        self.commodities_api = CommoditiesApi(self.api_client)
+        self.market_prices_api = MarketPricesApi(self.api_client)
 
     def get_retry_params(self) -> dict:
         return self.retry_params
@@ -65,37 +98,9 @@ class WFPAPI:
         return self.retry_params
 
     def refresh_token(self) -> None:
-        self.token_downloader.download(
-            self.token_url,
-            post=True,
-            parameters={
-                "grant_type": self.grant_type,
-                "scope": self.scope,
-                "client_id": self._wfp_key,
-                "client_secret": self._wfp_secret,
-            },
-        )
-        bearer_token = self.token_downloader.get_json()["access_token"]
-        self.retriever.downloader.set_bearer_token(bearer_token)
+        self.configuration.access_token = self.token.refresh()
 
-    def retrieve(
-        self,
-        url: Path | str,
-        filename: str,
-        log: str,
-        parameters: dict | None = None,
-    ) -> Any:
-        """Retrieve JSON from WFP API.
-
-        Args:
-            url: URL to download
-            filename: Filename of saved file. Defaults to getting from url.
-            log: Text to use in log string to describe download. Defaults to filename.
-            parameters: Parameters to pass to download_json call
-
-        Returns:
-            The data from the JSON file
-        """
+    def _with_retry(self, api_method: Callable, **kwargs: Any) -> Any:
         retryer = Retrying(
             retry=self.default_retry_params["retry"],
             after=self.default_retry_params["after"],
@@ -105,67 +110,214 @@ class WFPAPI:
         for attempt in retryer:
             with attempt:
                 try:
-                    results = self.retriever.download_json(
-                        url, filename, log, False, parameters=parameters
-                    )
-                except DownloadError:
-                    response = self.retriever.downloader.response
-                    if response and response.status_code not in (
-                        104,
-                        401,
-                        403,
-                    ):
+                    return api_method(**kwargs)
+                except ApiException as err:
+                    if err.status not in (104, 401, 403):
                         raise
                     self.refresh_token()
-                    results = self.retriever.download_json(
-                        url, filename, log, False, parameters=parameters
-                    )
-                return results
+                    return api_method(**kwargs)
 
-    def get_items(
+    def _call(
         self,
-        endpoint: str,
-        countryiso3: str | None = None,
-        parameters: dict | None = None,
-    ) -> list:
-        """Retrieve a list of items from the WFP API.
+        api_method: Callable,
+        model_cls: type,
+        filename: str,
+        log: str,
+        **kwargs: Any,
+    ) -> Any:
+        """Call a data_bridges_client API method, loading from or saving to
+        disk exactly as Retrieve does, so existing fixtures keep working
+        unchanged.
 
         Args:
-            endpoint: End point to call
-            countryiso3: Country for which to obtain data. Defaults to all countries.
-            parameters: Paramaters to pass to call. Defaults to None.
+            api_method: Bound method on one of the data_bridges_client APIs
+            model_cls: Paged result model class to (de)serialize with
+            filename: Filename of saved file
+            log: Text to use in log string to describe the call
+            **kwargs: Parameters to pass to api_method
 
         Returns:
-            List of items from the WFP endpoint
+            An instance of model_cls, or None if there is no saved data
         """
-        if not parameters:
-            parameters = {}
-        all_data = []
-        url = f"{self.base_url}{endpoint}"
-        url_parts = url.split("/")
-        base_filename = f"{url_parts[-2]}_{url_parts[-1]}"
+        filename, _ = self.retriever.get_filename("", filename)
+        saved_path = self.retriever.saved_dir / filename
+        if self.retriever.use_saved:
+            logger.info(f"Using saved {log} in {saved_path}")
+            try:
+                return model_cls.from_dict(load_json(saved_path))
+            except FileNotFoundError:
+                return None
+        result = self._with_retry(api_method, **kwargs)
+        if self.retriever.save:
+            logger.info(f"Saving {log} in {saved_path}")
+            with open(saved_path, "w", encoding="utf-8") as f:
+                json.dump(result.to_dict(), f, default=_json_default)
+        return result
+
+    @staticmethod
+    def _countryiso3s(countryiso3: str | None) -> list:
         if countryiso3 == "PSE":  # hack as PSE is treated by WFP as 2 areas
-            countryiso3s = ["PSW", "PSG"]
-        else:
-            countryiso3s = [countryiso3]
-        for countryiso3 in countryiso3s:
+            return ["PSW", "PSG"]
+        return [countryiso3]
+
+    @staticmethod
+    def _filename_and_log(
+        base_filename: str, countryiso3: str | None, page: int
+    ) -> tuple[str, str]:
+        if countryiso3 is None:
+            return f"{base_filename}_{page}.json", f"{base_filename} page {page}"
+        return (
+            f"{base_filename}_{countryiso3}_{page}.json",
+            f"{base_filename} for {countryiso3} page {page}",
+        )
+
+    def _get_all_pages(
+        self,
+        api_method: Callable,
+        model_cls: type,
+        base_filename: str,
+        countryiso3: str | None,
+        country_param: str,
+        extra_params: dict,
+    ) -> list:
+        all_items = []
+        for country in self._countryiso3s(countryiso3):
             page = 1
-            data = None
-            while data is None or len(data) > 0:
-                page_parameters = {"page": page}
-                page_parameters.update(parameters)
-                if countryiso3 is None:
-                    filename = f"{base_filename}_{page}.json"
-                    log = f"{base_filename} page {page}"
-                else:
-                    filename = f"{base_filename}_{countryiso3}_{page}.json"
-                    log = f"{base_filename} for {countryiso3} page {page}"
-                    page_parameters["countryCode"] = countryiso3
-                try:
-                    json = self.retrieve(url, filename, log, page_parameters)
-                except FileNotFoundError:
-                    json = {"items": []}
-                data = json["items"]
-                all_data.extend(data)
-                page = page + 1
-        return all_data
+            while True:
+                kwargs = dict(extra_params)
+                kwargs["page"] = page
+                if country is not None:
+                    kwargs[country_param] = country
+                filename, log = self._filename_and_log(base_filename, country, page)
+                result = self._call(api_method, model_cls, filename, log, **kwargs)
+                items = result.items if result else None
+                if not items:
+                    break
+                all_items.extend(items)
+                page += 1
+        return all_items
+
+    def get_currencies(
+        self, countryiso3: str | None = None, currency: str | None = None
+    ) -> list[CurrencyDTO]:
+        """Get list of currencies from the WFP API.
+
+        Args:
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+            currency: Currency 3-letter code to filter by. Defaults to all currencies.
+
+        Returns:
+            List of currencies from the WFP API
+        """
+        extra_params = {"currency_name": currency} if currency else {}
+        return self._get_all_pages(
+            self.currency_api.currency_list_get,
+            PagedCurrencyListDTO,
+            "Currency_List",
+            countryiso3,
+            "country_code",
+            extra_params,
+        )
+
+    def get_currency_usd_indirect_quotations(
+        self, currency: str, countryiso3: str | None = None
+    ) -> list[UsdIndirectQuotation]:
+        """Get USD indirect quotations for a currency from the WFP API.
+
+        Args:
+            currency: Currency 3-letter code
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+
+        Returns:
+            List of USD indirect quotations from the WFP API
+        """
+        return self._get_all_pages(
+            self.currency_api.currency_usd_indirect_quotation_get,
+            UsdIndirectQuotationPagedResult,
+            "Currency_UsdIndirectQuotation",
+            countryiso3,
+            # this endpoint uses country_iso3, unlike every other one here which
+            # uses country_code - don't "fix" this to country_code
+            "country_iso3",
+            {"currency_name": currency},
+        )
+
+    def get_markets(self, countryiso3: str | None = None) -> list[MarketDTO]:
+        """Get list of markets from the WFP API.
+
+        Args:
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+
+        Returns:
+            List of markets from the WFP API
+        """
+        return self._get_all_pages(
+            self.markets_api.markets_list_get,
+            PagedMarketListDTO,
+            "Markets_List",
+            countryiso3,
+            "country_code",
+            {},
+        )
+
+    def get_commodities(self, countryiso3: str | None = None) -> list[CommodityDTO]:
+        """Get list of commodities from the WFP API.
+
+        Args:
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+
+        Returns:
+            List of commodities from the WFP API
+        """
+        return self._get_all_pages(
+            self.commodities_api.commodities_list_get,
+            PagedCommodityListDTO,
+            "Commodities_List",
+            countryiso3,
+            "country_code",
+            {},
+        )
+
+    def get_commodity_categories(
+        self, countryiso3: str | None = None
+    ) -> list[CommodityDTO]:
+        """Get list of commodity categories from the WFP API.
+
+        Args:
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+
+        Returns:
+            List of commodity categories from the WFP API
+        """
+        return self._get_all_pages(
+            self.commodities_api.commodities_categories_list_get,
+            PagedCommodityListDTO,
+            "Commodities_Categories_List",
+            countryiso3,
+            "country_code",
+            {},
+        )
+
+    def get_market_prices_monthly(
+        self, countryiso3: str | None = None, **kwargs: Any
+    ) -> list[ViewExtendedMonthlyAggregatedPrice]:
+        """Get monthly aggregated market prices from the WFP API.
+
+        Args:
+            countryiso3: Country for which to obtain data. Defaults to all countries.
+            **kwargs: Additional filters accepted by
+                data_bridges_client's MarketPricesApi.market_prices_price_monthly_get,
+                e.g. market_id, commodity_id, price_type_name, currency_id,
+                price_flag, start_date, end_date, latest_value_only
+
+        Returns:
+            List of monthly aggregated market prices from the WFP API
+        """
+        return self._get_all_pages(
+            self.market_prices_api.market_prices_price_monthly_get,
+            ViewExtendedMonthlyAggregatedPricePagedResult,
+            "MarketPrices_PriceMonthly",
+            countryiso3,
+            "country_code",
+            kwargs,
+        )

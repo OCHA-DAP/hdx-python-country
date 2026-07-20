@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "marketId": 179,
+      "marketName": "Kabul",
+      "marketLocalName": "Kabul",
+      "marketLatitude": 34.526011,
+      "marketLongitude": 69.176033,
+      "admin1Name": "Kabul",
+      "admin1Code": 3417,
+      "admin2Name": "Kabul",
+      "admin2Code": 33475
+    },
+    {
+      "marketId": 180,
+      "marketName": "Herat",
+      "marketLocalName": "Herat",
+      "marketLatitude": 34.348418,
+      "marketLongitude": 62.199747,
+      "admin1Name": "Herat",
+      "admin1Code": 3424,
+      "admin2Name": "Herat",
+      "admin2Code": 33520
+    }
+  ],
+  "page": 1,
+  "totalItems": 2
+}

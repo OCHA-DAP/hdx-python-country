@@ -105,3 +105,28 @@ To run the tests and view coverage, execute:
 The documentation, including API documentation, is generated using ReadtheDocs and
 MkDocs with Material. As you change the source code, remember to update the
 documentation at `documentation/index.md`.
+
+## WFP DataBridges Client
+
+The `WFPAPI` class (`hdx.location.wfp_api`) uses WFP's `data-bridges-client` library, which is
+published on WFP's own package index rather than PyPI. To install it, use the `wfp` extra with
+that index added:
+
+```shell
+    pip install "hdx-python-country[wfp]" \
+      --extra-index-url https://d2i4vvypvg40rv.cloudfront.net/pypi/ \
+      --index-strategy unsafe-best-match
+```
+
+If using `uv`, add the following to your project's `pyproject.toml`:
+
+```toml
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[[tool.uv.index]]
+name = "wfp"
+url = "https://d2i4vvypvg40rv.cloudfront.net/pypi/"
+```
+
+then run `uv sync --extra wfp`.

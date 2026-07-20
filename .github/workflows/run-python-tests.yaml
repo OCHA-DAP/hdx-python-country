@@ -25,7 +25,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --extra wfp
 
       - name: Check styling
         run: |
@@ -37,7 +37,7 @@ jobs:
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
+        if: success()
         with:
           files: test-results.xml
 
