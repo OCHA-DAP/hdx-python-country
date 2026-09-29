@@ -5,7 +5,12 @@ from pathlib import Path
 from typing import Any
 
 from hdx.utilities.dictandlist import dict_of_sets_add
-from hdx.utilities.matching import Phonetics, multiple_replace
+from hdx.utilities.matching import (
+    Phonetics,
+    RapidFuzzMatcher,
+    multiple_replace,
+    resolve_name_parts,
+)
 from hdx.utilities.retriever import Retrieve
 from hdx.utilities.text import normalise
 
@@ -38,11 +43,17 @@ class AdminLevel:
     to files or to enable already saved files to be used instead of downloading
     from urls.
 
+    The matcher parameter overrides the fuzzy name matcher that fuzzy_pcode
+    tries last. It defaults to hdx.utilities.matching.RapidFuzzMatcher with
+    its place_name_scorer. hdx.utilities.matching.Phonetics can be passed
+    instead.
+
     Args:
         admin_config: Configuration dictionary. Defaults to {}.
         admin_level: Admin level. Defaults to 1.
         admin_level_overrides: Countries at other admin levels.
         retriever: Retriever object to use for loading/saving files.
+        matcher: Fuzzy name matcher to use. Defaults to None (RapidFuzzMatcher).
     """
 
     pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d+)$")
@@ -58,6 +69,7 @@ class AdminLevel:
         admin_level: int = 1,
         admin_level_overrides: dict | None = None,
         retriever: Retrieve | None = None,
+        matcher: Phonetics | RapidFuzzMatcher | None = None,
     ) -> None:
         self._admin_level_overrides = admin_level_overrides or {}
         self._retriever: Retrieve | None = retriever
@@ -69,7 +81,7 @@ class AdminLevel:
         self._use_parent = False
         self._zeroes = {}
         self._parent_admins = []
-        self._phonetics = Phonetics()
+        self._matcher = matcher or RapidFuzzMatcher(RapidFuzzMatcher.place_name_scorer)
         self.init_matches_errors()
         self.admin_level = admin_level
         self.pcodes = []
@@ -79,6 +91,7 @@ class AdminLevel:
         self.pcode_to_name = {}
         self.pcode_to_iso3 = {}
         self.pcode_to_parent = {}
+        self.parent_pcode_to_name = {}
         self.pcode_formats = {}
 
     @classmethod
@@ -136,6 +149,9 @@ class AdminLevel:
         def process_row(row):
             admin_level = row.get("Admin Level")
             if admin_level and int(admin_level) != self.admin_level:
+                if int(admin_level) == self.admin_level - 1 and row["Name"]:
+                    pcode = row["P-Code"].upper()
+                    self.parent_pcode_to_name[pcode] = normalise(row["Name"])
                 return
             countryiso3 = row["Location"].upper()
             if countryiso3s and countryiso3 not in countryiso3s:
@@ -568,7 +584,7 @@ class AdminLevel:
             parent = kwargs.get("parent")
         else:
             parent = None
-        if parent is None:
+        if not parent:
             name_to_pcode = self.name_to_pcode.get(countryiso3)
             if not name_to_pcode:
                 if logname:
@@ -626,6 +642,18 @@ class AdminLevel:
                         )
                     break
         if not pcode:
+            pcode, is_list = resolve_name_parts(
+                name, name_to_pcode, self.parent_pcode_to_name.get(parent)
+            )
+            if is_list:
+                if logname:
+                    self._ignored.add((logname, countryiso3, name))
+                return None
+            if pcode and logname:
+                self._matches.add(
+                    (logname, countryiso3, name, self.pcode_to_name[pcode], "parts")
+                )
+        if not pcode:
             map_names = list(name_to_pcode.keys())
 
             def al_transform_1(name):
@@ -644,7 +672,7 @@ class AdminLevel:
                 else:
                     return None
 
-            matching_index = self._phonetics.match(
+            matching_index = self._matcher.match(
                 map_names,
                 normalised_name,
                 alternative_name=alt_normalised_name,

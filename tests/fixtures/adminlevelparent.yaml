@@ -16,10 +16,11 @@ admin_name_mappings:
   "AF05|MyMapping3": "AF0501"
 
 admin_name_replacements:
-  " city": ""
+  "qx": ""
 
 alt1_admin_name_replacements:
-  "COD| city": ""
+  "COD|qx": ""
 
 alt2_admin_name_replacements:
-  "CD20| city": ""
+  "CD20|qx": ""
+  "CD31|qx": ""
