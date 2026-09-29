@@ -947,9 +947,6 @@ class Country:
         """
         countriesdata = cls.countriesdata(use_live=use_live, downloader=downloader)
         country = country.strip()
-        if not country.upper().isupper():
-            return None, False
-
         iso3 = cls.get_iso3_country_code(
             country, use_live=use_live, downloader=downloader
         )
@@ -957,6 +954,12 @@ class Country:
 
         if iso3 is not None:
             return iso3, True
+
+        # Chinese and Arabic have no case so are only exact matched
+        if not country.upper().isupper():
+            if exception is not None:
+                raise exception
+            return None, False
 
         # regex lookup
         for iso3, regex in countriesdata["aliases"].items():
