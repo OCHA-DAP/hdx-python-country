@@ -340,6 +340,7 @@ class TestAdminLevel:
             "MyMapping: Charikar (AF0301)",
             "AFG|MyMapping2: Maydan Shahr (AF0401)",
             "AF05|MyMapping3: Pul-e-Alam (AF0501)",
+            "AF05|MyMapping4: Maydan Shahr (AF0401)",
         ]
         assert admintwo.get_pcode("AFG", "MyMapping", logname="test") == (
             "AF0301",
@@ -372,6 +373,13 @@ class TestAdminLevel:
         ) == ("AF0501", True)
         assert admintwo.get_pcode(
             "AFG", "MyMapping3", parent="AF04", logname="test"
+        ) == (None, False)
+
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping4", parent="AF05", logname="test"
+        ) == ("AF0401", True)
+        assert admintwo.get_pcode(
+            "AFG", "MyMapping4", parent="AF04", logname="test"
         ) == (None, False)
 
         # Names are garbled so that only the "qx" replacement, not fuzzy

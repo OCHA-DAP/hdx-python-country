@@ -151,7 +151,10 @@ matching. Default is all countries.
 *admin_name_mappings* is a dictionary of mappings from name to pcode. These can
 be global or they can be restricted by country or parent (if the AdminLevel
 object has been set up with parents). Keys take the form "MAPPING",
-"AFG|MAPPING" or "AF01|MAPPING".
+"AFG|MAPPING" or "AF01|MAPPING". A mapping keyed by parent is used even if
+its pcode has a different parent (eg. "ET07|Dawuro": "ET1104" where ET07 is a
+pre-split region). Other mappings are only used with a parent if the pcode's
+parent matches it.
 *admin_name_replacements* is a dictionary of textual replacements to try when
 fuzzy matching. It maps from string to string replacement. The replacements can
 be global or they can be restricted by country or parent (if the AdminLevel

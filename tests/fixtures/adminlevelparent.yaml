@@ -14,6 +14,7 @@ admin_name_mappings:
   "MyMapping": "AF0301"
   "AFG|MyMapping2": "AF0401"
   "AF05|MyMapping3": "AF0501"
+  "AF05|MyMapping4": "AF0401"
 
 admin_name_replacements:
   "qx": ""
