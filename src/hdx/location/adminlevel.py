@@ -751,6 +751,12 @@ class AdminLevel:
             parent = kwargs.get("parent")
         else:
             parent = None
+        if parent:
+            # A parent-keyed mapping is trusted even if its p-code has a
+            # different parent eg. a pre-split region name
+            pcode = self._admin_name_mappings.get(f"{parent}|{name}")
+            if pcode and self.pcode_to_iso3[pcode] == countryiso3:
+                return pcode, True
         pcode = self.get_name_mapped_pcode(countryiso3, name, parent)
         if pcode and self.pcode_to_iso3[pcode] == countryiso3:
             if parent:
