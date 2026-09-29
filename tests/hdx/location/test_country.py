@@ -848,6 +848,18 @@ class TestCountry:
         assert Country.get_iso3_country_code_fuzzy("-") == (None, False)
         with pytest.raises(LocationError):
             Country.get_iso3_country_code_fuzzy("abcde", exception=LocationError)
+        with pytest.raises(LocationError):
+            Country.get_iso3_country_code_fuzzy("123", exception=LocationError)
+        assert Country.get_iso3_country_code_fuzzy("日本") == ("JPN", True)
+        assert Country.get_iso3_country_code_fuzzy("阿拉伯叙利亚共和国") == (
+            "SYR",
+            True,
+        )
+        assert Country.get_iso3_country_code_fuzzy("اليابان") == ("JPN", True)
+        assert Country.get_iso3_country_code_fuzzy("الجمهورية العربية السورية") == (
+            "SYR",
+            True,
+        )
         assert Country.get_iso3_country_code_fuzzy("United Kingdom") == (
             "GBR",
             True,
