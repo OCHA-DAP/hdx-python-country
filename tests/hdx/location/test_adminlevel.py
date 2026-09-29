@@ -205,6 +205,86 @@ class TestAdminLevel:
             "test - YEM: Matching (fuzzy) Al_Dhale'a to Ad Dali on map",
         ]
 
+    def test_adminlevel_custom_matcher(self, config):
+        class AlwaysFirstMatcher:
+            def match(
+                self,
+                possible_names,
+                name,
+                alternative_name=None,
+                transform_possible_names=(),
+                threshold=None,
+            ):
+                return 0
+
+        adminone = AdminLevel(config)
+        adminone.setup_from_iterable(config["admin_info"])
+        assert adminone.get_pcode("YEM", "Zzznotarealplace", logname="test") == (
+            None,
+            False,
+        )
+
+        adminone = AdminLevel(config, matcher=AlwaysFirstMatcher())
+        adminone.setup_from_iterable(config["admin_info"])
+        pcode, exact = adminone.get_pcode("YEM", "Zzznotarealplace", logname="test")
+        assert exact is False
+        assert pcode is not None
+        assert adminone.pcode_to_iso3[pcode] == "YEM"
+
+    def test_adminlevel_list_of_names(self):
+        def row(countryiso3, level, pcode, name, parent):
+            return {
+                "Location": countryiso3,
+                "Admin Level": level,
+                "P-Code": pcode,
+                "Name": name,
+                "Parent P-Code": parent,
+            }
+
+        rows = [
+            row("KHM", 1, "KH07", "Kampot", "KHM"),
+            row("KHM", 1, "KH23", "Kep", "KHM"),
+            row("SDN", 1, "SD02", "North Darfur", "SDN"),
+            row("SDN", 2, "SD02122", "Kutum", "SD02"),
+            row("SDN", 2, "SD02124", "Tawila", "SD02"),
+            row("VEN", 1, "VE11", "Falcón", "VEN"),
+            row("VEN", 2, "VE1101", "Acosta", "VE11"),
+            row("VEN", 2, "VE1109", "Falcón", "VE11"),
+            row("HTI", 1, "HT05", "Artibonite", "HTI"),
+            row("HTI", 2, "HT0541", "Dessalines", "HT05"),
+        ]
+        adminone = AdminLevel()
+        adminone.setup_from_iterable(rows)
+        assert adminone.get_pcode("KHM", "Kampot & Kep") == (None, False)
+        assert adminone.get_pcode("KHM", "Kampot and Kep") == (None, False)
+        assert adminone.get_pcode("KHM", "Kampott") == ("KH07", False)
+
+        admintwo = AdminLevel(admin_level=2)
+        admintwo.setup_from_iterable(rows)
+        assert admintwo.parent_pcode_to_name["VE11"] == "falcon"
+        assert admintwo.get_pcode("SDN", "Kutum, Tawila", parent="SD02") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode("SDN", "Kutum, Tawila, Kornoi", parent="SD02") == (
+            None,
+            False,
+        )
+        # One part is the parent's name
+        assert admintwo.get_pcode("VEN", "Falcón, Acosta", parent="VE11") == (
+            "VE1101",
+            False,
+        )
+        assert admintwo.get_pcode("VEN", "Falcón, Acosta") == (None, False)
+        # Only one part is an admin name, so the whole name is fuzzy matched
+        assert admintwo.get_pcode(
+            "HTI", "Dessalines/Marchandes", parent="HT05", logname="test"
+        ) == ("HT0541", False)
+        assert admintwo.output_ignored() == []
+        assert admintwo.output_matches() == [
+            "test - HTI: Matching (fuzzy) Dessalines/Marchandes to Dessalines on map"
+        ]
+
     def test_adminlevel_parent(self, config_parent):
         admintwo = AdminLevel(config_parent)
         admintwo.countries_fuzzy_try = None
@@ -250,6 +330,10 @@ class TestAdminLevel:
             None,
             False,
         )
+        assert admintwo.get_pcode("AFG", "Kabull", parent="", logname="test") == (
+            "AF0201",
+            False,
+        )
 
         output = admintwo.output_admin_name_mappings()
         assert output == [
@@ -290,23 +374,36 @@ class TestAdminLevel:
             "AFG", "MyMapping3", parent="AF04", logname="test"
         ) == (None, False)
 
+        # Names are garbled so that only the "qx" replacement, not fuzzy
+        # matching, can resolve them. That tests replacement scoping whatever
+        # the matcher.
+        mbanza = "Mqxbqxaqxnqxzqxa-Nqxgqxuqxnqxgqxu"
+        kenge = "Kqxeqxnqxgqxe"
+        blantyre = "Bqxlqxaqxnqxtqxyqxrqxe"
         output = admintwo.output_admin_name_replacements()
-        assert output == [" city: "]
-        assert admintwo.get_pcode("COD", "Mbanza-Ngungu city", logname="test") == (
+        assert output == ["qx: "]
+        assert admintwo.get_pcode("COD", mbanza, logname="test") == ("CD2013", False)
+        assert admintwo.get_pcode("COD", mbanza, parent="CD20", logname="test") == (
             "CD2013",
             False,
         )
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", parent="CD20", logname="test"
-        ) == ("CD2013", False)
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", parent="CD19", logname="test"
-        ) == (None, False)
-        assert admintwo.get_pcode("COD", "Kenge city", logname="test") == (
+        assert admintwo.get_pcode("COD", mbanza, parent="CD19", logname="test") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode("COD", kenge, logname="test") == (
             "CD3102",
             False,
         )
-        assert admintwo.get_pcode("MWI", "Blantyre city", logname="test") == (
+        assert admintwo.get_pcode("COD", kenge, parent="CD31", logname="test") == (
+            "CD3102",
+            False,
+        )
+        assert admintwo.get_pcode("MWI", blantyre, logname="test") == (
+            "MW305",
+            False,
+        )
+        assert admintwo.get_pcode("MWI", blantyre, parent="MW3", logname="test") == (
             "MW305",
             False,
         )
@@ -315,61 +412,67 @@ class TestAdminLevel:
             "alt1_admin_name_replacements"
         ]
         output = admintwo.output_admin_name_replacements()
-        assert output == ["COD| city: "]
-        assert admintwo.get_pcode("COD", "Mbanza-Ngungu city", logname="test") == (
+        assert output == ["COD|qx: "]
+        assert admintwo.get_pcode("COD", mbanza, logname="test") == ("CD2013", False)
+        assert admintwo.get_pcode("COD", mbanza, parent="CD20", logname="test") == (
             "CD2013",
             False,
         )
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", parent="CD20", logname="test"
-        ) == ("CD2013", False)
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", parent="CD19", logname="test"
-        ) == (None, False)
-        assert admintwo.get_pcode("COD", "Kenge city", logname="test") == (
-            "CD3102",
-            False,
-        )
-        assert admintwo.get_pcode(
-            "COD", "Kenge city", parent="CD31", logname="test"
-        ) == ("CD3102", False)
-        assert admintwo.get_pcode("MWI", "Blantyre city", logname="test") == (
+        assert admintwo.get_pcode("COD", mbanza, parent="CD19", logname="test") == (
             None,
             False,
         )
-        assert admintwo.get_pcode(
-            "MWI", "Blantyre city", parent="MW3", logname="test"
-        ) == (None, False)
+        assert admintwo.get_pcode("COD", kenge, logname="test") == (
+            "CD3102",
+            False,
+        )
+        assert admintwo.get_pcode("COD", kenge, parent="CD31", logname="test") == (
+            "CD3102",
+            False,
+        )
+        assert admintwo.get_pcode("MWI", blantyre, logname="test") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode("MWI", blantyre, parent="MW3", logname="test") == (
+            None,
+            False,
+        )
 
         admintwo._admin_name_replacements = config_parent[
             "alt2_admin_name_replacements"
         ]
         output = admintwo.output_admin_name_replacements()
-        assert output == ["CD20| city: "]
-        assert admintwo.get_pcode("COD", "Mbanza-Ngungu city", logname="test") == (
+        assert output == ["CD20|qx: ", "CD31|qx: "]
+        assert admintwo.get_pcode("COD", mbanza, logname="test") == (None, False)
+        assert admintwo.get_pcode("COD", mbanza, parent="CD20", logname="test") == (
+            "CD2013",
+            False,
+        )
+        assert admintwo.get_pcode("COD", mbanza, parent="CD19", logname="test") == (
             None,
             False,
         )
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", parent="CD20", logname="test"
-        ) == ("CD2013", False)
-        assert admintwo.get_pcode(
-            "COD", "Mbanza-Ngungu city", parent="CD19", logname="test"
-        ) == (None, False)
-        assert admintwo.get_pcode("COD", "Kenge city", logname="test") == (
+        assert admintwo.get_pcode("COD", kenge, logname="test") == (
             None,
             False,
         )
-        assert admintwo.get_pcode(
-            "COD", "Kenge city", parent="CD31", logname="test"
-        ) == (None, False)
-        assert admintwo.get_pcode("MWI", "Blantyre city", logname="test") == (
+        assert admintwo.get_pcode("COD", kenge, parent="CD31", logname="test") == (
+            "CD3102",
+            False,
+        )
+        assert admintwo.get_pcode("COD", kenge, parent="CD20", logname="test") == (
             None,
             False,
         )
-        assert admintwo.get_pcode(
-            "MWI", "Blantyre city", parent="MW3", logname="test"
-        ) == (None, False)
+        assert admintwo.get_pcode("MWI", blantyre, logname="test") == (
+            None,
+            False,
+        )
+        assert admintwo.get_pcode("MWI", blantyre, parent="MW3", logname="test") == (
+            None,
+            False,
+        )
 
     def test_adminlevel_with_url(self, config, url, fixtures_dir):
         with temp_dir(

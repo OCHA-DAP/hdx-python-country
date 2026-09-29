@@ -27,7 +27,7 @@ fuzzy matching for English look up that can handle abbreviations in country name
 Dem. for Democratic and Rep. for Republic.
 
 Mapping administration level names from a source to a given base set is also handled
-including phonetic fuzzy name matching.
+including fuzzy name matching.
 
 It also provides foreign exchange rates and conversion from amounts in local
 currency to USD and vice-versa. The conversion relies on Yahoo Finance, falling
@@ -42,6 +42,12 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 4.2.0, AdminLevel fuzzy matches using RapidFuzzMatcher (with its place_name_scorer)
+from HDX Python Utilities rather than Phonetics by default. Pass matcher=Phonetics() for
+the previous behaviour. Names made of parts are resolved from their parts and lists of
+names are not fuzzy matched (see Administration Level). Fuzzy matching is now tried when
+parent is "" as well as when it is None.
+
 From 4.1.1, HXL hashtags no longer used in AdminLevel class. The header names are used
 instead. setup_from_iterable replaces setup_from_admin_info and
 setup_from_libhxl_dataset using keys: "Location", "P-Code", "Name" and "Parent P-Code".
@@ -158,6 +164,17 @@ A Retrieve object can be passed in the *retriever* parameter that enables
 saving data downloaded to a file or loading previously saved data depending
 on how the Retrieve object is configured.
 
+The *matcher* parameter sets the fuzzy name matcher. It defaults to
+RapidFuzzMatcher from HDX Python Utilities with its place_name_scorer. Phonetics
+from HDX Python Utilities can be passed instead.
+
+Before fuzzy matching, a name made of parts split by separators (",", ";", "/",
+":", "&", newline, "and", "et") or a hyphen is resolved from its parts. A name
+with two parts where one is the parent's name gives the other part's p-code
+(eg. "Falcón, Acosta" with parent Falcón). A list of names (more than two parts,
+or two parts that are different admin units, eg. "Kampot & Kep") is not fuzzy
+matched.
+
 Once an AdminLevel object is constructed, either *setup_from_iterable* or
 *setup_from_url* must be called.
 
@@ -185,11 +202,14 @@ Examples of usage:
     AdminLevel.looks_like_pcode("Yemen")  # returns False
     AdminLevel.looks_like_pcode("YEME123")  # returns False
     adminlevel = AdminLevel(config)
-    adminlevel.setup_from_admin_info(admin_info, countryiso3s=("YEM",))
+    adminlevel.setup_from_iterable(admin_info, countryiso3s=("YEM",))
     adminlevel.get_pcode("YEM", "YEM030", logname="test")  # returns ("YE30", True)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع")  # returns ("YE30", False)
     adminlevel.get_pcode("YEM", "Al Dhale"e / الضالع", fuzzy_match=False)  # returns (None, True)
     assert admintwo.get_pcode("AFG", "Kabul", parent="AF01") == ("AF0101", True)
+    adminlevel.get_pcode("KHM", "Kampot & Kep")  # returns (None, False)
+    admintwo.get_pcode("VEN", "Falcón, Acosta", parent="VE11")  # returns ("VE1101", False)
+    adminlevel = AdminLevel(config, matcher=Phonetics())  # use Phonetics
 
 There is basic admin 1 p-code length conversion by default. A more advanced
 p-code length conversion can be activated by calling *load_pcode_formats*
