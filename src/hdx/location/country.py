@@ -5,6 +5,7 @@ import os.path
 import re
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from hdx.utilities.base_downloader import BaseDownload, DownloadError
 from hdx.utilities.downloader import Download
@@ -235,7 +236,7 @@ class Country:
         country_name_overrides: dict | None = None,
         country_name_mappings: dict | None = None,
         downloader: BaseDownload | None = None,
-    ) -> list[dict[str, dict]]:
+    ) -> dict[str, dict[str, Any]]:
         """
         Read countries data from OCHA countries feed (falling back to file).
         include_unofficial, use_live, country_name_overrides and country_name_mappings
@@ -250,7 +251,7 @@ class Country:
             downloader: Download or Retrieve object. Defaults to None.
 
         Returns:
-            Countries dictionaries
+            Dictionary of countries data lookups (countries, iso2iso3, m49iso3 etc.)
         """
         if include_unofficial is not None:
             cls._include_unofficial = include_unofficial
