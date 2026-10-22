@@ -18,7 +18,7 @@ fuzzy matching for English look up that can handle abbreviations in country name
 Dem. for Democratic and Rep. for Republic.
 
 Mapping administration level names from a source to a given base set is also handled
-including phonetic fuzzy name matching.
+including fuzzy name matching.
 
 It also provides foreign exchange rates and conversion from amounts in local
 currency to USD and vice-versa. The conversion relies on Yahoo Finance, falling

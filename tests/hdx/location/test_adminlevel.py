@@ -205,32 +205,6 @@ class TestAdminLevel:
             "test - YEM: Matching (fuzzy) Al_Dhale'a to Ad Dali on map",
         ]
 
-    def test_adminlevel_custom_matcher(self, config):
-        class AlwaysFirstMatcher:
-            def match(
-                self,
-                possible_names,
-                name,
-                alternative_name=None,
-                transform_possible_names=(),
-                threshold=None,
-            ):
-                return 0
-
-        adminone = AdminLevel(config)
-        adminone.setup_from_iterable(config["admin_info"])
-        assert adminone.get_pcode("YEM", "Zzznotarealplace", logname="test") == (
-            None,
-            False,
-        )
-
-        adminone = AdminLevel(config, matcher=AlwaysFirstMatcher())
-        adminone.setup_from_iterable(config["admin_info"])
-        pcode, exact = adminone.get_pcode("YEM", "Zzznotarealplace", logname="test")
-        assert exact is False
-        assert pcode is not None
-        assert adminone.pcode_to_iso3[pcode] == "YEM"
-
     def test_adminlevel_list_of_names(self):
         def row(countryiso3, level, pcode, name, parent):
             return {

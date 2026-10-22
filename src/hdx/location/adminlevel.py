@@ -6,7 +6,6 @@ from typing import Any
 
 from hdx.utilities.dictandlist import dict_of_sets_add
 from hdx.utilities.matching import (
-    Phonetics,
     RapidFuzzMatcher,
     multiple_replace,
     resolve_name_parts,
@@ -43,17 +42,14 @@ class AdminLevel:
     to files or to enable already saved files to be used instead of downloading
     from urls.
 
-    The matcher parameter overrides the fuzzy name matcher that fuzzy_pcode
-    tries last. It defaults to hdx.utilities.matching.RapidFuzzMatcher with
-    its place_name_scorer. hdx.utilities.matching.Phonetics can be passed
-    instead.
+    The fuzzy name matcher that fuzzy_pcode tries last is
+    hdx.utilities.matching.RapidFuzzMatcher with its place_name_scorer.
 
     Args:
         admin_config: Configuration dictionary. Defaults to {}.
         admin_level: Admin level. Defaults to 1.
         admin_level_overrides: Countries at other admin levels.
         retriever: Retriever object to use for loading/saving files.
-        matcher: Fuzzy name matcher to use. Defaults to None (RapidFuzzMatcher).
     """
 
     pcode_regex = re.compile(r"^([a-zA-Z]{2,3})(\d+)$")
@@ -69,7 +65,6 @@ class AdminLevel:
         admin_level: int = 1,
         admin_level_overrides: dict | None = None,
         retriever: Retrieve | None = None,
-        matcher: Phonetics | RapidFuzzMatcher | None = None,
     ) -> None:
         self._admin_level_overrides = admin_level_overrides or {}
         self._retriever: Retrieve | None = retriever
@@ -81,7 +76,7 @@ class AdminLevel:
         self._use_parent = False
         self._zeroes = {}
         self._parent_admins = []
-        self._matcher = matcher or RapidFuzzMatcher(RapidFuzzMatcher.place_name_scorer)
+        self._matcher = RapidFuzzMatcher(RapidFuzzMatcher.place_name_scorer)
         self.init_matches_errors()
         self.admin_level = admin_level
         self.pcodes = []

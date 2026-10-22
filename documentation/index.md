@@ -42,11 +42,13 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 4.2.4, the AdminLevel matcher parameter is removed and HDX Python Utilities
+4.2.3 or later is required.
+
 From 4.2.0, AdminLevel fuzzy matches using RapidFuzzMatcher (with its place_name_scorer)
-from HDX Python Utilities rather than Phonetics by default. Pass matcher=Phonetics() for
-the previous behaviour. Names made of parts are resolved from their parts and lists of
-names are not fuzzy matched (see Administration Level). Fuzzy matching is now tried when
-parent is "" as well as when it is None.
+from HDX Python Utilities rather than Phonetics by default. Names made of parts are
+resolved from their parts and lists of names are not fuzzy matched (see Administration
+Level). Fuzzy matching is now tried when parent is "" as well as when it is None.
 
 From 4.1.1, HXL hashtags no longer used in AdminLevel class. The header names are used
 instead. setup_from_iterable replaces setup_from_admin_info and
@@ -167,9 +169,8 @@ A Retrieve object can be passed in the *retriever* parameter that enables
 saving data downloaded to a file or loading previously saved data depending
 on how the Retrieve object is configured.
 
-The *matcher* parameter sets the fuzzy name matcher. It defaults to
-RapidFuzzMatcher from HDX Python Utilities with its place_name_scorer. Phonetics
-from HDX Python Utilities can be passed instead.
+Fuzzy name matching uses RapidFuzzMatcher from HDX Python Utilities with its
+place_name_scorer.
 
 Before fuzzy matching, a name made of parts split by separators (",", ";", "/",
 ":", "&", newline, "and", "et") or a hyphen is resolved from its parts. A name
@@ -212,7 +213,6 @@ Examples of usage:
     assert admintwo.get_pcode("AFG", "Kabul", parent="AF01") == ("AF0101", True)
     adminlevel.get_pcode("KHM", "Kampot & Kep")  # returns (None, False)
     admintwo.get_pcode("VEN", "Falcón, Acosta", parent="VE11")  # returns ("VE1101", False)
-    adminlevel = AdminLevel(config, matcher=Phonetics())  # use Phonetics
 
 There is basic admin 1 p-code length conversion by default. A more advanced
 p-code length conversion can be activated by calling *load_pcode_formats*
