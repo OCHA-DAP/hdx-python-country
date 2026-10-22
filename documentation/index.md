@@ -43,7 +43,7 @@ The library has detailed API documentation which can be found in the menu at the
 
 ## Breaking Changes
 From 4.2.4, the AdminLevel matcher parameter is removed and HDX Python Utilities
-4.2.2 or later is required.
+4.2.3 or later is required.
 
 From 4.2.0, AdminLevel fuzzy matches using RapidFuzzMatcher (with its place_name_scorer)
 from HDX Python Utilities rather than Phonetics by default. Names made of parts are
