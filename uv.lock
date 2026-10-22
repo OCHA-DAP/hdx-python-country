@@ -384,7 +384,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -479,7 +479,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "data-bridges-client", marker = "extra == 'wfp'", specifier = ">=9.0.0,<10" },
-    { name = "hdx-python-utilities", specifier = ">=4.2.0,<5" },
+    { name = "hdx-python-utilities", specifier = ">=4.2.2,<5" },
     { name = "mkapi", marker = "extra == 'docs'" },
     { name = "tenacity" },
 ]
@@ -496,7 +496,7 @@ dev = [
 
 [[package]]
 name = "hdx-python-utilities"
-version = "4.2.0"
+version = "4.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frictionless" },
@@ -504,7 +504,6 @@ dependencies = [
     { name = "jsonlines" },
     { name = "loguru" },
     { name = "openpyxl" },
-    { name = "pyphonetics" },
     { name = "python-dateutil" },
     { name = "rapidfuzz", version = "3.14.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "rapidfuzz", version = "3.14.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -517,9 +516,9 @@ dependencies = [
     { name = "xlsx2csv" },
     { name = "xlwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8f/b1/75977d4aabe5b64a66c760c243b3c57f2c80adc06fdd8f0c6bc67d2eb9da/hdx_python_utilities-4.2.0.tar.gz", hash = "sha256:83287c9ae3435b7d920f8c528c0a0ea68a04974e774a8ce1970ed8cc2e9fa0ab", size = 2135761, upload-time = "2026-09-29T02:02:38.053Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a4/28/c0c0fc5cd6defab05fb980d058f32cb9013ba43ed5429de7d512f0fe9269/hdx_python_utilities-4.2.2.tar.gz", hash = "sha256:c51645fc1927e0c626949888eac5235b6fd3947749ff049b952153a5832ff040", size = 2154470, upload-time = "2026-10-22T03:33:26.826Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/dd/16479fc69ee6271d1b44d93aecb7d4115e3629cd62ff6e0344f6d4360cc6/hdx_python_utilities-4.2.0-py3-none-any.whl", hash = "sha256:601a32fe00f405c1d4c62b7782e2372b1e86c4ed4cda645f374048a74bd5336b", size = 67404, upload-time = "2026-09-29T02:02:36.678Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/c7/2a18475ed3467ccb6dfe4bd8f7c3a402eb17b8698fe97981c41b512a120b/hdx_python_utilities-4.2.2-py3-none-any.whl", hash = "sha256:73e1c3f4f82890ab901a27e954b1c405b78ee44bcc8ea4099b41e8af31013060", size = 67599, upload-time = "2026-10-22T03:33:25.251Z" },
 ]
 
 [[package]]
@@ -1207,18 +1206,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1e/6c/9e370934bfa30e889d12e61d0dae009991294f40055c238980066a7fbd83/pymdown_extensions-10.20.1.tar.gz", hash = "sha256:e7e39c865727338d434b55f1dd8da51febcffcaebd6e1a0b9c836243f660740a", size = 852860, upload-time = "2026-01-24T05:56:56.758Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/40/6d/b6ee155462a0156b94312bdd82d2b92ea56e909740045a87ccb98bf52405/pymdown_extensions-10.20.1-py3-none-any.whl", hash = "sha256:24af7feacbca56504b313b7b418c4f5e1317bb5fea60f03d57be7fcc40912aa0", size = 268768, upload-time = "2026-01-24T05:56:54.537Z" },
-]
-
-[[package]]
-name = "pyphonetics"
-version = "0.5.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "unidecode" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/d6/7c/7c45a9e9bf6ddb57b67e66cf4e8076a7baf3a790a3411daac1a7a2df0c5b/pyphonetics-0.5.3.tar.gz", hash = "sha256:2d3c2e359fde91a3c57914f0b5468bba7a5daf38e7927fd999992ea68990fbe4", size = 10314, upload-time = "2020-02-25T12:08:31.049Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/dd/a7d0a860efd3d4335d538b4361b8e9af8311f2aba2e8c7e4c7a47d623b6e/pyphonetics-0.5.3-py2.py3-none-any.whl", hash = "sha256:e6b29671d0d624dda1cac59c0c5a8a7216d8db504bae4941bfc482e04a0621d1", size = 10729, upload-time = "2020-02-25T12:08:25.368Z" },
 ]
 
 [[package]]
@@ -1941,15 +1928,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/55/e3/70399cb7dd41c10ac53367ae42139cf4b1ca5f36bb3dc6c9d33acdb43655/typing_inspection-0.4.2.tar.gz", hash = "sha256:ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464", size = 75949, upload-time = "2025-10-01T02:14:41.687Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/dc/9b/47798a6c91d8bdb567fe2698fe81e0c6b7cb7ef4d13da4114b41d239f65d/typing_inspection-0.4.2-py3-none-any.whl", hash = "sha256:4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7", size = 14611, upload-time = "2025-10-01T02:14:40.154Z" },
-]
-
-[[package]]
-name = "unidecode"
-version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/94/7d/a8a765761bbc0c836e397a2e48d498305a865b70a8600fd7a942e85dcf63/Unidecode-1.4.0.tar.gz", hash = "sha256:ce35985008338b676573023acc382d62c264f307c8f7963733405add37ea2b23", size = 200149, upload-time = "2025-04-24T08:45:03.798Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/b7/559f59d57d18b44c6d1250d2eeaa676e028b9c527431f5d0736478a73ba1/Unidecode-1.4.0-py3-none-any.whl", hash = "sha256:c3c7606c27503ad8d501270406e345ddb480a7b5f38827eafe4fa82a137f0021", size = 235837, upload-time = "2025-04-24T08:45:01.609Z" },
 ]
 
 [[package]]
