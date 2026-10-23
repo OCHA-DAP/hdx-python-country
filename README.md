@@ -109,24 +109,38 @@ documentation at `documentation/index.md`.
 ## WFP DataBridges Client
 
 The `WFPAPI` class (`hdx.location.wfp_api`) uses WFP's `data-bridges-client` library, which is
-published on WFP's own package index rather than PyPI. To install it, use the `wfp` extra with
-that index added:
+published on WFP's own package index rather than PyPI. That index hosts only
+`data-bridges-client`, so install it from there first without dependencies, then install the
+`wfp` extra from PyPI:
 
 ```shell
-    pip install "hdx-python-country[wfp]" \
-      --extra-index-url https://d2i4vvypvg40rv.cloudfront.net/pypi/ \
-      --index-strategy unsafe-best-match
+    pip install "data-bridges-client>=9,<10" --no-deps \
+      --index-url https://d2i4vvypvg40rv.cloudfront.net/pypi/
+    pip install "hdx-python-country[wfp]"
 ```
 
-If using `uv`, add the following to your project's `pyproject.toml`:
+Avoid `--extra-index-url`: pip then picks the highest version from either index, so a package
+published on PyPI under the name `data-bridges-client` would be installed instead.
+
+If using `uv`, add the following to your project's `pyproject.toml` so that only
+`data-bridges-client` is fetched from WFP's index. `data-bridges-client` must be a direct
+dependency because `tool.uv.sources` does not apply to transitive dependencies; without it, uv
+falls back to an old `hdx-python-country` that has no `wfp` extra:
 
 ```toml
-[tool.uv]
-index-strategy = "unsafe-best-match"
+[project]
+dependencies = [
+    "hdx-python-country[wfp]",
+    "data-bridges-client>=9,<10",
+]
 
 [[tool.uv.index]]
 name = "wfp"
 url = "https://d2i4vvypvg40rv.cloudfront.net/pypi/"
+explicit = true
+
+[tool.uv.sources]
+data-bridges-client = { index = "wfp" }
 ```
 
-then run `uv sync --extra wfp`.
+then run `uv sync`.

@@ -82,12 +82,13 @@ allow-direct-references = true
 # uv (Package Management)
 # ----------------------------------------------------------------------------
 
-[tool.uv]
-index-strategy = "unsafe-best-match"
-
 [[tool.uv.index]]
 name = "wfp"
 url = "https://d2i4vvypvg40rv.cloudfront.net/pypi/"
+explicit = true
+
+[tool.uv.sources]
+data-bridges-client = { index = "wfp" }
 
 # ----------------------------------------------------------------------------
 # Ruff (Linting & Formatting)
