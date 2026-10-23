@@ -748,7 +748,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "data-bridges-client", marker = "extra == 'wfp'", specifier = ">=9.0.0,<10", index = "https://d2i4vvypvg40rv.cloudfront.net/pypi/" },
-    { name = "hdx-python-utilities", specifier = ">=4.2.3,<5" },
+    { name = "hdx-python-utilities", specifier = ">=4.2.4,<5" },
     { name = "mkapi", marker = "extra == 'docs'" },
     { name = "tenacity" },
 ]
@@ -765,7 +765,7 @@ dev = [
 
 [[package]]
 name = "hdx-python-utilities"
-version = "4.2.3"
+version = "4.2.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frictionless" },
@@ -785,9 +785,9 @@ dependencies = [
     { name = "xlsx2csv" },
     { name = "xlwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d7/70/d9e4db28e720510cf69ec75632784209c310f52994190a1f2dc15c508415/hdx_python_utilities-4.2.3.tar.gz", hash = "sha256:8e5213f93f51018049beb8808452e21ad70a441ff7607fa91d21574b00ee78fd", size = 2194034, upload-time = "2026-10-22T03:45:33.14Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/1d/b18aabb4f744a3841b79fd8f1f26439039b253bcc846203a8f00288781e9/hdx_python_utilities-4.2.4.tar.gz", hash = "sha256:9e70d9d6793745967e8e759071a70bc4f0fa94eb5afcd180063bdc59ceca3a84", size = 2207998, upload-time = "2026-10-23T03:09:23.884Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/56/de5aedca24a55cd95ae4b0dfdf37ba16b054dafea86f40765c8cc15a2782/hdx_python_utilities-4.2.3-py3-none-any.whl", hash = "sha256:13391adca4e82b9b3ef526562efac5d0123292f01645360073b1be5cab3e29d7", size = 67607, upload-time = "2026-10-22T03:45:31.376Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/c2/8dbbd48b770fcaa2da0b5780cb179d4cc72899d86a4a4f41295c74bd73e2/hdx_python_utilities-4.2.4-py3-none-any.whl", hash = "sha256:2377d3d24464408d5e861293686947637069463091f5287fc8bf7a858e1a493d", size = 67590, upload-time = "2026-10-23T03:09:22.644Z" },
 ]
 
 [[package]]
