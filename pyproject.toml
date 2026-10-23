@@ -36,7 +36,7 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-    "hdx-python-utilities>=4.2.3,<5",
+    "hdx-python-utilities>=4.2.4,<5",
     "tenacity",
 ]
 
@@ -82,12 +82,13 @@ allow-direct-references = true
 # uv (Package Management)
 # ----------------------------------------------------------------------------
 
-[tool.uv]
-index-strategy = "unsafe-best-match"
-
 [[tool.uv.index]]
 name = "wfp"
 url = "https://d2i4vvypvg40rv.cloudfront.net/pypi/"
+explicit = true
+
+[tool.uv.sources]
+data-bridges-client = { index = "wfp" }
 
 # ----------------------------------------------------------------------------
 # Ruff (Linting & Formatting)
