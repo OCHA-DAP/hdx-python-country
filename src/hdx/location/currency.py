@@ -2,7 +2,7 @@
 
 import logging
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from hdx.utilities.dateparse import (
@@ -484,9 +484,7 @@ class Currency:
         if currency == "USD":
             return 1
         if ignore_timeinfo:
-            date = date.replace(
-                hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
-            )
+            date = date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=UTC)
         timestamp = get_int_timestamp(date)
         return cls._get_historic_rate(currency, timestamp)
 
