@@ -42,6 +42,8 @@ The code for the library is [here](https://github.com/OCHA-DAP/hdx-python-countr
 The library has detailed API documentation which can be found in the menu at the top.
 
 ## Breaking Changes
+From 4.2.6, Python 3.11 or later and HDX Python Utilities 4.2.5 or later are required.
+
 From 4.2.4, the AdminLevel matcher parameter is removed and HDX Python Utilities
 4.2.3 or later is required.
 

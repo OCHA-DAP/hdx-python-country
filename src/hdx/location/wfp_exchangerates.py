@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Sequence
-from datetime import timezone
+from datetime import UTC
 
 from .int_timestamp import get_int_timestamp
 from .wfp_api import WFPAPI
@@ -62,7 +62,7 @@ class WFPExchangeRates:
                 # data_bridges_client parses WFP's timezone-less date strings
                 # into naive datetimes; assume UTC to match previous
                 # parse_date-based behaviour
-                date = date.replace(tzinfo=timezone.utc)
+                date = date.replace(tzinfo=UTC)
             timestamp = get_int_timestamp(date)
             historic_rates[timestamp] = quote.value
         return historic_rates
