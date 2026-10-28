@@ -17,6 +17,6 @@ def get_int_timestamp(date: datetime) -> int:
     """
     timestamp = _cache_timestamp_lookup.get(date)
     if timestamp is None:
-        timestamp = int(round(get_timestamp_from_datetime(date)))
+        timestamp = round(get_timestamp_from_datetime(date))
         _cache_timestamp_lookup[date] = timestamp
     return timestamp

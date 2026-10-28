@@ -5,7 +5,7 @@ import os.path
 import re
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from hdx.utilities.base_downloader import BaseDownload, DownloadError
 from hdx.utilities.downloader import Download
@@ -24,7 +24,7 @@ class Country:
     region names and codes. Uses OCHA's countries and territories feed.
     """
 
-    abbreviations = {
+    abbreviations: ClassVar[dict[str, str]] = {
         "DEM.": "DEMOCRATIC",
         "FMR.": "FORMER",
         "PROV.": "PROVINCE",
@@ -37,7 +37,7 @@ class Country:
         "W.": "WEST",
         "K.": "KINGDOM",
     }
-    major_differentiators = [
+    major_differentiators: ClassVar[list[str]] = [
         "DEMOCRATIC",
         "NORTH",
         "SOUTH",
@@ -45,13 +45,13 @@ class Country:
         "WEST",
         "STATES",
     ]
-    multiple_abbreviations = {
+    multiple_abbreviations: ClassVar[dict[str, list[str]]] = {
         "FED.": ["FEDERATION", "FEDERAL", "FEDERATED"],
         "ISL.": ["ISLAND", "ISLANDS"],
         "S.": ["SOUTH", "STATES"],
         "TERR.": ["TERRITORY", "TERRITORIES"],
     }
-    simplifications = [
+    simplifications: ClassVar[list[str]] = [
         "AND",
         "THE",
         "OF",
@@ -80,8 +80,8 @@ class Country:
         CountryError,
     )
     _ochapath = _ochapath_default
-    _country_name_overrides = {}
-    _country_name_mappings = {}
+    _country_name_overrides: ClassVar[dict] = {}
+    _country_name_mappings: ClassVar[dict] = {}
     _country_name_keys = (
         "Preferred Term",
         "ISO Alt Term",
@@ -223,7 +223,7 @@ class Country:
         def sort_list(colname):
             for idval in cls._countriesdata[colname]:
                 cls._countriesdata[colname][idval] = sorted(
-                    list(cls._countriesdata[colname][idval])
+                    cls._countriesdata[colname][idval]
                 )
 
         sort_list("regioncodes2countries")
@@ -317,7 +317,7 @@ class Country:
         cls._use_live = use_live
 
     @classmethod
-    def set_ocha_url(cls, url: str = None) -> None:
+    def set_ocha_url(cls, url: str | None = None) -> None:
         """
         Set OCHA url from which to retrieve countries data
 
@@ -376,7 +376,7 @@ class Country:
     def get_country_info_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> dict[str, str] | None:
@@ -404,7 +404,7 @@ class Country:
     def get_country_name_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         formal: bool = False,
         downloader: BaseDownload | None = None,
@@ -441,7 +441,7 @@ class Country:
     def get_currency_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> int | None:
@@ -469,7 +469,7 @@ class Country:
     def get_iso2_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> str | None:
@@ -497,7 +497,7 @@ class Country:
     def get_iso3_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> str | None:
@@ -525,7 +525,7 @@ class Country:
     def get_country_info_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> dict[str, str] | None:
@@ -553,7 +553,7 @@ class Country:
     def get_country_name_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         formal: bool = False,
         downloader: BaseDownload | None = None,
@@ -583,7 +583,7 @@ class Country:
     def get_currency_from_iso2(
         cls,
         iso2: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> str | None:
@@ -611,7 +611,7 @@ class Country:
     def get_m49_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> int | None:
@@ -639,7 +639,7 @@ class Country:
     def get_iso3_from_m49(
         cls,
         m49: int,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> str | None:
@@ -667,7 +667,7 @@ class Country:
     def get_country_info_from_m49(
         cls,
         m49: int,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> dict[str, str] | None:
@@ -695,7 +695,7 @@ class Country:
     def get_country_name_from_m49(
         cls,
         m49: int,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         formal: bool = False,
         downloader: BaseDownload | None = None,
@@ -725,7 +725,7 @@ class Country:
     def get_currency_from_m49(
         cls,
         m49: int,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> str | None:
@@ -876,7 +876,7 @@ class Country:
     def get_iso3_country_code(
         cls,
         country: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> str | None:
@@ -912,13 +912,13 @@ class Country:
                 if iso3 is not None:
                     return iso3
         elif re.search(r"[\u4e00-\u9fff]+", countryupper):
-            for country in countriesdata["countries"]:
-                if countriesdata["countries"][country]["Chinese Short"] == countryupper:
-                    return country
+            for iso3 in countriesdata["countries"]:
+                if countriesdata["countries"][iso3]["Chinese Short"] == countryupper:
+                    return iso3
         elif re.search(r"[\u0600-\u06FF]+", countryupper):
-            for country in countriesdata["countries"]:
-                if countriesdata["countries"][country]["Arabic Short"] == countryupper:
-                    return country
+            for iso3 in countriesdata["countries"]:
+                if countriesdata["countries"][iso3]["Arabic Short"] == countryupper:
+                    return iso3
 
         if exception is not None:
             raise exception
@@ -928,7 +928,7 @@ class Country:
     def get_iso3_country_code_fuzzy(
         cls,
         country: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         min_chars: int = 5,
         downloader: BaseDownload | None = None,
@@ -1023,7 +1023,7 @@ class Country:
     def get_countries_in_region(
         cls,
         region: int | str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> list[str]:
@@ -1056,7 +1056,7 @@ class Country:
     def get_hrp_status_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> bool | None:
@@ -1082,7 +1082,7 @@ class Country:
     def get_gho_status_from_iso3(
         cls,
         iso3: str,
-        use_live: bool = None,
+        use_live: bool | None = None,
         exception: Exception | None = None,
         downloader: BaseDownload | None = None,
     ) -> bool | None:

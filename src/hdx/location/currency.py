@@ -4,6 +4,7 @@ import logging
 from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import ClassVar
 
 from hdx.utilities.dateparse import (
     now_utc,
@@ -34,11 +35,11 @@ class Currency:
     _secondary_historic_url = (
         "https://codeforiati.org/imf-exchangerates/imf_exchangerates.csv"
     )
-    _cached_current_rates = {}
-    _cached_historic_rates = {}
+    _cached_current_rates: ClassVar[dict] = {}
+    _cached_historic_rates: ClassVar[dict] = {}
     _rates_api = ""
-    _secondary_rates = {}
-    _secondary_historic_rates = {}
+    _secondary_rates: ClassVar[dict] = {}
+    _secondary_historic_rates: ClassVar[dict] = {}
     _fallback_to_current = False
     _no_historic = False
     _user_agent = "hdx-python-country-rates"
@@ -60,8 +61,8 @@ class Currency:
         no_historic: bool = False,
         fixed_now: datetime | None = None,
         log_level: int = logging.DEBUG,
-        current_rates_cache: dict = {"USD": 1},
-        historic_rates_cache: dict = {},
+        current_rates_cache: dict | None = None,
+        historic_rates_cache: dict | None = None,
         use_secondary_historic: bool = False,
     ) -> None:
         """
@@ -88,6 +89,10 @@ class Currency:
             None
         """
 
+        if historic_rates_cache is None:
+            historic_rates_cache = {}
+        if current_rates_cache is None:
+            current_rates_cache = {"USD": 1}
         cls._cached_current_rates = deepcopy(current_rates_cache)
         cls._cached_historic_rates = deepcopy(historic_rates_cache)
         cls._rates_api = primary_rates_url
@@ -194,14 +199,10 @@ class Currency:
             return None
 
         def beyond_threshold(x, y):
-            if max(x, y) / min(x, y) > cls._threshold:
-                return True
-            return False
+            return max(x, y) / min(x, y) > cls._threshold
 
         def within_threshold(x, y):
-            if max(x, y) / min(x, y) > cls._threshold:
-                return False
-            return True
+            return max(x, y) / min(x, y) <= cls._threshold
 
         # Compare adjclose to other variables returned by Yahoo API
         adjclose = adjclose[0]
@@ -232,29 +233,27 @@ class Currency:
             secondary_fx_rate = cls._get_secondary_historic_rate(currency, timestamp)
         if not secondary_fx_rate:
             # compare with high and low to reveal errors from Yahoo feed
-            if high and low:
-                if within_threshold(low, high):
-                    return low + (high - low) / 2
+            if high and low and within_threshold(low, high):
+                return low + (high - low) / 2
             return None
 
         # compare with secondary historic rate
         if within_threshold(adjclose, secondary_fx_rate):
             return adjclose
         # if adjclose is wacky, find another value to return that is ok
-        if high and low:
-            if within_threshold(high, secondary_fx_rate) and within_threshold(
-                low, secondary_fx_rate
-            ):
-                return low + (high - low) / 2
-        if open:
-            if within_threshold(open, secondary_fx_rate):
-                return open
-        if high:
-            if within_threshold(high, secondary_fx_rate):
-                return high
-        if low:
-            if within_threshold(low, secondary_fx_rate):
-                return low
+        if (
+            high
+            and low
+            and within_threshold(high, secondary_fx_rate)
+            and within_threshold(low, secondary_fx_rate)
+        ):
+            return low + (high - low) / 2
+        if open and within_threshold(open, secondary_fx_rate):
+            return open
+        if high and within_threshold(high, secondary_fx_rate):
+            return high
+        if low and within_threshold(low, secondary_fx_rate):
+            return low
         return secondary_fx_rate
 
     @classmethod
@@ -329,7 +328,7 @@ class Currency:
         raise CurrencyError(f"Failed to get rate for currency {currency}!")
 
     @classmethod
-    def get_current_value_in_usd(cls, value: int | float, currency: str) -> float:
+    def get_current_value_in_usd(cls, value: float, currency: str) -> float:
         """
         Get the current USD value of the value in local currency
 
@@ -347,9 +346,7 @@ class Currency:
         return value / fx_rate
 
     @classmethod
-    def get_current_value_in_currency(
-        cls, usdvalue: int | float, currency: str
-    ) -> float:
+    def get_current_value_in_currency(cls, usdvalue: float, currency: str) -> float:
         """
         Get the current value in local currency of the value in USD
 
@@ -389,7 +386,7 @@ class Currency:
             return fx_rate
         timestamp1 = None
         timestamp2 = None
-        for ts in currency_data.keys():
+        for ts in currency_data:
             if timestamp > ts:
                 timestamp1 = ts
             else:
@@ -491,7 +488,7 @@ class Currency:
     @classmethod
     def get_historic_value_in_usd(
         cls,
-        value: int | float,
+        value: float,
         currency: str,
         date: datetime,
         ignore_timeinfo: bool = True,
@@ -521,7 +518,7 @@ class Currency:
     @classmethod
     def get_historic_value_in_currency(
         cls,
-        usdvalue: int | float,
+        usdvalue: float,
         currency: str,
         date: datetime,
         ignore_timeinfo: bool = True,
