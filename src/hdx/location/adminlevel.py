@@ -72,7 +72,7 @@ class AdminLevel:
         self._countries_fuzzy_try = admin_config.get("countries_fuzzy_try")
         self._admin_name_mappings = admin_config.get("admin_name_mappings", {})
         self._admin_name_replacements = admin_config.get("admin_name_replacements", {})
-        self._admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", list())
+        self._admin_fuzzy_dont = admin_config.get("admin_fuzzy_dont", [])
         self._use_parent = False
         self._zeroes = {}
         self._parent_admins = []
@@ -100,9 +100,7 @@ class AdminLevel:
         Returns:
             Whether string looks like a p-code
         """
-        if cls.pcode_regex.match(string):
-            return True
-        return False
+        return bool(cls.pcode_regex.match(string))
 
     @classmethod
     def set_default_admin_url(cls, admin_url: str | None = None) -> None:
@@ -403,19 +401,22 @@ class AdminLevel:
                             admin_changes.append(str(admin_no))
                     else:
                         admin_changes.append(str(admin_no))
-            elif len_new_pcode > total_length:
-                if admin_length <= 2 and pcode_part[0] == "0":
-                    pcode_part = pcode_part[1:]
-                    if self._parent_admins and admin_no < self.admin_level:
-                        parent_pcode = [pcode_parts[i] for i in range(admin_no)]
-                        parent_pcode.append(pcode_part[:admin_length])
-                        parent_pcode = "".join(parent_pcode)
-                        if parent_pcode not in self._parent_admins[admin_no - 1]:
-                            pcode_part = f"0{pcode_part}"
-                        else:
-                            admin_changes.append(str(admin_no))
+            elif (
+                len_new_pcode > total_length
+                and admin_length <= 2
+                and pcode_part[0] == "0"
+            ):
+                pcode_part = pcode_part[1:]
+                if self._parent_admins and admin_no < self.admin_level:
+                    parent_pcode = [pcode_parts[i] for i in range(admin_no)]
+                    parent_pcode.append(pcode_part[:admin_length])
+                    parent_pcode = "".join(parent_pcode)
+                    if parent_pcode not in self._parent_admins[admin_no - 1]:
+                        pcode_part = f"0{pcode_part}"
                     else:
                         admin_changes.append(str(admin_no))
+                else:
+                    admin_changes.append(str(admin_no))
             pcode_parts[admin_no] = pcode_part[:admin_length]
             pcode_parts.append(pcode_part[admin_length:])
             new_pcode = "".join(pcode_parts)
@@ -506,11 +507,10 @@ class AdminLevel:
                     relevant_name_replacements[key] = value
                 continue
             prefix, name = key.split("|")
-            if parent:
-                if prefix == parent:
-                    if name not in relevant_name_replacements:
-                        relevant_name_replacements[name] = value
-                    continue
+            if parent and prefix == parent:
+                if name not in relevant_name_replacements:
+                    relevant_name_replacements[name] = value
+                continue
             if prefix == countryiso3:
                 if name not in relevant_name_replacements:
                     relevant_name_replacements[name] = value
@@ -537,10 +537,8 @@ class AdminLevel:
                     relevant_admin_fuzzy_dont.append(value)
                 continue
             prefix, name = value.split("|")
-            if parent:
-                if prefix == parent:
-                    if name not in relevant_admin_fuzzy_dont:
-                        relevant_admin_fuzzy_dont.append(name)
+            if parent and prefix == parent and name not in relevant_admin_fuzzy_dont:
+                relevant_admin_fuzzy_dont.append(name)
             if prefix == countryiso3:
                 if name not in relevant_admin_fuzzy_dont:
                     relevant_admin_fuzzy_dont.append(name)

@@ -3,7 +3,7 @@ import logging
 from collections.abc import Callable
 from datetime import date, datetime
 from os import getenv
-from typing import Any
+from typing import Any, ClassVar
 
 from data_bridges_client import (
     ApiClient,
@@ -60,7 +60,7 @@ class WFPAPI:
         retriever: Retrieve object for interacting with WFP API
     """
 
-    default_retry_params = {
+    default_retry_params: ClassVar[dict[str, Any]] = {
         "retry": retry_if_exception_type(ApiException),
         "after": after_log(logger, logging.INFO),
     }

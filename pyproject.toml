@@ -35,7 +35,7 @@ dynamic = ["version"]
 requires-python = ">=3.11"
 
 dependencies = [
-    "hdx-python-utilities>=4.2.5,<5",
+    "hdx-python-utilities>=4.2.6,<5",
     "tenacity",
 ]
 
@@ -48,7 +48,7 @@ dev = [
     "pytest",
     "pytest-cov",
     "pre-commit",
-    "ruff==0.14.13",
+    "ruff==0.17.3",
     "data-bridges-client>=9.0.0,<10",
 ]
 
