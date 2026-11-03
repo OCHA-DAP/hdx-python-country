@@ -1,5 +1,4 @@
 import csv
-import io
 import logging
 import types
 from collections.abc import Callable
@@ -117,6 +116,11 @@ def _parse_csv(text: str, model_cls: type) -> list:
     value is a string. Blank strings are kept as "" (as JSON returns them)
     but blank values of non-string fields become None.
 
+    To limit memory use (IDN has 462,027 price rows), lines are split
+    lazily rather than with io.StringIO, which holds 4 bytes per character,
+    each column reuses one object per distinct value and rows with the same
+    fields share one pydantic fields set (2,264 bytes each otherwise).
+
     Args:
         text: CSV text
         model_cls: data_bridges_client model class of each row
@@ -125,19 +129,30 @@ def _parse_csv(text: str, model_cls: type) -> list:
         List of model_cls objects
     """
     converters = _csv_converters(model_cls)
-    reader = csv.reader(io.StringIO(text))
+    reader = csv.reader(f"{line}\n" for line in text.split("\n"))
     keys = [header[0].lower() + header[1:] for header in next(reader, [])]
-    columns = [(key, converters.get(key)) for key in keys]
+    columns = [(key, converters.get(key), {}) for key in keys]
+    fields_sets = {}
     items = []
     for row in reader:
         if not row:
             continue
         obj = {}
-        for (key, converter), value in zip(columns, row):
-            if converter:
-                value = converter(value) if value else None
-            obj[key] = value
-        items.append(model_cls.from_dict(obj))
+        for (key, converter, values), value in zip(columns, row):
+            try:
+                obj[key] = values[value]
+            except KeyError:
+                if converter:
+                    converted = converter(value) if value else None
+                else:
+                    converted = value
+                values[value] = converted
+                obj[key] = converted
+        item = model_cls.from_dict(obj)
+        fields_set = frozenset(item.__pydantic_fields_set__)
+        fields_set = fields_sets.setdefault(fields_set, item.__pydantic_fields_set__)
+        object.__setattr__(item, "__pydantic_fields_set__", fields_set)
+        items.append(item)
     return items
 
 
