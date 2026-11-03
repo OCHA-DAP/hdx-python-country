@@ -11,7 +11,12 @@ from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
 from tenacity import RetryError
 
-from hdx.location.wfp_api import WFPAPI, _parse_csv
+from hdx.location.wfp_api import (
+    _PRICES_START_DATE,
+    WFPAPI,
+    _default_end_date,
+    _parse_csv,
+)
 
 
 class StubResponse:
@@ -20,6 +25,10 @@ class StubResponse:
         self.reason = "Stub"
         self.data = data
         self.headers = {}
+
+
+def ok(text):
+    return lambda **kwargs: StubResponse(200, text.encode("utf-8"))
 
 
 @pytest.fixture(scope="module")
@@ -86,14 +95,14 @@ class TestWFPAPI:
             calls = self.stub_prices(
                 wfp_api,
                 monkeypatch,
-                lambda **kwargs: StubResponse(200, prices_csv.encode("utf-8")),
+                ok(prices_csv),
             )
             prices = wfp_api.get_market_prices_monthly(countryiso3="BTN")
             assert len(prices) == 4
             assert calls == [
                 {
-                    "start_date": date(1990, 1, 1),
-                    "end_date": date(date.today().year + 5, 12, 31),
+                    "start_date": _PRICES_START_DATE,
+                    "end_date": _default_end_date(),
                     "format": "CSV",
                     "country_code": "BTN",
                 }
@@ -125,8 +134,8 @@ class TestWFPAPI:
     def test_get_market_prices_monthly_split(self, prices_csv, monkeypatch):
         header, *rows = prices_csv.splitlines()
         row_dates = [
-            datetime.strptime(row.split('","')[9], "%m/%d/%Y %I:%M:%S %p").date()
-            for row in rows
+            x.commodity_price_date.date()
+            for x in _parse_csv(prices_csv, ViewExtendedMonthlyAggregatedPrice)
         ]
 
         def response(start_date, end_date, **kwargs):
@@ -152,8 +161,8 @@ class TestWFPAPI:
                 if (x["end_date"] - x["start_date"]).days <= 2000
             ]
             assert len(ranges) > 1
-            assert ranges[0][0] == date(1990, 1, 1)
-            assert ranges[-1][1] == date(date.today().year + 5, 12, 31)
+            assert ranges[0][0] == _PRICES_START_DATE
+            assert ranges[-1][1] == _default_end_date()
             for (_, end), (start, _) in pairwise(ranges):
                 assert start == end + timedelta(days=1)
 
@@ -163,7 +172,7 @@ class TestWFPAPI:
             self.stub_prices(
                 wfp_api,
                 monkeypatch,
-                lambda **kwargs: StubResponse(200, prices_csv.encode("utf-8")),
+                ok(prices_csv),
             )
             prices = wfp_api.get_market_prices_monthly(countryiso3="BTN")
             wfp_api = self.get_wfp_api(tempdir, use_saved=True)
@@ -181,7 +190,7 @@ class TestWFPAPI:
                 wfp_api.currency_api,
                 "currency_usd_indirect_quotation_get",
                 monkeypatch,
-                lambda **kwargs: StubResponse(200, quotations_csv.encode("utf-8")),
+                ok(quotations_csv),
             )
             quotations = wfp_api.get_currency_usd_indirect_quotations("SYP")
             assert calls == [{"currency_name": "SYP", "format": "CSV"}]

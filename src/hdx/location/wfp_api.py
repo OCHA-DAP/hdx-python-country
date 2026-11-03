@@ -41,6 +41,19 @@ _CSV_DATE_FORMAT = "%m/%d/%Y %I:%M:%S %p"
 _PRICES_START_DATE = date(1990, 1, 1)
 
 
+def _default_end_date() -> date:
+    # WFP has forecast prices a year or more ahead
+    return date(date.today().year + 5, 12, 31)
+
+
+def _to_date(value: date | None, default: date) -> date:
+    if value is None:
+        return default
+    if isinstance(value, datetime):
+        return value.date()
+    return value
+
+
 def _csv_datetime(value: str) -> datetime:
     return datetime.strptime(value, _CSV_DATE_FORMAT)
 
@@ -112,12 +125,15 @@ def _parse_csv(text: str, model_cls: type) -> list:
         List of model_cls objects
     """
     converters = _csv_converters(model_cls)
+    reader = csv.reader(io.StringIO(text))
+    keys = [header[0].lower() + header[1:] for header in next(reader, [])]
+    columns = [(key, converters.get(key)) for key in keys]
     items = []
-    for row in csv.DictReader(io.StringIO(text)):
+    for row in reader:
+        if not row:
+            continue
         obj = {}
-        for header, value in row.items():
-            key = header[0].lower() + header[1:]
-            converter = converters.get(key)
+        for (key, converter), value in zip(columns, row):
             if converter:
                 value = converter(value) if value else None
             obj[key] = value
@@ -253,13 +269,15 @@ class WFPAPI:
 
     def _get_all(
         self,
-        csv_method: Callable,
+        api_method: Callable,
         model_cls: type,
         base_filename: str,
         countryiso3: str | None,
         country_param: str,
         extra_params: dict,
+        get_csv: Callable | None = None,
     ) -> list:
+        csv_method = partial(get_csv or self._get_csv, api_method)
         all_items = []
         for country in self._countryiso3s(countryiso3):
             kwargs = dict(extra_params)
@@ -294,10 +312,7 @@ class WFPAPI:
             base_filename = "Currency_List"
             extra_params = {}
         return self._get_all(
-            partial(
-                self._get_csv,
-                self.currency_api.currency_list_get_without_preload_content,
-            ),
+            self.currency_api.currency_list_get_without_preload_content,
             CurrencyDTO,
             base_filename,
             countryiso3,
@@ -318,10 +333,7 @@ class WFPAPI:
             List of USD indirect quotations from the WFP API
         """
         return self._get_all(
-            partial(
-                self._get_csv,
-                self.currency_api.currency_usd_indirect_quotation_get_without_preload_content,
-            ),
+            self.currency_api.currency_usd_indirect_quotation_get_without_preload_content,
             UsdIndirectQuotation,
             f"Currency_UsdIndirectQuotation_{currency.upper()}",
             countryiso3,
@@ -341,9 +353,7 @@ class WFPAPI:
             List of markets from the WFP API
         """
         return self._get_all(
-            partial(
-                self._get_csv, self.markets_api.markets_list_get_without_preload_content
-            ),
+            self.markets_api.markets_list_get_without_preload_content,
             MarketDTO,
             "Markets_List",
             countryiso3,
@@ -362,10 +372,7 @@ class WFPAPI:
             List of commodities from the WFP API
         """
         return self._get_all(
-            partial(
-                self._get_csv,
-                self.commodities_api.commodities_list_get_without_preload_content,
-            ),
+            self.commodities_api.commodities_list_get_without_preload_content,
             CommodityDTO,
             "Commodities_List",
             countryiso3,
@@ -385,10 +392,7 @@ class WFPAPI:
             List of commodity categories from the WFP API
         """
         return self._get_all(
-            partial(
-                self._get_csv,
-                self.commodities_api.commodities_categories_list_get_without_preload_content,
-            ),
+            self.commodities_api.commodities_categories_list_get_without_preload_content,
             CommodityDTO,
             "Commodities_Categories_List",
             countryiso3,
@@ -397,27 +401,27 @@ class WFPAPI:
         )
 
     def _get_prices_csv_range(
-        self, start_date: date, end_date: date, **kwargs: Any
-    ) -> str:
+        self, api_method: Callable, start_date: date, end_date: date, **kwargs: Any
+    ) -> list[str]:
         """Get monthly aggregated market prices between two dates (inclusive)
         as CSV. If the API gateway times out (504), the date range is split in
         two and each half is requested.
 
         Args:
+            api_method: Bound market_prices_price_monthly_get_without_preload_content
             start_date: Start date
             end_date: End date
-            **kwargs: Parameters to pass to market_prices_price_monthly_get
+            **kwargs: Parameters to pass to api_method
 
         Returns:
-            CSV text
+            List of CSV texts, one per date range, in date order
         """
         try:
-            return self._get_csv(
-                self.market_prices_api.market_prices_price_monthly_get_without_preload_content,
-                start_date=start_date,
-                end_date=end_date,
-                **kwargs,
-            )
+            return [
+                self._get_csv(
+                    api_method, start_date=start_date, end_date=end_date, **kwargs
+                )
+            ]
         except ServiceException as err:
             if err.status != 504 or start_date >= end_date:
                 raise
@@ -425,31 +429,31 @@ class WFPAPI:
         logger.info(
             f"Timeout getting prices from {start_date} to {end_date}, splitting at {middle}"
         )
-        first = self._get_prices_csv_range(start_date, middle, **kwargs)
-        second = self._get_prices_csv_range(
-            middle + timedelta(days=1), end_date, **kwargs
+        return self._get_prices_csv_range(
+            api_method, start_date, middle, **kwargs
+        ) + self._get_prices_csv_range(
+            api_method, middle + timedelta(days=1), end_date, **kwargs
         )
-        if not first.endswith("\n"):
-            first += "\r\n"
-        # drop the second half's header row
-        return first + second.partition("\n")[2]
 
     def _get_prices_csv(
         self,
+        api_method: Callable,
         start_date: date | None = None,
         end_date: date | None = None,
         **kwargs: Any,
     ) -> str:
-        if start_date is None:
-            start_date = _PRICES_START_DATE
-        elif isinstance(start_date, datetime):
-            start_date = start_date.date()
-        if end_date is None:
-            # WFP has forecast prices a year or more ahead
-            end_date = date(date.today().year + 5, 12, 31)
-        elif isinstance(end_date, datetime):
-            end_date = end_date.date()
-        return self._get_prices_csv_range(start_date, end_date, **kwargs)
+        first, *rest = self._get_prices_csv_range(
+            api_method,
+            _to_date(start_date, _PRICES_START_DATE),
+            _to_date(end_date, _default_end_date()),
+            **kwargs,
+        )
+        if not rest:
+            return first
+        # keep only the first range's header row
+        parts = [first.rstrip("\r\n")]
+        parts.extend(text.partition("\n")[2].rstrip("\r\n") for text in rest)
+        return "\r\n".join(part for part in parts if part) + "\r\n"
 
     def get_market_prices_monthly(
         self, countryiso3: str | None = None, **kwargs: Any
@@ -467,10 +471,11 @@ class WFPAPI:
             List of monthly aggregated market prices from the WFP API
         """
         return self._get_all(
-            self._get_prices_csv,
+            self.market_prices_api.market_prices_price_monthly_get_without_preload_content,
             ViewExtendedMonthlyAggregatedPrice,
             "MarketPrices_PriceMonthly",
             countryiso3,
             "country_code",
             kwargs,
+            self._get_prices_csv,
         )
