@@ -552,8 +552,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "data-bridges-client", marker = "extra == 'wfp'", specifier = ">=9.0.0,<10", index = "https://d2i4vvypvg40rv.cloudfront.net/pypi/" },
-    { name = "hdx-python-utilities", specifier = ">=4.2.6,<5" },
+    { name = "data-bridges-client", marker = "extra == 'wfp'", specifier = ">=9.0.3,<10", index = "https://d2i4vvypvg40rv.cloudfront.net/pypi/" },
+    { name = "hdx-python-utilities", specifier = ">=4.2.7,<5" },
     { name = "mkapi", marker = "extra == 'docs'" },
     { name = "tenacity" },
 ]
@@ -561,7 +561,7 @@ provides-extras = ["docs", "wfp"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "data-bridges-client", specifier = ">=9.0.0,<10", index = "https://d2i4vvypvg40rv.cloudfront.net/pypi/" },
+    { name = "data-bridges-client", specifier = ">=9.0.3,<10", index = "https://d2i4vvypvg40rv.cloudfront.net/pypi/" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },

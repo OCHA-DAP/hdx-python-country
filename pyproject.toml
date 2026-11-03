@@ -35,13 +35,13 @@ dynamic = ["version"]
 requires-python = ">=3.11"
 
 dependencies = [
-    "hdx-python-utilities>=4.2.6,<5",
+    "hdx-python-utilities>=4.2.7,<5",
     "tenacity",
 ]
 
 [project.optional-dependencies]
 docs = ["mkapi"]
-wfp = ["data-bridges-client>=9.0.0,<10"]
+wfp = ["data-bridges-client>=9.0.3,<10"]
 
 [dependency-groups]
 dev = [
@@ -49,7 +49,7 @@ dev = [
     "pytest-cov",
     "pre-commit",
     "ruff==0.17.3",
-    "data-bridges-client>=9.0.0,<10",
+    "data-bridges-client>=9.0.3,<10",
 ]
 
 [project.urls]
