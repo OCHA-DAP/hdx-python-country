@@ -1,0 +1,4 @@
+"Id","Name","Adm0Code","CountryISO3","IsOfficial","Frequency","Value","Date"
+"78","SYP","238","SYR","True","Daily","122.00","11/2/2026 12:00:00 AM"
+"78","SYP","238","SYR","False","Monthly","11773.000000","12/15/2026 12:00:00 AM"
+"78","SYP","238","SYR","False","Weekly","137.560000","9/21/2026 12:00:00 AM"
