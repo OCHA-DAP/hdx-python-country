@@ -1,0 +1,5 @@
+"CommodityId","MarketId","PriceTypeId","CommodityUnitId","CurrencyId","Adm0Code","CommodityDateWeek","CommodityDateMonth","CommodityDateYear","CommodityPriceDate","CommodityName","MarketName","PriceTypeName","CommodityUnitName","CurrencyName","CountryIso3","CountryName","CommodityPriceSourceName","OriginalFrequency","CommodityPrice","CommodityPriceObservations","CommodityPriceFlag"
+"58","1036","15","5","76","31","","3","2006","3/15/2006 12:00:00 AM","Wheat flour","National Average","Retail","KG","BTN","BTN","Bhutan","National Statistics Bureau","Monthly","12.550000","1","actual"
+"58","1036","15","5","76","31","","3","2007","3/15/2007 12:00:00 AM","Wheat flour","National Average","Retail","KG","BTN","BTN","Bhutan","National Statistics Bureau","Monthly","14.100000","1","actual"
+"58","2609","15","5","76","31","","1","2021","1/15/2021 12:00:00 AM","Wheat flour","Thimphu","Retail","KG","BTN","BTN","Bhutan","","monthly","69.844700","","forecast"
+"58","1036","15","5","76","31","","12","2006","12/15/2006 12:00:00 AM","Wheat flour","National Average","Retail","KG","BTN","BTN","Bhutan","National Statistics Bureau","Monthly","13.690000","1","actual"
