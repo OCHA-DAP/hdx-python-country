@@ -114,12 +114,9 @@ def _parse_csv(text: str, model_cls: type) -> list:
     """Parse WFP's CSV output into data_bridges_client model objects. CSV
     headers are the JSON keys with the first letter capitalised and every
     value is a string. Blank strings are kept as "" (as JSON returns them)
-    but blank values of non-string fields become None.
-
-    To limit memory use (IDN has 462,027 price rows), lines are split
-    lazily rather than with io.StringIO, which holds 4 bytes per character,
-    each column reuses one object per distinct value and rows with the same
-    fields share one pydantic fields set (2,264 bytes each otherwise).
+    but blank values of non-string fields become None. Values and pydantic
+    fields sets are shared between rows to limit memory use (see
+    docs/decisions/0003).
 
     Args:
         text: CSV text
@@ -158,12 +155,10 @@ def _parse_csv(text: str, model_cls: type) -> list:
 
 class WFPAPI:
     """Light wrapper around WFP's data-bridges-client library. All data is
-    requested as CSV, which returns every row in one response, rather than
-    JSON, whose paging returns some rows twice and leaves others out. It
-    needs a retriever used only to decide whether to load from disk or hit
-    the network and whether to persist the network result (as the CSV
-    returned by WFP). Token refreshing is delegated to data_bridges_client's
-    own WfpApiToken.
+    requested as CSV (see docs/decisions/0001). It needs a retriever used
+    only to decide whether to load from disk or hit the network and whether
+    to persist the network result (as the CSV returned by WFP). Token
+    refreshing is delegated to data_bridges_client's own WfpApiToken.
 
     Args:
         retriever: Retrieve object for interacting with WFP API
@@ -278,7 +273,7 @@ class WFPAPI:
 
     @staticmethod
     def _countryiso3s(countryiso3: str | None) -> list:
-        if countryiso3 == "PSE":  # hack as PSE is treated by WFP as 2 areas
+        if countryiso3 == "PSE":  # see docs/decisions/0004
             return ["PSW", "PSG"]
         return [countryiso3]
 
@@ -420,7 +415,7 @@ class WFPAPI:
     ) -> list[str]:
         """Get monthly aggregated market prices between two dates (inclusive)
         as CSV. If the API gateway times out (504), the date range is split in
-        two and each half is requested.
+        two and each half is requested (see docs/decisions/0002).
 
         Args:
             api_method: Bound market_prices_price_monthly_get_without_preload_content

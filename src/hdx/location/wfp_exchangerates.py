@@ -59,9 +59,7 @@ class WFPExchangeRates:
                 continue
             date = quote.var_date
             if date.tzinfo is None:
-                # data_bridges_client parses WFP's timezone-less date strings
-                # into naive datetimes; assume UTC to match previous
-                # parse_date-based behaviour
+                # See docs/decisions/0005
                 date = date.replace(tzinfo=UTC)
             timestamp = get_int_timestamp(date)
             historic_rates[timestamp] = quote.value
